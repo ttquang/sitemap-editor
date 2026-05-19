@@ -167,7 +167,7 @@
   }
   .rp-title-pos button svg { width: 0.875rem; height: 0.875rem; display: block; }
 
-    /* ---- Inspector Area/Dissolve buttons ---- */
+    /* ---- Inspector Area selection button ---- */
   .rp-area-btn {
     appearance: none; border: 1px solid var(--border); background: var(--bg);
     display: inline-flex; align-items: center; gap: 0.4375rem;
@@ -188,12 +188,10 @@
     border-radius: 0.25rem;
     background: rgba(0,0,0,0.04);
   }
-  #rp-area-dissolve { color: var(--warn); }
-  #rp-area-dissolve svg { color: var(--warn); }
   #rp-area-selection { color: var(--accent); }
   #rp-area-selection svg { color: var(--accent); }
 
-    /* ---- Right-click context menu (Area / Dissolve) ---- */
+    /* ---- Right-click context menu ---- */
   .ctx-menu {
     position: fixed;
     z-index: 1000;

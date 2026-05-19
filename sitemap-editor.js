@@ -2138,40 +2138,6 @@
   }
   window.__graphAreaSelection = areaSelection;
 
-  // ----- Dissolve: removes the currently selected area(s). The area's
-  // SVG rect + label + resize handles are removed. Pages inside the bbox
-  // are not affected.
-  function dissolveSelected() {
-    var targets = [];
-    if (selected && selected.kind === 'area' && selected.ref) {
-      targets.push(selected.ref);
-    } else if (multiSel && multiSel.length > 0) {
-      multiSel.forEach(function (it) { if (isArea(it)) targets.push(it); });
-    }
-    if (targets.length === 0) return 0;
-
-    targets.forEach(function (g) {
-      // Sweep every SVG element tagged with this area's id — that covers
-      // rect.gzone, text.gzone-label, plus any resize/move handles that
-      // were attached via createHandles().
-      var sel = '[data-area-id="' + g.id + '"]';
-      Array.prototype.forEach.call(document.querySelectorAll(sel), function (el) {
-        if (el.parentNode) el.parentNode.removeChild(el);
-      });
-      // Defensive: drop direct refs we know about
-      if (g.rectEl && g.rectEl.parentNode) g.rectEl.parentNode.removeChild(g.rectEl);
-      if (g.labelEl && g.labelEl.parentNode) g.labelEl.parentNode.removeChild(g.labelEl);
-
-      // Drop from the model
-      var idx = areas.indexOf(g);
-      if (idx >= 0) areas.splice(idx, 1);
-    });
-
-    clearSelection();
-    return targets.length;
-  }
-  window.__graphDissolveSelected = dissolveSelected;
-
   function createArea(name, colorKey, parent) {
     var x, y, w, h;
     if (parent && typeof parent === 'object' && 'x' in parent && 'w' in parent) {
@@ -3106,13 +3072,6 @@
       var v = this.value || '';
       selected.ref.slug = v;
       if (selected.ref.rectEl) selected.ref.rectEl.setAttribute('data-slug', v);
-    });
-    var del = document.getElementById('rp-area-delete');
-    if (del) del.addEventListener('click', function () {
-      if (selected.kind === 'area') {
-        deleteArea(selected.ref);
-        clearSelection();
-      }
     });
   })();
 

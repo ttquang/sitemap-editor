@@ -1,11 +1,11 @@
 // Page-level wiring previously inline in sitemap-editor.html.
 // Loads AFTER sitemap-editor.js so it can reference the editor's
-// window.__graph* hooks (Area selection, Dissolve, Group/Ungroup, Lock).
+// window.__graph* hooks (Area selection, Group/Ungroup, Lock).
 //
 // Responsibilities:
-//   1. Right-click context menu (Area / Dissolve / Group / Ungroup / Lock)
-//   2. Inspector "Area selection" and "Dissolve" buttons (duplicate entry
-//      points alongside the context menu)
+//   1. Right-click context menu (Area / Group / Ungroup / Lock)
+//   2. Inspector "Area selection" button (duplicate entry point alongside
+//      the context menu)
 //   3. Listener equivalents of the inline onclick handlers that used to
 //      sit on:
 //        - the +Page toolbar button (calls quickAddPage)
@@ -20,7 +20,7 @@
 // removals.
 
 (function () {
-  // ----- Right-click context menu (Area / Dissolve / Group / Ungroup / Lock)
+  // ----- Right-click context menu (Area / Group / Ungroup / Lock)
   function setupContextMenu() {
     var menu = document.getElementById('ctxMenu');
     var canvas = document.querySelector('.canvas-wrap');
@@ -37,12 +37,10 @@
     function show(x, y) {
       var sel = currentSelection();
       var areaBtn     = menu.querySelector('[data-action="area"]');
-      var dissolveBtn = menu.querySelector('[data-action="dissolve"]');
       var groupBtn    = menu.querySelector('[data-action="group"]');
       var ungroupBtn  = menu.querySelector('[data-action="ungroup"]');
       var lockBtn     = menu.querySelector('.ctx-lock');
       if (areaBtn)     areaBtn.disabled     = (sel.pages + sel.areas) < 1;
-      if (dissolveBtn) dissolveBtn.disabled = sel.areas < 1;
       // Group needs ≥ 2 selected items (any mix of pages/areas).
       if (groupBtn)    groupBtn.disabled    = (sel.pages + sel.areas) < 2;
       // Ungroup needs the selection to touch at least one existing group.
@@ -121,8 +119,6 @@
       var action = btn.getAttribute('data-action');
       if (action === 'area' && typeof window.__graphAreaSelection === 'function') {
         window.__graphAreaSelection();
-      } else if (action === 'dissolve' && typeof window.__graphDissolveSelected === 'function') {
-        window.__graphDissolveSelected();
       } else if (action === 'group' && typeof window.__graphGroupSelected === 'function') {
         window.__graphGroupSelected();
       } else if (action === 'ungroup' && typeof window.__graphUngroupSelected === 'function') {
@@ -135,15 +131,6 @@
       hide();
     });
 
-    // Cmd/Ctrl+Shift+G → dissolve current area (parallels Cmd+G to group).
-    document.addEventListener('keydown', function (ev) {
-      if ((ev.metaKey || ev.ctrlKey) && ev.shiftKey && (ev.key === 'g' || ev.key === 'G')) {
-        if (typeof window.__graphDissolveSelected === 'function') {
-          window.__graphDissolveSelected();
-          ev.preventDefault();
-        }
-      }
-    });
   }
   setupContextMenu();
 
@@ -151,10 +138,6 @@
   var btnAreaSel = document.getElementById('rp-area-selection');
   if (btnAreaSel) btnAreaSel.addEventListener('click', function () {
     if (typeof window.__graphAreaSelection === 'function') window.__graphAreaSelection();
-  });
-  var btnDissolve = document.getElementById('rp-area-dissolve');
-  if (btnDissolve) btnDissolve.addEventListener('click', function () {
-    if (typeof window.__graphDissolveSelected === 'function') window.__graphDissolveSelected();
   });
 
   // ----- Replacements for the inline onclick="" handlers.
