@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PW Studio — Sitemap Editor (blank)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="sitemap-editor.css">
+
+<!-- Topbar / sidenav overrides — bring this page's chrome in
+     line with project-dashboard.html. sitemap-editor.css owns
+     the broader page styling; these rules just align the brand,
+     role tag, avatar, and add a canvas-toolbar overlay. -->
+<link rel="stylesheet" href="sitemap-editor.inline.css">
+</head>
+<body data-preserve-edge-labels="true">
+
+<!-- ============================================================
+     TOPBAR · aligned with project-dashboard.html
+     ============================================================ -->
+<header class="topbar">
+  <div class="brand">
+    <span class="mono">P<span class="accent">W</span></span>
+    <span class="tag">STUDIO</span>
+  </div>
+  <nav class="crumb">
+    <span class="current">Blank sitemap · editor</span>
+    <span class="role-tag">owner</span>
+  </nav>
+  <div class="tb-actions">
+    <button class="btn ghost icon-only" title="Notifications" aria-label="Notifications">
+      <svg class="ico-15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+    </button>
+    <span class="avatar" title="ITG R&amp;D">IR</span>
+  </div>
+</header>
+
+<!-- ============================================================
+     BODY AREA
+     ============================================================ -->
+<div class="body-area">
+
+  <!-- ============================================================
+       SIDENAV · aligned with project-dashboard.html · Sitemap active
+       ============================================================ -->
+  <aside class="sidenav"></aside>
+
+
+  <main>
+    <div class="graph-page u-graph-page-onerow">
+
+      <!-- ============================================================
+           GRAPH AREA · canvas + right rail
+           ============================================================ -->
+      <div class="graph-area">
+
+        <div class="canvas-wrap">
+
+          <!-- Edit-mode hint banner -->
+          <div class="edit-hint" id="editHint">
+            <b>Edit mode</b> · drag pages to move · drag the <span class="u-help-accent">●</span> handle to connect · <kbd>V</kbd>/<kbd>H</kbd> swap pointer · <kbd>P</kbd> add page · <kbd>G</kbd> add area · <kbd>esc</kbd> clears
+          </div>
+
+          <!-- =========================================================
+               v3 unified bottom-center toolbar.
+               IDs preserved for existing JS wiring:
+                 #tool-cursor / #tool-hand → pointer-mode toggle
+                 #zc-in / #zc-out / #zc-fit → zoom controls
+                 #newAreaBtn → +Area button
+                 #bottomToolbar → container (toggles .mode-edit / .mode-ai etc)
+               New data-* hooks:
+                 data-mode="view|edit|ai" → app-mode segmented buttons
+                 data-tool="cursor|hand"  → pointer-mode segmented buttons
+               ========================================================= -->
+          <div class="bottom-toolbar mode-view" id="bottomToolbar" data-app-mode="view" role="toolbar" aria-label="Canvas toolbar">
+
+            <!-- App-mode segmented toggle (View / Edit / AI) -->
+            <div class="seg seg-app" role="group" aria-label="App mode">
+              <span class="seg-pill" aria-hidden="true"></span>
+              <button class="active mode-view" data-mode="view" type="button" title="View (1) — read only">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                View
+              </button>
+              <button data-mode="edit" type="button" title="Edit (2) — add / move / connect">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                Edit
+              </button>
+              <button data-mode="ai" type="button" title="AI (3 or ⌘K) — open chat">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3L13.5 8.5L19 10L13.5 11.5L12 17L10.5 11.5L5 10L10.5 8.5L12 3Z"/><path d="M18 16L19 18L21 19L19 20L18 22L17 20L15 19L17 18L18 16Z"/></svg>
+                AI
+              </button>
+            </div>
+            <div class="tb-sep" aria-hidden="true"></div>
+
+            <!-- Pointer-mode segmented toggle (Move / Hand) — always visible -->
+            <div class="seg seg-pointer" role="group" aria-label="Pointer tool">
+              <span class="seg-pill" aria-hidden="true"></span>
+              <button id="tool-cursor" data-tool="cursor" type="button" title="Move (V) — drag empty canvas to marquee-select">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/><path d="M13 13l6 6"/></svg>
+              </button>
+              <button id="tool-hand" class="active" data-tool="hand" type="button" title="Hand (H) — drag empty canvas to pan">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg>
+              </button>
+            </div>
+            <div class="tb-sep" aria-hidden="true" data-needs-edit hidden></div>
+
+            <!-- Element palette — only present in Edit mode.
+                 Wrapping span carries `hidden` so the buttons disappear from the
+                 toolbar in View/AI mode (a CSS `display: inline-flex` rule on
+                 .bottom-toolbar button would otherwise outrank [hidden]). The
+                 buttons themselves keep data-needs-edit + aria-disabled so the
+                 inline onclick guard and P/G shortcuts stay defensive. -->
+            <span data-needs-edit hidden>
+              <button class="add-page" aria-disabled="true" data-needs-edit type="button" title="Add Page (P)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                Page
+              </button>
+              <button id="newAreaBtn" class="add-area" aria-disabled="true" data-needs-edit type="button" title="Add Area (G)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/></svg>
+                Area
+              </button>
+            </span>
+            <div class="tb-sep" aria-hidden="true" data-needs-edit hidden></div>
+
+            <!-- Always-on utilities: Import / Export + Zoom -->
+            <button id="btnImportSVG" class="icon-only" type="button" title="Import SVG (load a saved sitemap)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            </button>
+            <button id="btnExportSVG" class="icon-only" type="button" title="Export SVG (download the current sitemap)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            </button>
+            <input type="file" id="importFile" accept=".svg,image/svg+xml" hidden>
+            <button id="zc-out" class="icon-only" type="button" title="Zoom out (⌘−)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+            <button id="zc-in" class="icon-only" type="button" title="Zoom in (⌘+)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+            <button id="zc-fit" class="icon-only" type="button" title="Fit (⇧1)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+            </button>
+          </div>
+
+          <!-- AI Chat panel — floats just above the toolbar in AI mode -->
+          <div class="ai-chat-above" id="aiChatPanel" role="dialog" aria-label="Ask AI" hidden>
+            <div class="chat-head">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3L13.5 8.5L19 10L13.5 11.5L12 17L10.5 11.5L5 10L10.5 8.5L12 3Z"/></svg>
+              Ask AI
+              <span class="meta">⌘K to focus · esc to close</span>
+            </div>
+            <div class="chat-thread" id="aiChatThread">
+              <div class="chat-msg from-ai">Hi! I can help you reshape this sitemap. Try asking <i>"add a Forgot Password page under Login"</i> or <i>"explain the connectors between Pages and Test Cases"</i>.</div>
+            </div>
+            <div class="chat-input">
+              <input id="aiChatInput" placeholder="Ask anything about this sitemap…" autocomplete="off" />
+              <span class="kbd">↵</span>
+              <button id="aiChatSend" type="button">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                Send
+              </button>
+            </div>
+          </div>
+
+          <!-- =====================================================
+               SVG GRAPH · PW Studio self-test
+               viewBox 1360×1110. Three vertical tracks descend from
+               the project shell — PAGES, TEST CASES, TEST SUITES —
+               each with its entity list, detail wrapper, tab routes,
+               and sub-detail branches. Sitemap node (row 3, current
+               page) is highlighted with the accent stroke + fill.
+               Markers: arr-gray (default), arr-page, arr-accent
+               (sidenav links), arr-fragile, arr-fail, arr-ok, arr-sug
+               (lighter dashed for suggested / cross-track edges).
+               ===================================================== -->
+          <svg class="graph" viewBox="0 0 1600 1100" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker id="arr-gray" markerWidth="7" markerHeight="7" refX="6.5" refY="3.5" orient="auto">
+                <polygon points="0 0, 7 3.5, 0 7" fill="#4A5A6E"/>
+              </marker>
+              <marker id="arr-page" markerWidth="7" markerHeight="7" refX="6.5" refY="3.5" orient="auto">
+                <polygon points="0 0, 7 3.5, 0 7" fill="#0C6C68"/>
+              </marker>
+              <marker id="arr-accent" markerWidth="7" markerHeight="7" refX="6.5" refY="3.5" orient="auto">
+                <polygon points="0 0, 7 3.5, 0 7" fill="#1766DC"/>
+              </marker>
+              <marker id="arr-fragile" markerWidth="7" markerHeight="7" refX="6.5" refY="3.5" orient="auto">
+                <polygon points="0 0, 7 3.5, 0 7" fill="#C9820E"/>
+              </marker>
+              <marker id="arr-fail" markerWidth="7" markerHeight="7" refX="6.5" refY="3.5" orient="auto">
+                <polygon points="0 0, 7 3.5, 0 7" fill="#D83B3B"/>
+              </marker>
+              <marker id="arr-ok" markerWidth="7" markerHeight="7" refX="6.5" refY="3.5" orient="auto">
+                <polygon points="0 0, 7 3.5, 0 7" fill="#0E8A5F"/>
+              </marker>
+              <marker id="arr-sug" markerWidth="6" markerHeight="6" refX="5.5" refY="3" orient="auto">
+                <polygon points="0 0, 6 3, 0 6" fill="#97A3B2"/>
+              </marker>
+            </defs>
+
+            <!-- Blank canvas — author areas, pages, and edges with the editor.
+                 The defs above register the same arrow markers the editor uses
+                 (arr-gray, arr-page, arr-accent, arr-fragile, arr-fail, arr-ok,
+                 arr-sug), so any edges you create will pick the right marker. -->
+
+          </svg>
+
+        </div>
+
+        <!-- ============================================================
+             RIGHT PANEL · inspector — visible only in edit mode
+             ============================================================ -->
+        <aside class="right-panel" id="rightPanel">
+          <div class="rp-head">
+            <span class="rp-title">Inspector</span>
+            <span class="rp-meta">edit mode</span>
+          </div>
+          <div class="rp-body">
+
+            <div class="rp-empty" id="rp-empty">
+              <div class="rp-empty-title">Nothing selected</div>
+              <div class="rp-empty-text">Click a page or area to edit. Drag to move. Drag the dot on a page to connect.</div>
+            </div>
+
+            <div class="rp-section" id="rp-page" hidden>
+              <div class="rp-h">
+                <span class="rp-eyebrow">Page</span>
+                <span class="rp-h-name" id="rp-page-title">—</span>
+              </div>
+              <div class="rp-field">
+                <label for="rp-page-name">Name</label>
+                <input type="text" id="rp-page-name" autocomplete="off">
+              </div>
+              <div class="rp-field">
+                <label for="rp-page-slug">Slug</label>
+                <input type="text" id="rp-page-slug" autocomplete="off" spellcheck="false">
+              </div>
+              <div class="rp-field">
+                <label>Color</label>
+                <div class="rp-swatches" id="rp-page-swatches"></div>
+              </div>
+              <div class="rp-field">
+                <label>Border</label>
+                <div class="rp-borders" id="rp-page-borders"></div>
+              </div>
+              <div class="rp-field">
+                <label>Lock</label>
+                <button type="button" class="rp-lock-toggle" id="rp-page-lock">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="4" y="11" width="16" height="10" rx="2"/>
+                    <path d="M8 11V7a4 4 0 0 1 8 0v4"/>
+                  </svg>
+                  <span id="rp-page-lock-label">Unlocked</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="rp-section" id="rp-line" hidden>
+              <div class="rp-h">
+                <span class="rp-eyebrow u-eyebrow-accent">Line</span>
+                <span class="rp-h-name" id="rp-line-title">Connection</span>
+              </div>
+              <div class="rp-field">
+                <label for="rp-line-text">Text</label>
+                <input type="text" id="rp-line-text" autocomplete="off" placeholder="e.g. 12 cases, fragile…">
+              </div>
+              <div class="rp-field">
+                <label>Color</label>
+                <div class="rp-swatches" id="rp-line-swatches"></div>
+              </div>
+              <div class="rp-field">
+                <label>Style</label>
+                <div class="rp-borders" id="rp-line-styles"></div>
+              </div>
+              <div class="rp-field">
+                <label>Width</label>
+                <div class="rp-widths" id="rp-line-widths"></div>
+              </div>
+              <div class="rp-field">
+                <button type="button" class="rp-delete" id="rp-line-delete">Delete connection</button>
+              </div>
+            </div>
+
+            <div class="rp-section" id="rp-align" hidden>
+              <div class="rp-h">
+                <span class="rp-eyebrow u-eyebrow-accent">Align</span>
+                <span class="rp-h-name" id="rp-align-count">— selected</span>
+              </div>
+              <div class="rp-field">
+                <label>Horizontal</label>
+                <div class="rp-aligns">
+                  <button type="button" class="rp-align-btn" data-align="left" title="Align left">
+                    <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="1" x2="2" y2="11"/><rect x="3" y="2.5" width="7" height="2.5" fill="currentColor" stroke="none"/><rect x="3" y="6.5" width="5" height="2.5" fill="currentColor" stroke="none"/></svg>
+                  </button>
+                  <button type="button" class="rp-align-btn" data-align="center-h" title="Align center (horizontal)">
+                    <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="6" y1="1" x2="6" y2="11"/><rect x="2.5" y="2.5" width="7" height="2.5" fill="currentColor" stroke="none"/><rect x="3.5" y="6.5" width="5" height="2.5" fill="currentColor" stroke="none"/></svg>
+                  </button>
+                  <button type="button" class="rp-align-btn" data-align="right" title="Align right">
+                    <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="10" y1="1" x2="10" y2="11"/><rect x="2" y="2.5" width="7" height="2.5" fill="currentColor" stroke="none"/><rect x="4" y="6.5" width="5" height="2.5" fill="currentColor" stroke="none"/></svg>
+                  </button>
+                </div>
+              </div>
+              <div class="rp-field">
+                <label>Vertical</label>
+                <div class="rp-aligns">
+                  <button type="button" class="rp-align-btn" data-align="top" title="Align top">
+                    <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="1" y1="2" x2="11" y2="2"/><rect x="2.5" y="3" width="2.5" height="7" fill="currentColor" stroke="none"/><rect x="6.5" y="3" width="2.5" height="5" fill="currentColor" stroke="none"/></svg>
+                  </button>
+                  <button type="button" class="rp-align-btn" data-align="middle" title="Align middle (vertical)">
+                    <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="1" y1="6" x2="11" y2="6"/><rect x="2.5" y="2.5" width="2.5" height="7" fill="currentColor" stroke="none"/><rect x="6.5" y="3.5" width="2.5" height="5" fill="currentColor" stroke="none"/></svg>
+                  </button>
+                  <button type="button" class="rp-align-btn" data-align="bottom" title="Align bottom">
+                    <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="1" y1="10" x2="11" y2="10"/><rect x="2.5" y="2" width="2.5" height="7" fill="currentColor" stroke="none"/><rect x="6.5" y="4" width="2.5" height="5" fill="currentColor" stroke="none"/></svg>
+                  </button>
+                </div>
+              </div>
+              <div class="rp-field">
+                <label>Distribute</label>
+                <div class="rp-aligns">
+                  <button type="button" class="rp-align-btn" data-align="dist-h" title="Distribute horizontally">
+                    <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="1" y1="1" x2="1" y2="11"/><line x1="11" y1="1" x2="11" y2="11"/><rect x="2.5" y="3" width="2" height="6" fill="currentColor" stroke="none"/><rect x="5" y="3" width="2" height="6" fill="currentColor" stroke="none"/><rect x="7.5" y="3" width="2" height="6" fill="currentColor" stroke="none"/></svg>
+                  </button>
+                  <button type="button" class="rp-align-btn" data-align="dist-v" title="Distribute vertically">
+                    <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="1" y1="1" x2="11" y2="1"/><line x1="1" y1="11" x2="11" y2="11"/><rect x="3" y="2.5" width="6" height="2" fill="currentColor" stroke="none"/><rect x="3" y="5" width="6" height="2" fill="currentColor" stroke="none"/><rect x="3" y="7.5" width="6" height="2" fill="currentColor" stroke="none"/></svg>
+                  </button>
+                </div>
+              </div>
+              <div class="rp-field">
+                <button type="button" class="rp-area-btn" id="rp-area-selection" title="Wrap the current selection in a new Area (⌘G)">
+                  <svg class="ico-14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                    <line x1="3" y1="9" x2="21" y2="9"/>
+                  </svg>
+                  Area selection
+                  <span class="rp-kbd">⌘G</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="rp-section" id="rp-area" hidden>
+              <div class="rp-h">
+                <span class="rp-eyebrow">Area</span>
+                <span class="rp-h-name" id="rp-area-title">—</span>
+              </div>
+              <div class="rp-field">
+                <label for="rp-area-name">Name</label>
+                <input type="text" id="rp-area-name" autocomplete="off">
+              </div>
+              <div class="rp-field">
+                <label for="rp-area-slug">Slug</label>
+                <input type="text" id="rp-area-slug" autocomplete="off" spellcheck="false">
+              </div>
+              <div class="rp-field">
+                <label>Color</label>
+                <div class="rp-swatches" id="rp-area-swatches"></div>
+              </div>
+              <div class="rp-field">
+                <label>Title position</label>
+                <div class="rp-title-pos" id="rp-area-titlepos" role="group" aria-label="Title position">
+                  <button type="button" data-tp="top-left" title="Top-left">
+                    <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="1.5" y="1.5" width="9" height="9" rx="1"/><line x1="3" y1="4" x2="6" y2="4"/></svg>
+                  </button>
+                  <button type="button" data-tp="top-center" title="Top-center">
+                    <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="1.5" y="1.5" width="9" height="9" rx="1"/><line x1="4.5" y1="4" x2="7.5" y2="4"/></svg>
+                  </button>
+                  <button type="button" data-tp="top-right" title="Top-right">
+                    <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="1.5" y="1.5" width="9" height="9" rx="1"/><line x1="6" y1="4" x2="9" y2="4"/></svg>
+                  </button>
+                  <button type="button" data-tp="bottom-left" title="Bottom-left">
+                    <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="1.5" y="1.5" width="9" height="9" rx="1"/><line x1="3" y1="8" x2="6" y2="8"/></svg>
+                  </button>
+                  <button type="button" data-tp="bottom-center" title="Bottom-center">
+                    <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="1.5" y="1.5" width="9" height="9" rx="1"/><line x1="4.5" y1="8" x2="7.5" y2="8"/></svg>
+                  </button>
+                  <button type="button" data-tp="bottom-right" title="Bottom-right">
+                    <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="1.5" y="1.5" width="9" height="9" rx="1"/><line x1="6" y1="8" x2="9" y2="8"/></svg>
+                  </button>
+                </div>
+              </div>
+              <div class="rp-field">
+                <label>Lock</label>
+                <button type="button" class="rp-lock-toggle" id="rp-area-lock">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="4" y="11" width="16" height="10" rx="2"/>
+                    <path d="M8 11V7a4 4 0 0 1 8 0v4"/>
+                  </svg>
+                  <span id="rp-area-lock-label">Unlocked</span>
+                </button>
+              </div>
+              <div class="rp-field">
+                <button type="button" class="rp-area-btn" id="rp-area-dissolve" title="Dissolve this Area (⇧⌘G) — children move up one level">
+                  <svg class="ico-14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" stroke-dasharray="4 3"/>
+                    <line x1="8" y1="8" x2="16" y2="16"/>
+                    <line x1="16" y1="8" x2="8" y2="16"/>
+                  </svg>
+                  Dissolve
+                  <span class="rp-kbd">⇧⌘G</span>
+                </button>
+              </div>
+              <div class="rp-field">
+                <button type="button" class="rp-delete" id="rp-area-delete">Delete area</button>
+              </div>
+            </div>
+
+          </div>
+        </aside>
+
+      </div>
+
+    </div>
+  </main>
+</div>
+
+</div>
+
+<!-- ============================================================
+     TOAST · success feedback after page creation
+     ============================================================ -->
+<div class="toast" id="createToast">
+  <span class="check">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+  </span>
+  <span>Page <b id="toast-name">—</b> created.</span>
+  <span class="link" id="toast-open" role="button" tabindex="0">Open →</span>
+</div>
+
+<!-- ============================================================
+     GRAPH INTERACTION · fit / zoom / pan / drag / connect
+     Parses the inline SVG into a node+edge model on load, then
+     re-renders nodes via <g> transforms and edges via straight
+     perimeter-to-perimeter lines so they follow when nodes move.
+     ============================================================ -->
+
+<!-- Right-click context menu — populated/positioned by setupContextMenu() above -->
+<div class="ctx-menu" id="ctxMenu" hidden>
+  <button class="ctx-item ctx-lock" data-action="lock" type="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    <span class="label">Lock</span>
+  </button>
+  <div class="ctx-sep" role="separator"></div>
+  <button class="ctx-item" data-action="group" type="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/><path d="M11 7h6M7 11v6"/></svg>
+    <span class="label">Group</span>
+  </button>
+  <button class="ctx-item" data-action="ungroup" type="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg>
+    <span class="label">Ungroup</span>
+  </button>
+  <div class="ctx-sep" role="separator"></div>
+  <button class="ctx-item" data-action="area" type="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+    <span class="label">Area selection</span>
+    <span class="kbd">⌘G</span>
+  </button>
+  <button class="ctx-item" data-action="dissolve" type="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="6" y1="18" x2="18" y2="6"/></svg>
+    <span class="label">Dissolve</span>
+    <span class="kbd">⇧⌘G</span>
+  </button>
+</div>
+
+<!-- Pending-import shim — must run BEFORE sitemap-editor.js so the IIFE
+     parses the imported sitemap as the new model. -->
+<script src="sitemap-editor.svg-shim.js"></script>
+<script src="sitemap-editor.js"></script>
+<script src="sitemap-editor.wire.js"></script>
+
+</body>
+</html>
