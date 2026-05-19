@@ -4,7 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7956be5f-a3f2-4c04-80fd-1860e56e7340" name="Changes" comment="" />
+    <list default="true" id="7956be5f-a3f2-4c04-80fd-1860e56e7340" name="Changes" comment="Add project configuration files and initial styles for sitemap-editor">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sitemap-editor.css" beforeDir="false" afterPath="$PROJECT_DIR$/sitemap-editor.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sitemap-editor.html" beforeDir="false" afterPath="$PROJECT_DIR$/sitemap-editor.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sitemap-editor.inline.css" beforeDir="false" afterPath="$PROJECT_DIR$/sitemap-editor.inline.css" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -26,12 +31,12 @@
     &quot;assignee&quot;: &quot;ttquang&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/ttquang/automation-test-frontend-poc&quot;,
-    &quot;accountId&quot;: &quot;6977e147-07e5-4f64-b51d-1d6127c7e4a3&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/ttquang/sitemap-editor",
+    "accountId": "6977e147-07e5-4f64-b51d-1d6127c7e4a3"
   }
-}</component>
+}]]></component>
   <component name="McpProjectServerCommands">
     <commands />
     <urls />
@@ -66,10 +71,10 @@
 }]]></component>
   <component name="RecapSpentCounter">
     <option name="endsOfQuotaMs" value="1779652827240" />
-    <option name="spentUsd" value="0.13608305" />
+    <option name="spentUsd" value="0.1580898" />
   </component>
   <component name="RecapUselessUpdatesCounter">
-    <option name="suspendCountdown" value="3" />
+    <option name="suspendCountdown" value="2" />
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -88,11 +93,24 @@
       <workItem from="1779130171606" duration="1441000" />
       <workItem from="1779193241301" duration="4837000" />
       <workItem from="1779205443774" duration="97000" />
-      <workItem from="1779205961640" duration="523000" />
+      <workItem from="1779205961640" duration="2116000" />
     </task>
+    <task id="LOCAL-00001" summary="Add project configuration files and initial styles for sitemap-editor">
+      <option name="closed" value="true" />
+      <created>1779206526173</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1779206526173</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Add project configuration files and initial styles for sitemap-editor" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add project configuration files and initial styles for sitemap-editor" />
   </component>
 </project>

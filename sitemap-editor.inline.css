@@ -24,29 +24,6 @@
     color: var(--ink-faint); letter-spacing: 0.08em;
     text-transform: uppercase; line-height: 1;
   }
-  .topbar .crumb { flex: 1; }
-  .topbar .role-tag {
-    font-family: var(--mono);
-    font-size: 0.5625rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    padding: 0.0625rem 0.4375rem;
-    margin-left: 0.375rem;
-    border-radius: 0.625rem;
-    background: var(--ok-soft);
-    color: var(--ok);
-    border: 1px solid var(--ok-border);
-  }
-  .topbar .tb-actions { margin-left: auto; }
-  .topbar .avatar {
-    width: 1.75rem; height: 1.75rem; border-radius: 50%;
-    background: var(--accent-soft); color: var(--accent);
-    font-family: var(--mono); font-size: 0.625rem; font-weight: 600;
-    display: inline-flex; align-items: center; justify-content: center;
-    border: 1px solid var(--border);
-    margin-left: 0.25rem;
-    user-select: none;
-  }
     /* ============================================================
      v3 Toolbar — Modern Pill, with App-mode segmented toggle.
      Lives at bottom-center, always visible. The pointer toggle and
@@ -376,20 +353,12 @@
 
 /* ============================================================
    Utility classes that replace inline style="" attributes.
-   Naming convention:
-     .ico-N            — square SVG icon, side length N in 1/16rem units
-     .ico-N--page     — same size, color: var(--page-fg)
-     .ico-N--case     — same size, color: var(--case-fg)
-     .u-…              — one-off layout/typography helpers
+     .ico-N — square SVG icon, side length N in 1/16rem units
+     .u-…   — one-off layout/typography helpers
    ============================================================ */
 
-  /* SVG icon sizes (numbers are tenths-of-rem to match the original values) */
-  .ico-9   { width: 0.5625rem; height: 0.5625rem; }
-  .ico-10  { width: 0.625rem;  height: 0.625rem; }
+  /* SVG icon size used by inspector action buttons */
   .ico-14  { width: 0.875rem;  height: 0.875rem; }
-  .ico-15  { width: 0.9375rem; height: 0.9375rem; }
-  .ico-10--page { color: var(--page-fg); }
-  .ico-10--case { color: var(--case-fg); }
 
   /* One-off layout helpers */
   .u-graph-page-onerow { grid-template-rows: 1fr; }
@@ -398,35 +367,4 @@
     background: var(--accent-soft);
     color: var(--accent);
     border-color: var(--border);
-  }
-  .u-pill-spaced { margin-left: 0.4375rem; }
-  .u-flex-wrap-row {
-    display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
-  }
-  .u-scope-tok-sm {
-    font-size: 0.75rem;
-    padding: 0.1875rem 0.4375rem;
-  }
-  .u-time-mono {
-    font-size: 0.75rem;
-    font-family: var(--mono);
-  }
-  .u-suggested-box {
-    background: var(--bg-alt);
-    border: 1px dashed var(--border-2);
-    border-radius: var(--radius);
-    padding: 0.5rem 0.75rem;
-  }
-  .u-suggested-label {
-    color: var(--ink-faint);
-    font-style: italic;
-  }
-  .u-warn-callout {
-    padding: 0.625rem 0.75rem;
-    background: var(--warn-soft);
-    border: 1px solid var(--warn-border);
-    border-radius: var(--radius);
-    font-size: 0.75rem;
-    color: var(--ink);
-    line-height: 1.5;
   }
