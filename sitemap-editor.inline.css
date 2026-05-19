@@ -118,13 +118,16 @@
   .bottom-toolbar .seg button.active.mode-view { color: #0A6644; }
   .bottom-toolbar .seg button.active.mode-edit { color: var(--accent); }
   .bottom-toolbar .seg button.active.mode-ai   { color: #7C3AED; }
-  /* Pointer-mode buttons are fixed square slots — icons dead-center */
-  .bottom-toolbar .seg.seg-pointer button {
+  /* App-mode + Pointer-mode buttons are fixed square slots — icons dead-center.
+     (App-mode was previously icon+label; labels removed for a tighter toolbar.) */
+  .bottom-toolbar .seg.seg-pointer button,
+  .bottom-toolbar .seg.seg-app button {
     width: 2.125rem; height: 2.125rem;
     padding: 0;
     gap: 0;
   }
-  .bottom-toolbar .seg.seg-pointer button svg { display: block; width: 1.0625rem; height: 1.0625rem; }
+  .bottom-toolbar .seg.seg-pointer button svg,
+  .bottom-toolbar .seg.seg-app button svg { display: block; width: 1.0625rem; height: 1.0625rem; }
   /* Brief "press" squish */
   .bottom-toolbar .seg.pressing .seg-pill { transform: var(--seg-tx, translateX(0)) scaleX(0.94); }
 
@@ -141,7 +144,7 @@
         grabbing: fist (palm only, fingers tucked) with white knuckle dots
      Black fill + 1.5px white outline. Hotspot at the palm center (11, 15). */
   .canvas-wrap svg.graph.tool-hand {
-    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><g fill='%23000' stroke='%23fff' stroke-width='1.5' stroke-linejoin='round' stroke-linecap='round'><path d='M2.5 13 C 2.5 12 3.5 11.2 4.5 11.6 L 6.4 12.5 L 6.4 11.5 C 6.4 10.4 7.2 9.5 8.4 9.5 L 16.5 9.5 C 18.2 9.5 19.4 10.7 19.4 12.4 L 19.4 16 C 19.4 19.5 16.4 22 12.5 22 L 11.5 22 C 7.6 22 5.4 19 4.4 16 Z'/><rect x='6.4' y='4' width='2.5' height='7.5' rx='1.25'/><rect x='9.5' y='2.5' width='2.5' height='9' rx='1.25'/><rect x='12.6' y='3' width='2.5' height='8.5' rx='1.25'/><rect x='15.7' y='4.5' width='2.5' height='7' rx='1.25'/></g></svg>") 11 15, grab;
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><g fill='%23000' stroke='%23fff' stroke-width='1.5' stroke-linejoin='round' stroke-linecap='round'><path d='M2.5 13 C 2.5 12 3.5 11.2 4.5 11.6 L 6.4 12.5 L 6.4 11.5 C 6.4 10.4 7.2 9.5 8.4 9.5 L 16.5 9.5 C 18.2 9.5 19.4 10.7 19.4 12.4 L 19.4 16 C 19.4 19.5 16.4 22 12.5 22 L 11.5 22 C 7.6 22 5.4 19 4.4 16 Z'/><rect x='6.4' y='4' width='2.5' height='7.5' rx='1.25'/><rect x='9.5' y='2.5' width='2.5' height='9' rx='1.25'/><rect x='12.6' y='3' width='2.5' height='8.5' rx='1.25'/><rect x='15.7' y='4.5' width='2.5' height='7' rx='1.25'/></g></svg>") 11 15, grab;
   }
   /* ---- Area title-position picker (3×2 grid) ---- */
   .rp-title-pos {
@@ -243,15 +246,97 @@
     background: var(--divider);
     margin: 0.25rem 0.125rem;
   }
-  .canvas-wrap svg.graph.tool-hand.panning {
-    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><g stroke='%23fff' stroke-width='1.5' stroke-linejoin='round' stroke-linecap='round'><path fill='%23000' d='M2.5 13 C 2.5 12 3.5 11.2 4.5 11.6 L 6.4 12.5 L 6.4 11 C 6.4 9.5 7.4 8.5 8.9 8.5 L 16 8.5 C 17.8 8.5 19.4 9.8 19.4 11.7 L 19.4 16 C 19.4 19.5 16.4 22 12.5 22 L 11.5 22 C 7.6 22 5.4 19 4.4 16 Z'/></g><g fill='%23fff'><circle cx='8.6' cy='11' r='0.7'/><circle cx='11.2' cy='10.6' r='0.7'/><circle cx='13.8' cy='10.6' r='0.7'/><circle cx='16.4' cy='11' r='0.7'/></g></svg>") 11 15, grabbing;
-  }
-  /* Custom Move/Mouse cursor — Figma-style filled arrow with an
-     integrated tail (single closed path). Black fill + 1.5px white
-     stroke so it reads on any canvas background. Hotspot (4, 3) sits
-     right at the arrow tip. */
+  /* ============================================================
+     Custom canvas cursors — coherent monochrome set.
+     All four share: charcoal fill (#1A1F2B), 1.5px white halo for
+     contrast over any canvas background, rounded joins. Hotspots
+     are calibrated so the action point matches the visual cue.
+       1. Move arrow   — Figma-style filled arrow, tip at top-left
+       2. Hand (idle)  — open palm with 4 fingers up
+       3. Hand (grab)  — closed fist with knuckle dots
+       4. Connecting   — precision reticle with accent dot
+     ============================================================ */
+
+  /* 1. Move arrow — slim, pointed tip, integrated tail */
   .canvas-wrap svg.graph.tool-cursor {
-    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24'><path fill='%23000' stroke='%23fff' stroke-width='1.5' stroke-linejoin='round' stroke-linecap='round' d='M5 3 L 5 17 L 9 13.5 L 12 20 L 14 19 L 11 12.5 L 16 12 Z'/></svg>") 4 3, default;
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><path fill='%231A1F2B' stroke='%23fff' stroke-width='1.6' stroke-linejoin='round' stroke-linecap='round' d='M4 2.5 L 4 17 L 7.8 13.7 L 10.4 19.4 L 12.4 18.6 L 9.9 13 L 15.3 12.4 Z'/></svg>") 5 4, default;
+  }
+
+  /* 2. Hand idle — open palm, fingers up, ready to grab */
+  .canvas-wrap svg.graph.tool-hand {
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><path fill='%231A1F2B' stroke='%23fff' stroke-width='1.4' stroke-linejoin='round' stroke-linecap='round' d='M5 14 C 5 12.5 6 11.8 7 12.2 L 7.6 12.5 L 7.6 7.5 C 7.6 6.5 8.4 5.7 9.4 5.7 C 10.4 5.7 11.2 6.5 11.2 7.5 L 11.2 11.4 L 11.2 4.5 C 11.2 3.5 12 2.7 13 2.7 C 14 2.7 14.8 3.5 14.8 4.5 L 14.8 11 L 14.8 5 C 14.8 4 15.6 3.2 16.6 3.2 C 17.6 3.2 18.4 4 18.4 5 L 18.4 11.4 L 18.4 7 C 18.4 6 19.2 5.2 20.2 5.2 C 21.2 5.2 22 6 22 7 L 22 14 C 22 18.4 18.4 22 14 22 L 13 22 C 9.4 22 6.6 19.2 5.6 16 Z'/></svg>") 16 16, grab;
+  }
+
+  /* 3. Hand grabbing — closed fist, knuckles visible (panning state) */
+  .canvas-wrap svg.graph.tool-hand.panning {
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><path fill='%231A1F2B' stroke='%23fff' stroke-width='1.5' stroke-linejoin='round' stroke-linecap='round' d='M2.5 13 C 2.5 12 3.5 11.2 4.5 11.6 L 6.4 12.5 L 6.4 11 C 6.4 9.5 7.4 8.5 8.9 8.5 L 16 8.5 C 17.8 8.5 19.4 9.8 19.4 11.7 L 19.4 16 C 19.4 19.5 16.4 22 12.5 22 L 11.5 22 C 7.6 22 5.4 19 4.4 16 Z'/><g fill='%23fff'><circle cx='8.6' cy='11' r='0.7'/><circle cx='11.2' cy='10.6' r='0.7'/><circle cx='13.8' cy='10.6' r='0.7'/><circle cx='16.4' cy='11' r='0.7'/></g></svg>") 15 20, grabbing;
+  }
+
+  /* 4. Connecting — precision reticle with accent center dot */
+  .canvas-wrap svg.graph.connecting,
+  .canvas-wrap svg.graph.connecting .gnode {
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><g fill='none' stroke='%23fff' stroke-width='3' stroke-linecap='round'><circle cx='12' cy='12' r='7.5'/><line x1='12' y1='1.5' x2='12' y2='6'/><line x1='12' y1='18' x2='12' y2='22.5'/><line x1='1.5' y1='12' x2='6' y2='12'/><line x1='18' y1='12' x2='22.5' y2='12'/></g><g fill='none' stroke='%231A1F2B' stroke-width='1.6' stroke-linecap='round'><circle cx='12' cy='12' r='7.5'/><line x1='12' y1='1.5' x2='12' y2='6'/><line x1='12' y1='18' x2='12' y2='22.5'/><line x1='1.5' y1='12' x2='6' y2='12'/><line x1='18' y1='12' x2='22.5' y2='12'/></g><circle cx='12' cy='12' r='2' fill='%231766DC' stroke='%23fff' stroke-width='1'/></svg>") 16 16, crosshair;
+  }
+
+  /* ============================================================
+     Resize cursors — coherent double-arrow set, same charcoal +
+     white-halo treatment as the canvas cursors. Centered hotspot
+     (12, 12). Covers all 8 area handles plus the two edge-connector
+     axes (overrides the OS-keyword rules in sitemap-editor.css).
+     ============================================================ */
+
+  /* Horizontal ↔ (area handles E/W) */
+  .resize-handle.dir-e,
+  .resize-handle.dir-w {
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><g fill='none' stroke-linecap='round' stroke-linejoin='round'><path stroke='%23fff' stroke-width='3.2' d='M4 12 H 20 M 4 12 L 8 8.5 M 4 12 L 8 15.5 M 20 12 L 16 8.5 M 20 12 L 16 15.5'/><path stroke='%231A1F2B' stroke-width='1.6' d='M4 12 H 20 M 4 12 L 8 8.5 M 4 12 L 8 15.5 M 20 12 L 16 8.5 M 20 12 L 16 15.5'/></g></svg>") 16 16, ew-resize;
+  }
+
+  /* Vertical ↕ (area handles N/S) */
+  .resize-handle.dir-n,
+  .resize-handle.dir-s {
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><g fill='none' stroke-linecap='round' stroke-linejoin='round'><path stroke='%23fff' stroke-width='3.2' d='M12 4 V 20 M 12 4 L 8.5 8 M 12 4 L 15.5 8 M 12 20 L 8.5 16 M 12 20 L 15.5 16'/><path stroke='%231A1F2B' stroke-width='1.6' d='M12 4 V 20 M 12 4 L 8.5 8 M 12 4 L 15.5 8 M 12 20 L 8.5 16 M 12 20 L 15.5 16'/></g></svg>") 16 16, ns-resize;
+  }
+
+  /* Diagonal ↘↖ (corners NW / SE) */
+  .resize-handle.dir-nw,
+  .resize-handle.dir-se {
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><g fill='none' stroke-linecap='round' stroke-linejoin='round'><path stroke='%23fff' stroke-width='3.2' d='M5.5 5.5 L 18.5 18.5 M 5.5 5.5 L 10.5 5.5 M 5.5 5.5 L 5.5 10.5 M 18.5 18.5 L 13.5 18.5 M 18.5 18.5 L 18.5 13.5'/><path stroke='%231A1F2B' stroke-width='1.6' d='M5.5 5.5 L 18.5 18.5 M 5.5 5.5 L 10.5 5.5 M 5.5 5.5 L 5.5 10.5 M 18.5 18.5 L 13.5 18.5 M 18.5 18.5 L 18.5 13.5'/></g></svg>") 16 16, nwse-resize;
+  }
+
+  /* Diagonal ↗↙ (corners NE / SW) */
+  .resize-handle.dir-ne,
+  .resize-handle.dir-sw {
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><g fill='none' stroke-linecap='round' stroke-linejoin='round'><path stroke='%23fff' stroke-width='3.2' d='M18.5 5.5 L 5.5 18.5 M 18.5 5.5 L 13.5 5.5 M 18.5 5.5 L 18.5 10.5 M 5.5 18.5 L 10.5 18.5 M 5.5 18.5 L 5.5 13.5'/><path stroke='%231A1F2B' stroke-width='1.6' d='M18.5 5.5 L 5.5 18.5 M 18.5 5.5 L 13.5 5.5 M 18.5 5.5 L 18.5 10.5 M 5.5 18.5 L 10.5 18.5 M 5.5 18.5 L 5.5 13.5'/></g></svg>") 16 16, nesw-resize;
+  }
+
+  /* Column resize — edge connectors on X axis (vertical segment, drag left/right) */
+  .canvas-wrap svg.graph.editmode .gedge-hit[data-axis="x"] {
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><g fill='none' stroke-linecap='round' stroke-linejoin='round'><path stroke='%23fff' stroke-width='3.2' d='M12 5 V 19 M 4 12 H 9 M 4 12 L 7 9 M 4 12 L 7 15 M 20 12 H 15 M 20 12 L 17 9 M 20 12 L 17 15'/><path stroke='%231A1F2B' stroke-width='1.6' d='M12 5 V 19 M 4 12 H 9 M 4 12 L 7 9 M 4 12 L 7 15 M 20 12 H 15 M 20 12 L 17 9 M 20 12 L 17 15'/></g></svg>") 16 16, col-resize;
+  }
+
+  /* Row resize — edge connectors on Y axis (horizontal segment, drag up/down) */
+  .canvas-wrap svg.graph.editmode .gedge-hit[data-axis="y"] {
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><g fill='none' stroke-linecap='round' stroke-linejoin='round'><path stroke='%23fff' stroke-width='3.2' d='M5 12 H 19 M 12 4 V 9 M 12 4 L 9 7 M 12 4 L 15 7 M 12 20 V 15 M 12 20 L 9 17 M 12 20 L 15 17'/><path stroke='%231A1F2B' stroke-width='1.6' d='M5 12 H 19 M 12 4 V 9 M 12 4 L 9 7 M 12 4 L 15 7 M 12 20 V 15 M 12 20 L 9 17 M 12 20 L 15 17'/></g></svg>") 16 16, row-resize;
+  }
+
+  /* ============================================================
+     Movable-node cursor — unified 4-way arrow shown when hovering
+     a Page or Area in edit mode. The main stylesheet sets these
+     to `move` / `grab` keywords (two different OS cursors); this
+     rule overrides both so Pages and Areas share one indicator.
+     Dragging state uses the closed-hand cursor for consistency
+     with the panning interaction.
+     ============================================================ */
+  .canvas-wrap svg.graph.editmode .gnode,
+  .canvas-wrap svg.graph.editmode .gzone {
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><g fill='none' stroke-linecap='round' stroke-linejoin='round'><path stroke='%23fff' stroke-width='3.2' d='M12 3 V 21 M 3 12 H 21 M 12 3 L 9 6 M 12 3 L 15 6 M 12 21 L 9 18 M 12 21 L 15 18 M 3 12 L 6 9 M 3 12 L 6 15 M 21 12 L 18 9 M 21 12 L 18 15'/><path stroke='%231A1F2B' stroke-width='1.6' d='M12 3 V 21 M 3 12 H 21 M 12 3 L 9 6 M 12 3 L 15 6 M 12 21 L 9 18 M 12 21 L 15 18 M 3 12 L 6 9 M 3 12 L 6 15 M 21 12 L 18 9 M 21 12 L 18 15'/></g></svg>") 16 16, move;
+  }
+
+  /* Dragging a Page or Area — switch to the closed-hand cursor */
+  .canvas-wrap svg.graph .gnode.dragging,
+  .canvas-wrap svg.graph .gnode.dragging rect,
+  .canvas-wrap svg.graph.editmode .gzone.dragging {
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><path fill='%231A1F2B' stroke='%23fff' stroke-width='1.5' stroke-linejoin='round' stroke-linecap='round' d='M2.5 13 C 2.5 12 3.5 11.2 4.5 11.6 L 6.4 12.5 L 6.4 11 C 6.4 9.5 7.4 8.5 8.9 8.5 L 16 8.5 C 17.8 8.5 19.4 9.8 19.4 11.7 L 19.4 16 C 19.4 19.5 16.4 22 12.5 22 L 11.5 22 C 7.6 22 5.4 19 4.4 16 Z'/><g fill='%23fff'><circle cx='8.6' cy='11' r='0.7'/><circle cx='11.2' cy='10.6' r='0.7'/><circle cx='13.8' cy='10.6' r='0.7'/><circle cx='16.4' cy='11' r='0.7'/></g></svg>") 15 20, grabbing;
   }
 
   /* AI chat panel — floats just above the toolbar (centered, not docked) */
