@@ -63,17 +63,14 @@
             <!-- App-mode segmented toggle (View / Edit / AI) -->
             <div class="seg seg-app" role="group" aria-label="App mode">
               <span class="seg-pill" aria-hidden="true"></span>
-              <button class="active mode-view" data-mode="view" type="button" title="View (1) — read only">
+              <button class="active mode-view" data-mode="view" type="button" title="View (1) — read only" aria-label="View">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                View
               </button>
-              <button data-mode="edit" type="button" title="Edit (2) — add / move / connect">
+              <button data-mode="edit" type="button" title="Edit (2) — add / move / connect" aria-label="Edit">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                Edit
               </button>
-              <button data-mode="ai" type="button" title="AI (3 or ⌘K) — open chat">
+              <button data-mode="ai" type="button" title="AI (3 or ⌘K) — open chat" aria-label="AI">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3L13.5 8.5L19 10L13.5 11.5L12 17L10.5 11.5L5 10L10.5 8.5L12 3Z"/><path d="M18 16L19 18L21 19L19 20L18 22L17 20L15 19L17 18L18 16Z"/></svg>
-                AI
               </button>
             </div>
             <div class="tb-sep" aria-hidden="true"></div>
@@ -88,7 +85,7 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg>
               </button>
             </div>
-            <div class="tb-sep" aria-hidden="true" data-needs-edit hidden></div>
+            <div class="tb-sep" aria-hidden="true"></div>
 
             <!-- Element palette — only present in Edit mode.
                  Wrapping span carries `hidden` so the buttons disappear from the
@@ -116,6 +113,7 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             </button>
             <input type="file" id="importFile" accept=".svg,image/svg+xml" hidden>
+            <div class="tb-sep" aria-hidden="true"></div>
             <button id="zc-out" class="icon-only" type="button" title="Zoom out (⌘−)">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
             </button>

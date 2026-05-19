@@ -118,12 +118,14 @@
   .bottom-toolbar .seg button.active.mode-view { color: #0A6644; }
   .bottom-toolbar .seg button.active.mode-edit { color: var(--accent); }
   .bottom-toolbar .seg button.active.mode-ai   { color: #7C3AED; }
-  /* Pointer-mode buttons are fixed square slots — icons dead-center */
+  /* Icon-only seg buttons (App-mode + Pointer-mode) — fixed square slots, icons dead-center */
+  .bottom-toolbar .seg.seg-app button,
   .bottom-toolbar .seg.seg-pointer button {
     width: 2.125rem; height: 2.125rem;
     padding: 0;
     gap: 0;
   }
+  .bottom-toolbar .seg.seg-app button svg,
   .bottom-toolbar .seg.seg-pointer button svg { display: block; width: 1.0625rem; height: 1.0625rem; }
   /* Brief "press" squish */
   .bottom-toolbar .seg.pressing .seg-pill { transform: var(--seg-tx, translateX(0)) scaleX(0.94); }

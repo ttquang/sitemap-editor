@@ -4,11 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7956be5f-a3f2-4c04-80fd-1860e56e7340" name="Changes" comment="Add project configuration files and initial styles for sitemap-editor">
+    <list default="true" id="7956be5f-a3f2-4c04-80fd-1860e56e7340" name="Changes" comment="Remove &quot;Dissolve&quot; functionality and related assets from sitemap-editor.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sitemap-editor.css" beforeDir="false" afterPath="$PROJECT_DIR$/sitemap-editor.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/sitemap-editor.html" beforeDir="false" afterPath="$PROJECT_DIR$/sitemap-editor.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/sitemap-editor.inline.css" beforeDir="false" afterPath="$PROJECT_DIR$/sitemap-editor.inline.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sitemap-editor.js" beforeDir="false" afterPath="$PROJECT_DIR$/sitemap-editor.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -19,7 +19,7 @@
     <execution />
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="9" />
+    <option name="cachedIndexableFilesCount" value="11" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="Git.Settings">
@@ -31,12 +31,12 @@
     &quot;assignee&quot;: &quot;ttquang&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/ttquang/sitemap-editor",
-    "accountId": "6977e147-07e5-4f64-b51d-1d6127c7e4a3"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/ttquang/sitemap-editor&quot;,
+    &quot;accountId&quot;: &quot;6977e147-07e5-4f64-b51d-1d6127c7e4a3&quot;
   }
-}]]></component>
+}</component>
   <component name="McpProjectServerCommands">
     <commands />
     <urls />
@@ -49,26 +49,26 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "git-widget-placeholder": "main",
-    "ignore.virus.scanning.warn.message": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "D:/project/sitemap-editor",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/project/sitemap-editor&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecapSpentCounter">
     <option name="endsOfQuotaMs" value="1779652827240" />
     <option name="spentUsd" value="0.1580898" />
@@ -93,7 +93,8 @@
       <workItem from="1779130171606" duration="1441000" />
       <workItem from="1779193241301" duration="4837000" />
       <workItem from="1779205443774" duration="97000" />
-      <workItem from="1779205961640" duration="2116000" />
+      <workItem from="1779205961640" duration="3111000" />
+      <workItem from="1779209213273" duration="41000" />
     </task>
     <task id="LOCAL-00001" summary="Add project configuration files and initial styles for sitemap-editor">
       <option name="closed" value="true" />
@@ -103,7 +104,15 @@
       <option name="project" value="LOCAL" />
       <updated>1779206526173</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Update project configuration and clean up unused styles and components">
+      <option name="closed" value="true" />
+      <created>1779208118049</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1779208118049</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -111,6 +120,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Add project configuration files and initial styles for sitemap-editor" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add project configuration files and initial styles for sitemap-editor" />
+    <MESSAGE value="Update project configuration and clean up unused styles and components" />
+    <MESSAGE value="Remove &quot;Dissolve&quot; functionality and related assets from sitemap-editor." />
+    <option name="LAST_COMMIT_MESSAGE" value="Remove &quot;Dissolve&quot; functionality and related assets from sitemap-editor." />
   </component>
 </project>

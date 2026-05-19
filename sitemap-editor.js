@@ -2747,6 +2747,9 @@
       });
     }
     // ----- Title-position picker — sync the active button -----
+    // The click handler is wired once per button and reads `selected.ref` at
+    // click time rather than capturing the showAreaPanel argument, so it stays
+    // correct after switching between areas.
     var tpWrap = document.getElementById('rp-area-titlepos');
     if (tpWrap) {
       Array.prototype.forEach.call(tpWrap.querySelectorAll('button[data-tp]'), function (b) {
@@ -2754,8 +2757,9 @@
         if (!b.__wired) {
           b.__wired = true;
           b.addEventListener('click', function () {
+            if (selected.kind !== 'area' || !selected.ref) return;
             var pos = b.getAttribute('data-tp');
-            setAreaTitlePos(g, pos);
+            setAreaTitlePos(selected.ref, pos);
             Array.prototype.forEach.call(tpWrap.querySelectorAll('button[data-tp]'), function (x) { x.classList.remove('active'); });
             b.classList.add('active');
           });
