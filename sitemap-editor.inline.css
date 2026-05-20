@@ -52,6 +52,14 @@
     background: linear-gradient(180deg, #FFF6E5 0%, #FFFFFF 60%);
     border-color: #F0D49A;
   }
+  .bottom-toolbar.mode-heatmap {
+    background: linear-gradient(180deg, #FFEAEA 0%, #FFFFFF 60%);
+    border-color: #F2BFBF;
+  }
+  .bottom-toolbar.mode-monitor {
+    background: linear-gradient(180deg, #E8F5EC 0%, #FFFFFF 60%);
+    border-color: #BFE0CB;
+  }
   .bottom-toolbar .tb-sep {
     width: 1px; align-self: stretch;
     background: #E5E5E5;
@@ -123,6 +131,8 @@
   .bottom-toolbar .seg button.active.mode-edit { color: var(--accent); }
   .bottom-toolbar .seg button.active.mode-ai   { color: #7C3AED; }
   .bottom-toolbar .seg button.active.mode-path { color: #B45309; }
+  .bottom-toolbar .seg button.active.mode-heatmap { color: #D83B3B; }
+  .bottom-toolbar .seg button.active.mode-monitor { color: #0E8A5F; }
 
   /* Path mode — neutralize swatch colors and trace a route from the clicked
      page back to every root. Reverse-BFS marks ancestors as .path-on, roots
@@ -189,6 +199,79 @@
 
   .canvas-wrap svg.graph .gnode { transition: opacity 160ms ease; }
   .canvas-wrap svg.graph path.gedge { transition: opacity 160ms ease, stroke 160ms ease; }
+
+  /* Heatmap mode — colors each Page by test-case traversal density.
+     data-heat="0..7" is set by applyHeatmap(): 0 = no coverage (cool gray);
+     1..7 = single-hue red ramp from pale pink to deep crimson. Edges and
+     zones fade out so the page fills carry the signal. Case / flow / suite
+     source nodes are dimmed (dashed outline) because they're the source of
+     the count, not the subject. */
+  svg.graph.heatmapmode .gnode rect:not(.connect-handle) {
+    fill: #F5F7FA;
+    stroke: #C9CFD6;
+    transition: fill 200ms ease, stroke 200ms ease, stroke-width 200ms ease;
+  }
+  svg.graph.heatmapmode .gnode[data-heat="0"] rect:not(.connect-handle) { fill: #F5F7FA; stroke: #C9CFD6; }
+  svg.graph.heatmapmode .gnode[data-heat="1"] rect:not(.connect-handle) { fill: #FEECEC; stroke: #F2C5C5; }
+  svg.graph.heatmapmode .gnode[data-heat="2"] rect:not(.connect-handle) { fill: #FACFCF; stroke: #E29B9B; }
+  svg.graph.heatmapmode .gnode[data-heat="3"] rect:not(.connect-handle) { fill: #F4ABAB; stroke: #D17474; }
+  svg.graph.heatmapmode .gnode[data-heat="4"] rect:not(.connect-handle) { fill: #EE8585; stroke: #B85050; }
+  svg.graph.heatmapmode .gnode[data-heat="5"] rect:not(.connect-handle) { fill: #E25E5E; stroke: #9C3030; stroke-width: 1.5; }
+  svg.graph.heatmapmode .gnode[data-heat="6"] rect:not(.connect-handle) { fill: #C93232; stroke: #7A1818; stroke-width: 1.75; }
+  svg.graph.heatmapmode .gnode[data-heat="7"] rect:not(.connect-handle) { fill: #9C1818; stroke: #4F0808; stroke-width: 2; }
+  /* High-bin nodes use white-on-dark text for readability (mid bins onward) */
+  svg.graph.heatmapmode .gnode[data-heat="5"] text,
+  svg.graph.heatmapmode .gnode[data-heat="6"] text,
+  svg.graph.heatmapmode .gnode[data-heat="7"] text { fill: #FFFFFF; }
+
+  svg.graph.heatmapmode .gnode.heat-source rect:not(.connect-handle) {
+    fill: #FAFAFA;
+    stroke: #D6DEE9;
+    stroke-dasharray: 3 2;
+  }
+  svg.graph.heatmapmode .gnode.heat-source { opacity: 0.55; }
+
+  svg.graph.heatmapmode path.gedge {
+    stroke: #C9CFD6;
+    marker-end: url(#arr-gray);
+    opacity: 0.5;
+  }
+  svg.graph.heatmapmode rect.gzone { fill: rgba(180,188,200,0.06); stroke: #E2E6EC; }
+  svg.graph.heatmapmode .gzone-label { fill: #8A92A0; }
+
+  /* Floating heatmap legend chip — sits just above the bottom toolbar,
+     centered horizontally. Only visible while in Heatmap mode (the JS
+     toggles `hidden`). */
+  .heatmap-legend {
+    position: absolute;
+    bottom: 5.5rem; left: 50%;
+    transform: translateX(-50%);
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: #FFFFFF;
+    border: 1px solid #E5E5E5;
+    border-radius: 999px;
+    padding: 0.4375rem 0.875rem;
+    box-shadow:
+      0 2px 4px rgba(0,0,0,0.04),
+      0 12px 28px -12px rgba(0,0,0,0.18);
+    font: 500 0.75rem/1 var(--sans);
+    color: #5E6470;
+    z-index: 5;
+    pointer-events: none;
+  }
+  .heatmap-legend[hidden] { display: none; }
+  .heatmap-legend .hm-label { font-weight: 600; color: #1E1E1E; }
+  .heatmap-legend .hm-bar {
+    display: inline-block; width: 9rem; height: 0.5rem; border-radius: 999px;
+    background: linear-gradient(90deg,
+      #F5F7FA 0%, #F5F7FA 6%,
+      #FEECEC 6%, #FACFCF 22%, #F4ABAB 36%,
+      #EE8585 50%, #E25E5E 64%, #C93232 80%, #9C1818 100%);
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.06);
+  }
+  .heatmap-legend .hm-min,
+  .heatmap-legend .hm-max { font-variant-numeric: tabular-nums; min-width: 1ch; text-align: center; }
+
   /* App-mode + Pointer-mode buttons are fixed square slots — icons dead-center.
      (App-mode was previously icon+label; labels removed for a tighter toolbar.) */
   .bottom-toolbar .seg.seg-pointer button,
@@ -579,4 +662,88 @@
     background: var(--accent-soft);
     color: var(--accent);
     border-color: var(--border);
+  }
+
+  /* Monitor mode — colors each Page by the pass rate of test cases that
+     traverse it. data-monitor="0..4" is set by applyMonitor(): 0 = all failed
+     (red), 4 = all passed (green); 1..3 are evenly spaced gradient steps.
+     Pages with no test data get data-monitor="none" (neutral gray). Data is
+     polled from the backend on a 5s interval while this mode is active. */
+  svg.graph.monitormode .gnode rect:not(.connect-handle) {
+    fill: #F5F7FA;
+    stroke: #C9CFD6;
+    transition: fill 240ms ease, stroke 240ms ease, stroke-width 240ms ease;
+  }
+  svg.graph.monitormode .gnode[data-monitor="none"] rect:not(.connect-handle) { fill: #F5F7FA; stroke: #C9CFD6; }
+  svg.graph.monitormode .gnode[data-monitor="0"] rect:not(.connect-handle)    { fill: #D83B3B; stroke: #8C1F1F; stroke-width: 2; }
+  svg.graph.monitormode .gnode[data-monitor="1"] rect:not(.connect-handle)    { fill: #E97A3A; stroke: #A14B17; stroke-width: 1.75; }
+  svg.graph.monitormode .gnode[data-monitor="2"] rect:not(.connect-handle)    { fill: #E8B53A; stroke: #8C6B11; stroke-width: 1.5; }
+  svg.graph.monitormode .gnode[data-monitor="3"] rect:not(.connect-handle)    { fill: #6FBE56; stroke: #2E7820; stroke-width: 1.5; }
+  svg.graph.monitormode .gnode[data-monitor="4"] rect:not(.connect-handle)    { fill: #0E8A5F; stroke: #0A5A3F; stroke-width: 2; }
+  /* High-contrast text on the darker fills */
+  svg.graph.monitormode .gnode[data-monitor="0"] text,
+  svg.graph.monitormode .gnode[data-monitor="4"] text { fill: #FFFFFF; }
+
+  /* Source nodes (cases/flows/suites) — dim so the Pages carry the signal */
+  svg.graph.monitormode .gnode.monitor-source rect:not(.connect-handle) {
+    fill: #FAFAFA;
+    stroke: #D6DEE9;
+    stroke-dasharray: 3 2;
+  }
+  svg.graph.monitormode .gnode.monitor-source { opacity: 0.55; }
+
+  svg.graph.monitormode path.gedge {
+    stroke: #C9CFD6;
+    marker-end: url(#arr-gray);
+    opacity: 0.5;
+  }
+  svg.graph.monitormode rect.gzone { fill: rgba(180,188,200,0.06); stroke: #E2E6EC; }
+  svg.graph.monitormode .gzone-label { fill: #8A92A0; }
+
+  /* Floating monitor legend chip — mirrors .heatmap-legend layout but adds a
+     live status indicator on the left that pulses on each refresh. */
+  .monitor-legend {
+    position: absolute;
+    bottom: 5.5rem; left: 50%;
+    transform: translateX(-50%);
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: #FFFFFF;
+    border: 1px solid #E5E5E5;
+    border-radius: 999px;
+    padding: 0.4375rem 0.875rem;
+    box-shadow:
+      0 2px 4px rgba(0,0,0,0.04),
+      0 12px 28px -12px rgba(0,0,0,0.18);
+    font: 500 0.75rem/1 var(--sans);
+    color: #5E6470;
+    z-index: 5;
+    pointer-events: none;
+  }
+  .monitor-legend[hidden] { display: none; }
+  .monitor-legend .mn-label { font-weight: 600; color: #1E1E1E; }
+  .monitor-legend .mn-bar {
+    display: inline-block; width: 9rem; height: 0.5rem; border-radius: 999px;
+    background: linear-gradient(90deg,
+      #D83B3B 0%, #E97A3A 25%, #E8B53A 50%, #6FBE56 75%, #0E8A5F 100%);
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.06);
+  }
+  .monitor-legend .mn-min,
+  .monitor-legend .mn-max { font-variant-numeric: tabular-nums; }
+  .monitor-legend .mn-min { color: #8C1F1F; }
+  .monitor-legend .mn-max { color: #0A5A3F; }
+  .monitor-legend .mn-sep {
+    width: 1px; height: 0.75rem; background: #E5E5E5; margin: 0 0.125rem;
+  }
+  .monitor-legend .mn-status { font-variant-numeric: tabular-nums; color: #5E6470; }
+  .monitor-legend .mn-dot {
+    width: 0.5rem; height: 0.5rem; border-radius: 999px;
+    background: #0E8A5F;
+    box-shadow: 0 0 0 0 rgba(14, 138, 95, 0.6);
+  }
+  .monitor-legend.is-refreshing .mn-dot {
+    animation: monitor-pulse 0.6s ease-out;
+  }
+  @keyframes monitor-pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(14, 138, 95, 0.6); }
+    100% { box-shadow: 0 0 0 0.5rem rgba(14, 138, 95, 0); }
   }

@@ -989,18 +989,256 @@
     pathHighlightOn = true;
   }
 
+  // ---- Heatmap mode -------------------------------------------------------
+  // Colors each Page by how many test cases touch it. Counts are sourced via
+  // loadHeatmapData() — currently a deterministic mock; will be swapped to a
+  // backend fetch later. applyHeatmap() bins counts into 5 levels and writes
+  // data-heat="0..4" on each .gnode; CSS in heatmapmode paints the fill.
+  var heatmapOn = false;
+  var heatmapMax = 0;
+
+  function loadHeatmapData() {
+    // MOCK: random counts per page, 0..50, with ~15% zeros and a long-tail
+    // skew so a handful of pages land in the hot bins. Wrapped in a small
+    // artificial delay so the call shape matches the future backend fetch
+    // (and exercises the stale-promise guard in applyHeatmap).
+    // Replace this body with `fetch('/api/heatmap?...').then(r => r.json())`
+    // once the backend endpoint is live.
+    var out = Object.create(null);
+    nodes.forEach(function (n) {
+      if (n.color === 'case' || n.color === 'flow' || n.color === 'suite') return;
+      if (Math.random() < 0.15) { out[n.id] = 0; return; }
+      // Bias toward lower counts; occasional hot pages.
+      var r = Math.random();
+      out[n.id] = Math.round(Math.pow(r, 1.8) * 50);
+    });
+    return new Promise(function (resolve) {
+      setTimeout(function () { resolve(out); }, 180);
+    });
+  }
+
+  function clearHeatmap() {
+    if (!heatmapOn) return;
+    nodes.forEach(function (n) {
+      n.el.removeAttribute('data-heat');
+      n.el.removeAttribute('data-heat-count');
+      n.el.classList.remove('heat-zero', 'heat-source');
+      // Remove the <title> tooltip element we injected for hover counts.
+      var t = n.el.querySelector(':scope > title.heatmap-tip');
+      if (t) t.parentNode.removeChild(t);
+    });
+    var legend = document.getElementById('heatmapLegend');
+    if (legend) legend.hidden = true;
+    heatmapOn = false;
+    heatmapMax = 0;
+  }
+
+  function applyHeatmap(counts) {
+    // Guard against stale promise resolving after the user left heatmap mode
+    // (e.g. when the real backend fetch lands milliseconds after a mode flip).
+    if (currentAppMode !== 'heatmap') return;
+    clearHeatmap();
+    var max = 0;
+    Object.keys(counts).forEach(function (k) { if (counts[k] > max) max = counts[k]; });
+    heatmapMax = max;
+    nodes.forEach(function (n) {
+      if (n.color === 'case' || n.color === 'flow' || n.color === 'suite') {
+        n.el.classList.add('heat-source');
+        return;
+      }
+      var c = counts[n.id] || 0;
+      // 8-bin scale: 0 = no coverage (neutral gray), 1..7 = single-hue red
+      // ramp from pale pink to deep crimson. Bin index is a ceil over a 7-step
+      // partition of (0, max] so even a single touch lands in bin 1.
+      var bin;
+      if (c === 0 || max === 0) bin = 0;
+      else bin = Math.min(7, Math.max(1, Math.ceil((c / max) * 7)));
+      n.el.setAttribute('data-heat', String(bin));
+      n.el.setAttribute('data-heat-count', String(c));
+      if (bin === 0) n.el.classList.add('heat-zero');
+      // Native browser tooltip — show "N test cases" on hover.
+      var tip = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+      tip.setAttribute('class', 'heatmap-tip');
+      tip.textContent = c + (c === 1 ? ' test case' : ' test cases');
+      n.el.insertBefore(tip, n.el.firstChild);
+    });
+    renderHeatmapLegend(max);
+    heatmapOn = true;
+  }
+
+  function renderHeatmapLegend(max) {
+    var legend = document.getElementById('heatmapLegend');
+    if (!legend) return;
+    var maxLabel = document.getElementById('heatmapMaxLabel');
+    if (maxLabel) maxLabel.textContent = String(max);
+    legend.hidden = false;
+  }
+
+  // ---- Monitor mode -------------------------------------------------------
+  // Colors each Page by the pass rate of test cases that traverse it. The
+  // backend (mocked here) returns { pageId: { passed, failed } } per Page.
+  // applyMonitor() bins the pass rate into 5 levels (0 = all failed / red,
+  // 4 = all passed / green) and writes data-monitor="0..4" on each .gnode;
+  // CSS in .monitormode paints the fill. Pages with no test data get
+  // data-monitor="none" (neutral gray).
+  //
+  // While the mode is active a 5-second poller refreshes the data; the
+  // interval is cleared as soon as the user leaves the mode so background
+  // tabs don't keep hitting the API.
+  var monitorOn = false;
+  var monitorTimer = null;
+  var monitorFetchSeq = 0;
+
+  function loadMonitorData() {
+    // MOCK: random {passed, failed} per page. Replace with
+    //   fetch('/api/monitor?...').then(r => r.json())
+    // The shape the consumer expects is { pageId: { passed: N, failed: N } }.
+    // ~10% of pages return null (no test data → neutral gray bin).
+    var out = Object.create(null);
+    nodes.forEach(function (n) {
+      if (n.color === 'case' || n.color === 'flow' || n.color === 'suite') return;
+      if (Math.random() < 0.1) { out[n.id] = null; return; }
+      var total = 1 + Math.floor(Math.random() * 20);
+      var passed = Math.floor(Math.random() * (total + 1));
+      out[n.id] = { passed: passed, failed: total - passed };
+    });
+    return new Promise(function (resolve) {
+      // Slight delay so the legend's "refreshing" pulse is visible and the
+      // shape matches a real network call.
+      setTimeout(function () { resolve(out); }, 220);
+    });
+  }
+
+  function clearMonitor() {
+    if (monitorTimer) { clearInterval(monitorTimer); monitorTimer = null; }
+    if (!monitorOn) return;
+    nodes.forEach(function (n) {
+      n.el.removeAttribute('data-monitor');
+      n.el.removeAttribute('data-monitor-passed');
+      n.el.removeAttribute('data-monitor-failed');
+      n.el.classList.remove('monitor-source');
+      var t = n.el.querySelector(':scope > title.monitor-tip');
+      if (t) t.parentNode.removeChild(t);
+    });
+    var legend = document.getElementById('monitorLegend');
+    if (legend) {
+      legend.hidden = true;
+      legend.classList.remove('is-refreshing');
+    }
+    monitorOn = false;
+  }
+
+  function applyMonitor(data) {
+    // Stale-promise guard — drop responses that arrive after the user has
+    // left Monitor mode (e.g. a refresh that resolves post mode-flip).
+    if (currentAppMode !== 'monitor') return;
+
+    var hadPaint = monitorOn;
+    // We don't full-reset on every refresh — just rewrite attrs in place so
+    // the CSS transition animates between bins.
+    var passedTotal = 0, failedTotal = 0, pagesWithData = 0;
+    nodes.forEach(function (n) {
+      if (n.color === 'case' || n.color === 'flow' || n.color === 'suite') {
+        n.el.classList.add('monitor-source');
+        return;
+      }
+      var d = data[n.id];
+      if (!d || (d.passed === 0 && d.failed === 0)) {
+        n.el.setAttribute('data-monitor', 'none');
+        n.el.removeAttribute('data-monitor-passed');
+        n.el.removeAttribute('data-monitor-failed');
+      } else {
+        var total = d.passed + d.failed;
+        var rate = d.passed / total; // 0..1
+        // 5-bin partition:
+        //   rate === 0    → 0 (all failed)
+        //   rate === 1    → 4 (all passed)
+        //   else bin = ceil(rate * 3) clamped to 1..3
+        var bin;
+        if (rate <= 0) bin = 0;
+        else if (rate >= 1) bin = 4;
+        else bin = Math.min(3, Math.max(1, Math.ceil(rate * 3)));
+        n.el.setAttribute('data-monitor', String(bin));
+        n.el.setAttribute('data-monitor-passed', String(d.passed));
+        n.el.setAttribute('data-monitor-failed', String(d.failed));
+        passedTotal += d.passed;
+        failedTotal += d.failed;
+        pagesWithData++;
+      }
+      // Native tooltip — "12 passed · 3 failed" or "no test data".
+      var prev = n.el.querySelector(':scope > title.monitor-tip');
+      if (prev) prev.parentNode.removeChild(prev);
+      var tip = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+      tip.setAttribute('class', 'monitor-tip');
+      if (data[n.id]) {
+        tip.textContent = data[n.id].passed + ' passed · ' + data[n.id].failed + ' failed';
+      } else {
+        tip.textContent = 'no test data';
+      }
+      n.el.insertBefore(tip, n.el.firstChild);
+    });
+    renderMonitorLegend(passedTotal, failedTotal, pagesWithData);
+    monitorOn = true;
+
+    // Pulse the legend dot on every successful repaint.
+    var legend = document.getElementById('monitorLegend');
+    if (legend) {
+      legend.classList.remove('is-refreshing');
+      // Force reflow so the animation restarts even if the class never left.
+      void legend.offsetWidth;
+      legend.classList.add('is-refreshing');
+    }
+    return hadPaint;
+  }
+
+  function renderMonitorLegend(passed, failed, pages) {
+    var legend = document.getElementById('monitorLegend');
+    if (!legend) return;
+    var status = document.getElementById('monitorStatus');
+    var total = passed + failed;
+    if (status) {
+      if (pages === 0) {
+        status.textContent = 'no data';
+      } else {
+        var pct = total === 0 ? 0 : Math.round((passed / total) * 100);
+        status.textContent = pct + '% · ' + pages + (pages === 1 ? ' page' : ' pages');
+      }
+    }
+    legend.hidden = false;
+  }
+
+  function refreshMonitor() {
+    // Sequence guard — if multiple in-flight fetches resolve out of order,
+    // only the most recent one is allowed to paint.
+    var seq = ++monitorFetchSeq;
+    loadMonitorData().then(function (data) {
+      if (seq !== monitorFetchSeq) return;
+      applyMonitor(data);
+    });
+  }
+
+  function startMonitorPolling() {
+    if (monitorTimer) clearInterval(monitorTimer);
+    refreshMonitor();
+    monitorTimer = setInterval(refreshMonitor, 5000);
+  }
+
   function setAppMode(mode) {
-    if (mode !== 'view' && mode !== 'edit' && mode !== 'ai' && mode !== 'path') return;
+    if (mode !== 'view' && mode !== 'edit' && mode !== 'ai' && mode !== 'path' && mode !== 'heatmap' && mode !== 'monitor') return;
     currentAppMode = mode;
     editMode = (mode === 'edit');
 
     // SVG class hints (legacy)
     svg.classList.toggle('editmode', editMode);
     svg.classList.toggle('pathmode', mode === 'path');
+    svg.classList.toggle('heatmapmode', mode === 'heatmap');
+    svg.classList.toggle('monitormode', mode === 'monitor');
 
     // Leaving Path mode drops any active highlight. (Re-entering and clicking
     // a different page also calls clearPathHighlight from highlightPathTo.)
     if (mode !== 'path') clearPathHighlight();
+    if (mode !== 'heatmap') clearHeatmap();
+    if (mode !== 'monitor') clearMonitor();
 
     // Toolbar surface (drives the violet AI wash + mode-specific palette)
     var bottom = document.getElementById('bottomToolbar');
@@ -1009,6 +1247,8 @@
       bottom.classList.toggle('mode-edit', mode === 'edit');
       bottom.classList.toggle('mode-ai',   mode === 'ai');
       bottom.classList.toggle('mode-path', mode === 'path');
+      bottom.classList.toggle('mode-heatmap', mode === 'heatmap');
+      bottom.classList.toggle('mode-monitor', mode === 'monitor');
       bottom.setAttribute('data-app-mode', mode);
     }
 
@@ -1017,12 +1257,26 @@
     if (appSeg) {
       var btns = Array.prototype.slice.call(appSeg.querySelectorAll(':scope > button[data-mode]'));
       btns.forEach(function (b) {
-        b.classList.remove('active', 'mode-view', 'mode-edit', 'mode-ai', 'mode-path');
+        b.classList.remove('active', 'mode-view', 'mode-edit', 'mode-ai', 'mode-path', 'mode-heatmap', 'mode-monitor');
         if (b.getAttribute('data-mode') === mode) {
           b.classList.add('active', 'mode-' + mode);
         }
       });
       if (typeof positionSegPill === 'function') positionSegPill(appSeg);
+    }
+
+    // Entering Heatmap mode (or re-entering while already in it) — refetch
+    // counts and repaint. The stale-promise guard inside applyHeatmap drops
+    // any in-flight response if the user has since switched modes.
+    if (mode === 'heatmap') {
+      loadHeatmapData().then(applyHeatmap);
+    }
+
+    // Entering Monitor mode — kick off the 5s poller. startMonitorPolling
+    // does an immediate fetch and then setInterval; clearMonitor (called
+    // above when leaving) stops the timer.
+    if (mode === 'monitor') {
+      startMonitorPolling();
     }
 
     // Edit-only affordances
@@ -3640,11 +3894,13 @@
     }
     if (e.metaKey || e.ctrlKey || e.altKey) return;
 
-    // 1 / 2 / 3 / 4 → app modes
+    // 1 / 2 / 3 / 4 / 5 / 6 → app modes
     if (e.key === '1') { setAppMode('view'); e.preventDefault(); return; }
     if (e.key === '2') { setAppMode('edit'); e.preventDefault(); return; }
     if (e.key === '3') { setAppMode('ai');   e.preventDefault(); return; }
     if (e.key === '4') { setAppMode('path'); e.preventDefault(); return; }
+    if (e.key === '5') { setAppMode('heatmap'); e.preventDefault(); return; }
+    if (e.key === '6') { setAppMode('monitor'); e.preventDefault(); return; }
 
     // Pointer toggle (always works)
     if (e.key === 'v' || e.key === 'V') {
