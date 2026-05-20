@@ -1,0 +1,70 @@
+{
+  "format": "pw-studio-sitemap",
+  "version": 1,
+  "viewport": { "scale": 0.85, "tx": 60, "ty": 40, "vbW": 1600, "vbH": 900 },
+  "pages": [
+    { "id": "home",         "name": "Home",               "sub": null, "slug": "home",               "x": 180,  "y": 96,  "w": 140, "h": 48, "color": "page", "border": "solid", "locked": false },
+    { "id": "about",        "name": "About",              "sub": null, "slug": "about",              "x": 380,  "y": 96,  "w": 140, "h": 48, "color": "page", "border": "solid", "locked": false },
+    { "id": "contact",      "name": "Contact",            "sub": null, "slug": "contact",            "x": 580,  "y": 96,  "w": 140, "h": 48, "color": "page", "border": "solid", "locked": false },
+    { "id": "faq",          "name": "FAQ",                "sub": null, "slug": "faq",                "x": 780,  "y": 96,  "w": 140, "h": 48, "color": "page", "border": "solid", "locked": false },
+
+    { "id": "categories",   "name": "Categories",         "sub": null, "slug": "categories",         "x": 180,  "y": 256, "w": 140, "h": 48, "color": "info", "border": "solid", "locked": false },
+    { "id": "search",       "name": "Search Results",     "sub": null, "slug": "search-results",     "x": 380,  "y": 256, "w": 140, "h": 48, "color": "info", "border": "solid", "locked": false },
+    { "id": "category",     "name": "Category Listing",   "sub": null, "slug": "category-listing",   "x": 180,  "y": 336, "w": 140, "h": 48, "color": "info", "border": "solid", "locked": false },
+    { "id": "product",      "name": "Product Detail",     "sub": null, "slug": "product-detail",     "x": 380,  "y": 336, "w": 140, "h": 48, "color": "info", "border": "solid", "locked": false },
+
+    { "id": "cart",         "name": "Cart",               "sub": null, "slug": "cart",               "x": 660,  "y": 256, "w": 140, "h": 48, "color": "flow", "border": "solid", "locked": false },
+    { "id": "checkout",     "name": "Checkout",           "sub": null, "slug": "checkout",           "x": 860,  "y": 256, "w": 140, "h": 48, "color": "flow", "border": "solid", "locked": false },
+    { "id": "payment",      "name": "Payment",            "sub": null, "slug": "payment",            "x": 660,  "y": 336, "w": 140, "h": 48, "color": "flow", "border": "solid", "locked": false },
+    { "id": "confirmation", "name": "Order Confirmation", "sub": null, "slug": "order-confirmation", "x": 860,  "y": 336, "w": 140, "h": 48, "color": "flow", "border": "solid", "locked": false },
+
+    { "id": "signin",       "name": "Sign In",            "sub": null, "slug": "sign-in",            "x": 1160, "y": 96,  "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+    { "id": "register",     "name": "Register",           "sub": null, "slug": "register",           "x": 1360, "y": 96,  "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+    { "id": "forgot",       "name": "Forgot Password",    "sub": null, "slug": "forgot-password",    "x": 1160, "y": 176, "w": 140, "h": 48, "color": "case", "border": "dashed","locked": false },
+    { "id": "account",      "name": "Account",            "sub": null, "slug": "account",            "x": 1360, "y": 176, "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+    { "id": "orders",       "name": "Order History",      "sub": null, "slug": "order-history",      "x": 1160, "y": 296, "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+    { "id": "wishlist",     "name": "Wishlist",           "sub": null, "slug": "wishlist",           "x": 1360, "y": 296, "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+
+    { "id": "returns",      "name": "Returns",            "sub": null, "slug": "returns",            "x": 180,  "y": 556, "w": 140, "h": 48, "color": "warn", "border": "solid", "locked": false },
+    { "id": "help",         "name": "Help Center",        "sub": null, "slug": "help-center",        "x": 380,  "y": 556, "w": 140, "h": 48, "color": "warn", "border": "solid", "locked": false }
+  ],
+  "areas": [
+    { "id": "area-marketing", "name": "Marketing",       "slug": "marketing",      "x": 120,  "y": 60,  "w": 820, "h": 120, "color": "neutral", "titlePos": "top-left", "locked": false },
+    { "id": "area-catalog",   "name": "Catalog",         "slug": "catalog",        "x": 120,  "y": 220, "w": 440, "h": 240, "color": "info",    "titlePos": "top-left", "locked": false },
+    { "id": "area-checkout",  "name": "Cart & Checkout", "slug": "checkout-flow",  "x": 600,  "y": 220, "w": 440, "h": 240, "color": "flow",    "titlePos": "top-left", "locked": false },
+    { "id": "area-account",   "name": "Account",         "slug": "account-area",   "x": 1100, "y": 60,  "w": 440, "h": 400, "color": "case",    "titlePos": "top-left", "locked": false },
+    { "id": "area-support",   "name": "Support",         "slug": "support",        "x": 120,  "y": 520, "w": 440, "h": 120, "color": "warn",    "titlePos": "top-left", "locked": false }
+  ],
+  "edges": [
+    { "sourceId": "home",         "targetId": "categories",   "label": "Shop",        "lineColor": "gray",   "lineStyle": "solid",  "lineWidth": "thin", "manualMid": null, "manualSp": null, "manualTp": null },
+    { "sourceId": "home",         "targetId": "search",       "label": "Search",      "lineColor": "gray",   "lineStyle": "solid",  "lineWidth": "thin", "manualMid": null, "manualSp": null, "manualTp": null },
+    { "sourceId": "home",         "targetId": "signin",       "label": "Sign in",     "lineColor": "gray",   "lineStyle": "solid",  "lineWidth": "thin", "manualMid": null, "manualSp": null, "manualTp": null },
+    { "sourceId": "home",         "targetId": "cart",         "label": null,          "lineColor": "gray",   "lineStyle": "dashed", "lineWidth": "thin",   "manualMid": null, "manualSp": null, "manualTp": null },
+    { "sourceId": "home",         "targetId": "about",        "label": null,          "lineColor": "gray",   "lineStyle": "dotted", "lineWidth": "thin",   "manualMid": null, "manualSp": null, "manualTp": null },
+    { "sourceId": "home",         "targetId": "contact",      "label": null,          "lineColor": "gray",   "lineStyle": "dotted", "lineWidth": "thin",   "manualMid": null, "manualSp": null, "manualTp": null },
+    { "sourceId": "home",         "targetId": "faq",          "label": null,          "lineColor": "gray",   "lineStyle": "dotted", "lineWidth": "thin",   "manualMid": null, "manualSp": null, "manualTp": null },
+
+    { "sourceId": "categories",   "targetId": "category",     "label": null,          "lineColor": "page",   "lineStyle": "solid",  "lineWidth": "thin", "manualMid": null, "manualSp": null, "manualTp": null },
+    { "sourceId": "category",     "targetId": "product",      "label": null,          "lineColor": "page",   "lineStyle": "solid",  "lineWidth": "thin", "manualMid": null, "manualSp": null, "manualTp": null },
+    { "sourceId": "search",       "targetId": "product",      "label": null,          "lineColor": "page",   "lineStyle": "solid",  "lineWidth": "thin", "manualMid": null, "manualSp": null, "manualTp": null },
+
+    { "sourceId": "product",      "targetId": "cart",         "label": "Add to cart", "lineColor": "accent", "lineStyle": "solid",  "lineWidth": "thin",  "manualMid": null, "manualSp": null, "manualTp": null },
+    { "sourceId": "product",      "targetId": "wishlist",     "label": null,          "lineColor": "gray",   "lineStyle": "dashed", "lineWidth": "thin",   "manualMid": null, "manualSp": null, "manualTp": null },
+
+    { "sourceId": "cart",         "targetId": "checkout",     "label": null,          "lineColor": "accent", "lineStyle": "solid",  "lineWidth": "thin",  "manualMid": null, "manualSp": null, "manualTp": null },
+    { "sourceId": "checkout",     "targetId": "payment",      "label": null,          "lineColor": "accent", "lineStyle": "solid",  "lineWidth": "thin",  "manualMid": null, "manualSp": null, "manualTp": null },
+    { "sourceId": "payment",      "targetId": "confirmation", "label": "Pay",         "lineColor": "ok",     "lineStyle": "solid",  "lineWidth": "thin",  "manualMid": null, "manualSp": null, "manualTp": null },
+
+    { "sourceId": "signin",       "targetId": "account",      "label": null,          "lineColor": "page",   "lineStyle": "solid",  "lineWidth": "thin", "manualMid": null, "manualSp": null, "manualTp": null },
+    { "sourceId": "signin",       "targetId": "register",     "label": null,          "lineColor": "gray",   "lineStyle": "dashed", "lineWidth": "thin",   "manualMid": null, "manualSp": null, "manualTp": null },
+    { "sourceId": "signin",       "targetId": "forgot",       "label": null,          "lineColor": "gray",   "lineStyle": "dashed", "lineWidth": "thin",   "manualMid": null, "manualSp": null, "manualTp": null },
+    { "sourceId": "register",     "targetId": "account",      "label": null,          "lineColor": "page",   "lineStyle": "solid",  "lineWidth": "thin", "manualMid": null, "manualSp": null, "manualTp": null },
+
+    { "sourceId": "account",      "targetId": "orders",       "label": null,          "lineColor": "page",   "lineStyle": "solid",  "lineWidth": "thin", "manualMid": null, "manualSp": null, "manualTp": null },
+    { "sourceId": "account",      "targetId": "wishlist",     "label": null,          "lineColor": "page",   "lineStyle": "solid",  "lineWidth": "thin", "manualMid": null, "manualSp": null, "manualTp": null },
+    { "sourceId": "confirmation", "targetId": "orders",       "label": null,          "lineColor": "accent", "lineStyle": "dashed", "lineWidth": "thin", "manualMid": null, "manualSp": null, "manualTp": null },
+
+    { "sourceId": "faq",          "targetId": "help",         "label": null,          "lineColor": "gray",   "lineStyle": "solid",  "lineWidth": "thin", "manualMid": null, "manualSp": null, "manualTp": null },
+    { "sourceId": "orders",       "targetId": "returns",      "label": "Return",      "lineColor": "warn",   "lineStyle": "solid",  "lineWidth": "thin", "manualMid": null, "manualSp": null, "manualTp": null }
+  ]
+}

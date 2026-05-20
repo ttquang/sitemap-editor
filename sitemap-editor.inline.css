@@ -162,7 +162,9 @@
     min-width: 4.25rem;
     padding: 0.5625rem 0.625rem;
     border-radius: 0.5rem;
-    cursor: grab;
+    /* Open-palm hand cursor — same SVG as the canvas .tool-hand state so
+       picking up a tile feels continuous with grabbing on the canvas. */
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><path fill='%231A1F2B' stroke='%23fff' stroke-width='1.4' stroke-linejoin='round' stroke-linecap='round' d='M5 14 C 5 12.5 6 11.8 7 12.2 L 7.6 12.5 L 7.6 7.5 C 7.6 6.5 8.4 5.7 9.4 5.7 C 10.4 5.7 11.2 6.5 11.2 7.5 L 11.2 11.4 L 11.2 4.5 C 11.2 3.5 12 2.7 13 2.7 C 14 2.7 14.8 3.5 14.8 4.5 L 14.8 11 L 14.8 5 C 14.8 4 15.6 3.2 16.6 3.2 C 17.6 3.2 18.4 4 18.4 5 L 18.4 11.4 L 18.4 7 C 18.4 6 19.2 5.2 20.2 5.2 C 21.2 5.2 22 6 22 7 L 22 14 C 22 18.4 18.4 22 14 22 L 13 22 C 9.4 22 6.6 19.2 5.6 16 Z'/></svg>") 16 16, grab;
     color: #1E1E1E;
     font: 500 0.75rem/1 var(--sans); letter-spacing: -0.005em;
     transition: background 80ms, border-color 80ms, color 80ms;
@@ -171,7 +173,11 @@
   .palette-tile svg { width: 1.25rem; height: 1.25rem; display: block; }
   .palette-tile:hover { background: #F2F3F5; border-color: #E5E5E5; }
   .palette-tile:active,
-  .palette-tile.dragging { cursor: grabbing; background: #ECEEF1; }
+  .palette-tile.dragging {
+    /* Closed-fist hand — same SVG as .tool-hand.panning on the canvas. */
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><path fill='%231A1F2B' stroke='%23fff' stroke-width='1.5' stroke-linejoin='round' stroke-linecap='round' d='M2.5 13 C 2.5 12 3.5 11.2 4.5 11.6 L 6.4 12.5 L 6.4 11 C 6.4 9.5 7.4 8.5 8.9 8.5 L 16 8.5 C 17.8 8.5 19.4 9.8 19.4 11.7 L 19.4 16 C 19.4 19.5 16.4 22 12.5 22 L 11.5 22 C 7.6 22 5.4 19 4.4 16 Z'/><g fill='%23fff'><circle cx='8.6' cy='11' r='0.7'/><circle cx='11.2' cy='10.6' r='0.7'/><circle cx='13.8' cy='10.6' r='0.7'/><circle cx='16.4' cy='11' r='0.7'/></g></svg>") 15 20, grabbing;
+    background: #ECEEF1;
+  }
   .palette-tile.tile-page         { color: var(--page-fg); }
   .palette-tile.tile-page:hover   { background: var(--page-bg); }
   .palette-tile.tile-area         { color: #5E3DB3; }

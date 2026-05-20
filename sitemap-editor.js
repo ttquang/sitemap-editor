@@ -99,8 +99,25 @@
     var slug = presetSlug || (typeof slugify === 'function' ? slugify(displayText) : displayText.toLowerCase()) || id;
     g.setAttribute('data-slug', slug);
 
+    // Cache the title <text> and any existing sub <text> so the inspector
+    // can update them uniformly across new-page and imported-page paths.
+    var texts = g.querySelectorAll('text');
+    var labelEl = texts.length >= 1 ? texts[0] : null;
+    var subEl   = texts.length >= 2 ? texts[1] : null;
+    // The sub-line shows the slug as a visible URL hint under the title.
+    // If the imported SVG didn't include a sub <text>, create one so the
+    // slug is always rendered (and stays in sync when edited).
+    if (!subEl) {
+      subEl = document.createElementNS(SVG_NS, 'text');
+      subEl.setAttribute('class', 'sub');
+      subEl.setAttribute('x', x + w / 2);
+      subEl.setAttribute('y', y + 34);
+      g.appendChild(subEl);
+    }
+    if (!subEl.textContent) subEl.textContent = slug;
+
     var node = {
-      id: id, el: g, rectEl: rect,
+      id: id, el: g, rectEl: rect, labelEl: labelEl, subEl: subEl,
       x0: x, y0: y, w: w, h: h,
       offsetX: 0, offsetY: 0,
       color: 'default',
@@ -185,7 +202,7 @@
     e.lineStyle = key;
   }
   function applyLineWidth(e, key) {
-    if (LINE_WIDTHS[key] == null) key = 'normal';
+    if (LINE_WIDTHS[key] == null) key = 'thin';
     e.pathEl.setAttribute('stroke-width', LINE_WIDTHS[key]);
     e.lineWidth = key;
   }
@@ -282,10 +299,11 @@
     var dashAttr = p.getAttribute('stroke-dasharray') || '';
     if (dashAttr.length > 0 || p.classList.contains('suggested')) initialStyle = 'dashed';
     var existingW = parseFloat(p.getAttribute('stroke-width'));
-    var initialWidth = 'normal';
+    var initialWidth = 'thin';
     if (!isNaN(existingW)) {
       if (existingW < 1.8) initialWidth = 'thin';
       else if (existingW > 2.5) initialWidth = 'thick';
+      else initialWidth = 'normal';
     }
     var edgeObj = {
       pathEl: p, labelBgEl: labelBg, labelTextEl: labelText,
@@ -720,7 +738,7 @@
         label: label || null,
         lineColor: e.lineColor || 'gray',
         lineStyle: e.lineStyle || 'solid',
-        lineWidth: e.lineWidth || 'normal',
+        lineWidth: e.lineWidth || 'thin',
         manualMid: e.manualMid || null,
         manualSp:  e.manualSp  || null,
         manualTp:  e.manualTp  || null
@@ -960,10 +978,16 @@
     if (!editMode) clearSelection();
     if (editMode && !currentTool) setTool('hand');
 
-    // Cursor SVG hint
-    if (!editMode) { svg.classList.remove('tool-hand'); svg.classList.remove('tool-cursor'); }
-    else if (currentTool === 'hand') { svg.classList.add('tool-hand'); svg.classList.remove('tool-cursor'); }
-    else { svg.classList.add('tool-cursor'); svg.classList.remove('tool-hand'); }
+    // Cursor SVG hint. View mode panning is the only canvas action available,
+    // so the hand cursor applies there too. Cursor-tool only diverges in edit
+    // mode (where it switches to marquee select).
+    if (editMode && currentTool === 'cursor') {
+      svg.classList.add('tool-cursor');
+      svg.classList.remove('tool-hand');
+    } else {
+      svg.classList.add('tool-hand');
+      svg.classList.remove('tool-cursor');
+    }
   }
 
   function setEditMode(on) {
@@ -1845,7 +1869,7 @@
     if (edges.some(function (e) { return e.sourceId === srcId && e.targetId === tgtId; })) return;
     var pathEl = document.createElementNS(SVG_NS, 'path');
     pathEl.setAttribute('class', 'gedge');
-    pathEl.setAttribute('stroke-width', '2');
+    pathEl.setAttribute('stroke-width', '1.5');
     pathEl.setAttribute('marker-end', 'url(#arr-page)');
     var firstNode = vp.querySelector('.gnode');
     if (firstNode) vp.insertBefore(pathEl, firstNode);
@@ -1859,11 +1883,11 @@
       pathEl: pathEl, labelBgEl: null, labelTextEl: null,
       sourceId: srcId, targetId: tgtId,
       manualMid: null, manualSp: seedSp, manualTp: null,
-      lineColor: 'gray', lineStyle: 'solid', lineWidth: 'normal'
+      lineColor: 'gray', lineStyle: 'solid', lineWidth: 'thin'
     };
     edges.push(e);
     applyLineColor(e, 'gray');
-    applyLineWidth(e, 'normal');
+    applyLineWidth(e, 'thin');
     renderEdge(e); // creates hit-paths
   }
 
@@ -2907,12 +2931,35 @@
     // First <text> is the title; subsequent texts are .sub lines — leave those alone.
     if (ts.length >= 1) ts[0].textContent = name;
   }
+  // Update the page node's sub-line (visible URL hint under the title).
+  // The sub element is cached on the node (set by both addPageNode and the
+  // parser); falls back to ts[1] if absent so this helper stays robust.
+  function setNodeSub(n, text) {
+    if (!n) return;
+    var subEl = n.subEl;
+    if (!subEl && n.el) {
+      var ts = n.el.querySelectorAll('text');
+      if (ts.length >= 2) subEl = ts[1];
+    }
+    if (subEl) {
+      subEl.textContent = text || '';
+      n.subEl = subEl;
+    }
+  }
 
   function openPageEditor(n) { selectPage(n); }
   function closePageEditor() { if (selected.kind === 'page') clearSelection(); }
 
   // ----- Inspector panel: selection model + populate + listeners
   var selected = { kind: null, ref: null };
+
+  // While a Page is open in the inspector, the slug auto-derives from the
+  // name field as the user types — unless the user has explicitly edited the
+  // slug, in which case auto-sync stops until the next selection. The flag
+  // is recomputed every time a Page is loaded into the panel: if the current
+  // slug equals slugify(name), it's still "auto" (re-deriving is safe); if
+  // it differs, the slug is customized and shouldn't be overwritten.
+  var pageSlugCustomized = false;
 
   function showEmptyPanel() {
     var em = document.getElementById('rp-empty');
@@ -2947,6 +2994,10 @@
     if (titleEl) titleEl.textContent = currentName || '—';
     var slugEl = document.getElementById('rp-page-slug');
     if (slugEl) slugEl.value = n.slug || '';
+    // Recompute the auto-sync flag for this page: if the slug currently
+    // matches slugify(name), treat it as auto-derived (keep syncing on
+    // name edits); otherwise treat as customized (stop auto-syncing).
+    pageSlugCustomized = !!(n.slug && n.slug !== (typeof slugify === 'function' ? slugify(currentName) : ''));
 
     var swEl = document.getElementById('rp-page-swatches');
     if (swEl) {
@@ -3238,7 +3289,7 @@
 
     fillButtons('rp-line-swatches', LINE_COLORS, e.lineColor || 'page',   'swatch', applyLineColor);
     fillButtons('rp-line-styles',   LINE_STYLES, e.lineStyle || 'solid',  'border', applyLineStyle);
-    fillButtons('rp-line-widths',   LINE_WIDTHS, e.lineWidth || 'normal', 'width',  applyLineWidth);
+    fillButtons('rp-line-widths',   LINE_WIDTHS, e.lineWidth || 'thin', 'width',  applyLineWidth);
   }
 
   // Wire lock toggle for Page panel (once)
@@ -3323,10 +3374,20 @@
   (function wirePanelInputs() {
     var pgName = document.getElementById('rp-page-name');
     if (pgName) pgName.addEventListener('input', function () {
-      if (selected.kind === 'page') {
-        setNodeName(selected.ref, this.value || 'Untitled');
-        var t = document.getElementById('rp-page-title');
-        if (t) t.textContent = this.value || '—';
+      if (selected.kind !== 'page' || !selected.ref) return;
+      var name = this.value || 'Untitled';
+      setNodeName(selected.ref, name);
+      var t = document.getElementById('rp-page-title');
+      if (t) t.textContent = this.value || '—';
+      // Auto-derive slug from name unless the user has customized it. Also
+      // refresh the page's sub-line so the visible URL hint stays in sync.
+      if (!pageSlugCustomized) {
+        var derived = (typeof slugify === 'function' ? slugify(name) : name.toLowerCase());
+        selected.ref.slug = derived;
+        if (selected.ref.el) selected.ref.el.setAttribute('data-slug', derived);
+        var slugEl = document.getElementById('rp-page-slug');
+        if (slugEl) slugEl.value = derived;
+        setNodeSub(selected.ref, derived);
       }
     });
     var pgSlug = document.getElementById('rp-page-slug');
@@ -3335,6 +3396,14 @@
       var v = this.value || '';
       selected.ref.slug = v;
       if (selected.ref.el) selected.ref.el.setAttribute('data-slug', v);
+      // Reflect the new slug as the visible sub-line on the page card.
+      setNodeSub(selected.ref, v);
+      // User has explicitly edited the slug — stop auto-syncing from name
+      // until the next selection (or until they re-derive it back to
+      // slugify(name), at which point auto-sync resumes).
+      var labelEl = selected.ref.labelEl;
+      var liveName = labelEl ? (labelEl.textContent || '') : (selected.ref.name || '');
+      pageSlugCustomized = (typeof slugify === 'function') ? v !== slugify(liveName) : true;
     });
     var grName = document.getElementById('rp-area-name');
     if (grName) grName.addEventListener('input', function () {
@@ -3732,7 +3801,9 @@
     sub.setAttribute('class', 'sub');
     sub.setAttribute('x', x + nodeW / 2);
     sub.setAttribute('y', y + 34);
-    sub.textContent = 'untouched';
+    // Show the slug as the sub-line — a visible URL hint under the title.
+    // Stays in sync with the inspector's slug field via setNodeSub().
+    sub.textContent = initialSlug;
     g.appendChild(sub);
     vp.appendChild(g);
 
@@ -3743,11 +3814,19 @@
       slug: initialSlug
     });
     addConnectHandles(g, id, x, y, nodeW, nodeH);
+    // Imported pages get anchor dots from standardizeNodeSizes at init;
+    // a freshly-spawned page must opt in too so its hover affordance
+    // (connect handles + anchor dots) matches.
+    try { if (typeof addAnchorDots === 'function') addAnchorDots(nodes.get(id)); } catch (err) {}
     try { if (typeof renderNode === 'function') renderNode(nodes.get(id)); } catch (err) {}
   }
   window.__graphAddPageNode = addPageNode;
 
   function init() {
+    // Reflect the default pointer tool on the SVG so the custom hand cursor
+    // shows from page load. setAppMode is only called when the user clicks a
+    // mode button, which leaves view-mode pages without a tool class.
+    if (typeof setTool === 'function') setTool(currentTool || 'hand');
     if (typeof renderAll === 'function') renderAll();
     var pending = window.__pendingImportState;
     if (pending) {

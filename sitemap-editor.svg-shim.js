@@ -50,18 +50,21 @@
       g.setAttribute('data-id', p.id);
       if (p.slug) g.setAttribute('data-slug', p.slug);
 
+      // Mirror addPageNode (sitemap-editor.js) exactly so an imported Page
+      // has the same shape and label position as a freshly-spawned one —
+      // rounded corners (rx=5) and label/sub at the addPageNode-tuned
+      // y-offsets (21 and 34 for the canonical h=48 page).
       var rect = document.createElementNS(SVG_NS, 'rect');
       rect.setAttribute('x', p.x);
       rect.setAttribute('y', p.y);
       rect.setAttribute('width', p.w);
       rect.setAttribute('height', p.h);
+      rect.setAttribute('rx', 5);
       g.appendChild(rect);
 
       var text = document.createElementNS(SVG_NS, 'text');
       text.setAttribute('x', p.x + p.w / 2);
-      text.setAttribute('y', p.y + p.h / 2);
-      text.setAttribute('text-anchor', 'middle');
-      text.setAttribute('dominant-baseline', 'middle');
+      text.setAttribute('y', p.y + 21);
       text.textContent = p.name || '';
       g.appendChild(text);
 
@@ -69,8 +72,7 @@
         var sub = document.createElementNS(SVG_NS, 'text');
         sub.setAttribute('class', 'sub');
         sub.setAttribute('x', p.x + p.w / 2);
-        sub.setAttribute('y', p.y + p.h / 2 + 14);
-        sub.setAttribute('text-anchor', 'middle');
+        sub.setAttribute('y', p.y + 34);
         sub.textContent = p.sub;
         g.appendChild(sub);
       }
