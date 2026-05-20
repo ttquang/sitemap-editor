@@ -48,6 +48,10 @@
     background: linear-gradient(180deg, #F3EEFF 0%, #FFFFFF 60%);
     border-color: #DCD0F8;
   }
+  .bottom-toolbar.mode-path {
+    background: linear-gradient(180deg, #FFF6E5 0%, #FFFFFF 60%);
+    border-color: #F0D49A;
+  }
   .bottom-toolbar .tb-sep {
     width: 1px; align-self: stretch;
     background: #E5E5E5;
@@ -118,6 +122,21 @@
   .bottom-toolbar .seg button.active.mode-view { color: #0A6644; }
   .bottom-toolbar .seg button.active.mode-edit { color: var(--accent); }
   .bottom-toolbar .seg button.active.mode-ai   { color: #7C3AED; }
+  .bottom-toolbar .seg button.active.mode-path { color: #B45309; }
+
+  /* Path mode highlight — reverse-BFS from the clicked page marks every
+     ancestor + connecting edge as .path-on; everything else gets .path-dim.
+     Color matches the toolbar's amber tint to read as "trace mode". */
+  .canvas-wrap svg.graph .gnode { transition: opacity 160ms ease; }
+  .canvas-wrap svg.graph path.gedge { transition: opacity 160ms ease, stroke 160ms ease; }
+  .canvas-wrap svg.graph .gnode.path-dim,
+  .canvas-wrap svg.graph rect.gzone.path-dim,
+  .canvas-wrap svg.graph .gzone-label.path-dim,
+  .canvas-wrap svg.graph .gelabel.path-dim,
+  .canvas-wrap svg.graph .gelabel-bg.path-dim { opacity: 0.18; }
+  .canvas-wrap svg.graph path.gedge.path-dim { opacity: 0.12; }
+  .canvas-wrap svg.graph path.gedge.path-on  { stroke: #B45309 !important; stroke-width: 3 !important; }
+  .canvas-wrap svg.graph .gnode.path-target rect:not(.connect-handle) { stroke: #B45309; stroke-width: 2.5; }
   /* Icon-only seg buttons (App-mode + Pointer-mode) — fixed square slots, icons dead-center */
   .bottom-toolbar .seg.seg-app button,
   .bottom-toolbar .seg.seg-pointer button {

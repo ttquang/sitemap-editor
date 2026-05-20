@@ -658,18 +658,90 @@
     return !(ax + aw < bx || ax > bx + bw || ay + ah < by || ay > by + bh);
   }
 
-  // App-mode state: 'view' | 'edit' | 'ai'. setEditMode is now a
+  // App-mode state: 'view' | 'edit' | 'ai' | 'path'. setEditMode is now a
   // thin wrapper around setAppMode for backward compatibility with
   // existing call sites (selectPage, selectArea, etc.).
   var currentAppMode = 'view';
+  var pathHighlightOn = false;
+
+  function clearPathHighlight() {
+    if (!pathHighlightOn) return;
+    nodes.forEach(function (n) {
+      n.el.classList.remove('path-on', 'path-target', 'path-dim');
+    });
+    edges.forEach(function (e) {
+      if (e.pathEl) e.pathEl.classList.remove('path-on', 'path-dim');
+      if (e.labelBgEl) e.labelBgEl.classList.remove('path-dim');
+      if (e.labelTextEl) e.labelTextEl.classList.remove('path-dim');
+    });
+    Array.prototype.forEach.call(vp.querySelectorAll('rect.gzone, .gzone-label'), function (el) {
+      el.classList.remove('path-dim');
+    });
+    pathHighlightOn = false;
+  }
+
+  // Reverse-BFS from `target` along incoming edges; mark every reachable
+  // ancestor and the edges connecting them as "on path", dim everything else.
+  // Lets the user see how a leaf page can be reached from any root.
+  function highlightPathTo(target) {
+    clearPathHighlight();
+    var incoming = Object.create(null);
+    edges.forEach(function (e) {
+      (incoming[e.targetId] || (incoming[e.targetId] = [])).push(e);
+    });
+    var onNodes = Object.create(null);
+    var onEdges = [];
+    var queue = [target.id];
+    onNodes[target.id] = true;
+    while (queue.length) {
+      var cur = queue.shift();
+      var ins = incoming[cur] || [];
+      for (var i = 0; i < ins.length; i++) {
+        var e = ins[i];
+        onEdges.push(e);
+        if (!onNodes[e.sourceId]) {
+          onNodes[e.sourceId] = true;
+          queue.push(e.sourceId);
+        }
+      }
+    }
+    nodes.forEach(function (n) {
+      if (onNodes[n.id]) {
+        n.el.classList.add('path-on');
+        if (n.id === target.id) n.el.classList.add('path-target');
+      } else {
+        n.el.classList.add('path-dim');
+      }
+    });
+    var onEdgeSet = Object.create(null);
+    onEdges.forEach(function (e) { onEdgeSet[edges.indexOf(e)] = true; });
+    edges.forEach(function (e, i) {
+      if (onEdgeSet[i]) {
+        if (e.pathEl) e.pathEl.classList.add('path-on');
+      } else {
+        if (e.pathEl) e.pathEl.classList.add('path-dim');
+        if (e.labelBgEl) e.labelBgEl.classList.add('path-dim');
+        if (e.labelTextEl) e.labelTextEl.classList.add('path-dim');
+      }
+    });
+    Array.prototype.forEach.call(vp.querySelectorAll('rect.gzone, .gzone-label'), function (el) {
+      el.classList.add('path-dim');
+    });
+    pathHighlightOn = true;
+  }
 
   function setAppMode(mode) {
-    if (mode !== 'view' && mode !== 'edit' && mode !== 'ai') return;
+    if (mode !== 'view' && mode !== 'edit' && mode !== 'ai' && mode !== 'path') return;
     currentAppMode = mode;
     editMode = (mode === 'edit');
 
     // SVG class hints (legacy)
     svg.classList.toggle('editmode', editMode);
+    svg.classList.toggle('pathmode', mode === 'path');
+
+    // Leaving path mode clears any active highlight. (Re-entering and clicking
+    // a different page also calls clearPathHighlight from highlightPathTo.)
+    if (mode !== 'path') clearPathHighlight();
 
     // Toolbar surface (drives the violet AI wash + mode-specific palette)
     var bottom = document.getElementById('bottomToolbar');
@@ -677,6 +749,7 @@
       bottom.classList.toggle('mode-view', mode === 'view');
       bottom.classList.toggle('mode-edit', mode === 'edit');
       bottom.classList.toggle('mode-ai',   mode === 'ai');
+      bottom.classList.toggle('mode-path', mode === 'path');
       bottom.setAttribute('data-app-mode', mode);
     }
 
@@ -685,7 +758,7 @@
     if (appSeg) {
       var btns = Array.prototype.slice.call(appSeg.querySelectorAll(':scope > button[data-mode]'));
       btns.forEach(function (b) {
-        b.classList.remove('active', 'mode-view', 'mode-edit', 'mode-ai');
+        b.classList.remove('active', 'mode-view', 'mode-edit', 'mode-ai', 'mode-path');
         if (b.getAttribute('data-mode') === mode) {
           b.classList.add('active', 'mode-' + mode);
         }
@@ -829,6 +902,13 @@
         var n = nodes.get(id);
         if (n) startNodeDrag(n, ev);
         ev.preventDefault();
+      } else if (currentAppMode === 'path') {
+        var pid = nodeEl.getAttribute('data-id');
+        var pn = nodes.get(pid);
+        if (pn) highlightPathTo(pn);
+        ev.preventDefault();
+        ev.stopPropagation();
+        suppressNextClick = true;
       }
       return;
     }
@@ -1475,6 +1555,9 @@
       if (editMode && movedDist < 0.5) {
         // It was a click on empty canvas in edit mode — clear selection
         clearSelection();
+      } else if (currentAppMode === 'path' && movedDist < 0.5) {
+        // Click on empty canvas in path mode — drop the highlighted path
+        clearPathHighlight();
       }
     }
     if (nodeDragState) {
@@ -3206,6 +3289,7 @@
     if (e.key === '1') { setAppMode('view'); e.preventDefault(); return; }
     if (e.key === '2') { setAppMode('edit'); e.preventDefault(); return; }
     if (e.key === '3') { setAppMode('ai');   e.preventDefault(); return; }
+    if (e.key === '4') { setAppMode('path'); e.preventDefault(); return; }
 
     // Pointer toggle (always works)
     if (e.key === 'v' || e.key === 'V') {
@@ -3292,6 +3376,7 @@
     var openModal = document.querySelector('.scrim.open');
     if (openModal) return;
     if (currentAppMode === 'ai') { setAppMode('view'); e.preventDefault(); return; }
+    if (currentAppMode === 'path' && pathHighlightOn) { clearPathHighlight(); e.preventDefault(); return; }
     if (typeof marqueeState !== 'undefined' && marqueeState) {
       if (typeof cancelMarquee === 'function') cancelMarquee();
       e.preventDefault(); return;
