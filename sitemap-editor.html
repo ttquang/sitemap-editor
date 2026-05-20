@@ -60,20 +60,17 @@
                ========================================================= -->
           <div class="bottom-toolbar mode-view" id="bottomToolbar" data-app-mode="view" role="toolbar" aria-label="Canvas toolbar">
 
-            <!-- App-mode segmented toggle (View / Edit / AI / Path) -->
+            <!-- App-mode segmented toggle (View / Edit / AI) — icon-only -->
             <div class="seg seg-app" role="group" aria-label="App mode">
               <span class="seg-pill" aria-hidden="true"></span>
-              <button class="active mode-view" data-mode="view" type="button" title="View (1) — read only" aria-label="View">
+              <button class="active mode-view" data-mode="view" type="button" aria-label="View" title="View (1) — read only">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
               </button>
-              <button data-mode="edit" type="button" title="Edit (2) — add / move / connect" aria-label="Edit">
+              <button class="mode-edit" data-mode="edit" type="button" aria-label="Edit" title="Edit (2) — add / move / connect">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
               </button>
-              <button data-mode="ai" type="button" title="AI (3 or ⌘K) — open chat" aria-label="AI">
+              <button class="mode-ai" data-mode="ai" type="button" aria-label="AI" title="AI (3 or ⌘K) — open chat">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3L13.5 8.5L19 10L13.5 11.5L12 17L10.5 11.5L5 10L10.5 8.5L12 3Z"/><path d="M18 16L19 18L21 19L19 20L18 22L17 20L15 19L17 18L18 16Z"/></svg>
-              </button>
-              <button data-mode="path" type="button" title="Path (4) — click a page to trace its route from the start" aria-label="Path">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="11.49"/></svg>
               </button>
             </div>
             <div class="tb-sep" aria-hidden="true"></div>
@@ -88,6 +85,7 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg>
               </button>
             </div>
+            <!-- Sep: Cursor Mode | (Palette in edit mode | ) Import/Export -->
             <div class="tb-sep" aria-hidden="true"></div>
 
             <!-- Element palette — only present in Edit mode.
@@ -106,17 +104,22 @@
                 Area
               </button>
             </span>
+            <!-- Sep visible only in edit mode (palette → import) -->
             <div class="tb-sep" aria-hidden="true" data-needs-edit hidden></div>
 
-            <!-- Always-on utilities: Import / Export + Zoom -->
-            <button id="btnImportSVG" class="icon-only" type="button" title="Import SVG (load a saved sitemap)">
+            <!-- Import / Export -->
+            <button id="btnImportSVG" class="icon-only" type="button" title="Import sitemap (.sitemap.json)">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
             </button>
-            <button id="btnExportSVG" class="icon-only" type="button" title="Export SVG (download the current sitemap)">
+            <button id="btnExportSVG" class="icon-only" type="button" title="Export sitemap (.sitemap.json)">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             </button>
-            <input type="file" id="importFile" accept=".svg,image/svg+xml" hidden>
+            <input type="file" id="importFile" accept=".json,.sitemap.json,application/json" hidden>
+
+            <!-- Sep: Import/Export | Zoom -->
             <div class="tb-sep" aria-hidden="true"></div>
+
+            <!-- Zoom controls -->
             <button id="zc-out" class="icon-only" type="button" title="Zoom out (⌘−)">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
             </button>

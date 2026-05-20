@@ -158,4 +158,36 @@
   if (toastOpen) toastOpen.addEventListener('click', function () {
     if (typeof window.openCreatedPage === 'function') window.openCreatedPage();
   });
+
+  // ----- Import / Export buttons (JSON) -------------------------------
+  // Export: synthesize the JSON payload and trigger a Blob download.
+  var exportBtn = document.getElementById('btnExportSVG');
+  if (exportBtn) exportBtn.addEventListener('click', function () {
+    if (typeof window.__graphExportJSON === 'function') window.__graphExportJSON();
+  });
+
+  // Import: button opens the hidden file picker; change handler reads
+  // the selected file and forwards the text to __graphImportJSON, which
+  // validates + reloads.
+  var importBtn  = document.getElementById('btnImportSVG');
+  var importFile = document.getElementById('importFile');
+  if (importBtn && importFile) {
+    importBtn.addEventListener('click', function () { importFile.click(); });
+    importFile.addEventListener('change', function (ev) {
+      var file = ev.target.files && ev.target.files[0];
+      // Always reset value so the same file can be re-selected later.
+      ev.target.value = '';
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function () {
+        if (typeof window.__graphImportJSON === 'function') {
+          window.__graphImportJSON(reader.result);
+        }
+      };
+      reader.onerror = function () {
+        alert('Could not read the selected file.');
+      };
+      reader.readAsText(file);
+    });
+  }
 })();

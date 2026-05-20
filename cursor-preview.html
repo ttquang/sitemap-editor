@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cursor Set Preview — PW Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:        #0A1628;
+    --ink-strong: #050B17;
+    --ink-mid:    #4A5A6E;
+    --ink-faint:  #8A95A5;
+    --bg:         #FFFFFF;
+    --bg-alt:     #FAFBFC;
+    --bg-dark:    #0F1A2C;
+    --border:     #E5E8EC;
+    --divider:    #EEF1F4;
+    --accent:     #1766DC;
+    --accent-soft:#E1ECFB;
+    --teal:       #0C6C68;
+    --sans: 'Inter', system-ui, sans-serif;
+    --mono: 'IBM Plex Mono', ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: var(--sans);
+    color: var(--ink);
+    background: var(--bg-alt);
+    min-height: 100vh;
+    padding: 2.5rem 2rem 4rem;
+  }
+
+  .page-head {
+    max-width: 72rem;
+    margin: 0 auto 2rem;
+  }
+  .page-head .eyebrow {
+    font-family: var(--mono);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    color: var(--ink-faint);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+  .page-head h1 {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--ink-strong);
+  }
+  .page-head p {
+    margin: 0.5rem 0 0;
+    color: var(--ink-mid);
+    font-size: 0.9375rem;
+    max-width: 44rem;
+    line-height: 1.5;
+  }
+  .page-head .nav {
+    margin-top: 1rem;
+    font-size: 0.8125rem;
+  }
+  .page-head .nav a {
+    color: var(--accent);
+    text-decoration: none;
+    font-family: var(--mono);
+  }
+  .page-head .nav a:hover { text-decoration: underline; }
+
+  .grid {
+    max-width: 72rem;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+  @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }
+
+  .card {
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    border-radius: 0.875rem;
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+  }
+  .card-head {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 1rem;
+    padding: 0.875rem 1.125rem;
+    border-bottom: 1px solid var(--divider);
+  }
+  .card-head .label {
+    display: flex; align-items: baseline; gap: 0.625rem;
+  }
+  .card-head h2 {
+    margin: 0;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--ink-strong);
+  }
+  .card-head .tag {
+    font-family: var(--mono);
+    font-size: 0.625rem;
+    color: var(--ink-faint);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .card-head .hotspot {
+    font-family: var(--mono);
+    font-size: 0.6875rem;
+    color: var(--ink-mid);
+    background: var(--bg-alt);
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.3125rem;
+    border: 1px solid var(--divider);
+  }
+  .card-head .hotspot b { color: var(--ink-strong); font-weight: 600; }
+
+  /* Hover zones — two backgrounds per cursor (light + dark) so the
+     halo contrast can be judged on both. */
+  .zones {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .zone {
+    height: 11rem;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    transition: background 120ms ease;
+  }
+  .zone .hint {
+    position: absolute;
+    bottom: 0.625rem; left: 0.75rem;
+    font-family: var(--mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    pointer-events: none;
+  }
+  .zone-light {
+    background:
+      radial-gradient(circle at 1px 1px, rgba(10,22,40,0.06) 1px, transparent 0) 0 0 / 24px 24px,
+      #FAFBFC;
+  }
+  .zone-light .hint { color: var(--ink-faint); }
+  .zone-dark {
+    background:
+      radial-gradient(circle at 1px 1px, rgba(255,255,255,0.06) 1px, transparent 0) 0 0 / 24px 24px,
+      var(--bg-dark);
+  }
+  .zone-dark .hint { color: rgba(255,255,255,0.4); }
+
+  .zone .preview-glyph {
+    pointer-events: none;
+    width: 3.5rem; height: 3.5rem;
+    opacity: 0.7;
+  }
+  .zone-dark .preview-glyph path,
+  .zone-dark .preview-glyph circle,
+  .zone-dark .preview-glyph line { stroke-opacity: 0.6; }
+
+  /* === Cursor zone definitions === */
+  .zone.cursor-move        { cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><path fill='%231A1F2B' stroke='%23fff' stroke-width='1.6' stroke-linejoin='round' stroke-linecap='round' d='M4 2.5 L 4 17 L 7.8 13.7 L 10.4 19.4 L 12.4 18.6 L 9.9 13 L 15.3 12.4 Z'/></svg>") 5 4, default; }
+
+  .zone.cursor-hand-idle   { cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><path fill='%231A1F2B' stroke='%23fff' stroke-width='1.4' stroke-linejoin='round' stroke-linecap='round' d='M5 14 C 5 12.5 6 11.8 7 12.2 L 7.6 12.5 L 7.6 7.5 C 7.6 6.5 8.4 5.7 9.4 5.7 C 10.4 5.7 11.2 6.5 11.2 7.5 L 11.2 11.4 L 11.2 4.5 C 11.2 3.5 12 2.7 13 2.7 C 14 2.7 14.8 3.5 14.8 4.5 L 14.8 11 L 14.8 5 C 14.8 4 15.6 3.2 16.6 3.2 C 17.6 3.2 18.4 4 18.4 5 L 18.4 11.4 L 18.4 7 C 18.4 6 19.2 5.2 20.2 5.2 C 21.2 5.2 22 6 22 7 L 22 14 C 22 18.4 18.4 22 14 22 L 13 22 C 9.4 22 6.6 19.2 5.6 16 Z'/></svg>") 16 16, grab; }
+
+  .zone.cursor-hand-grab   { cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><path fill='%231A1F2B' stroke='%23fff' stroke-width='1.5' stroke-linejoin='round' stroke-linecap='round' d='M2.5 13 C 2.5 12 3.5 11.2 4.5 11.6 L 6.4 12.5 L 6.4 11 C 6.4 9.5 7.4 8.5 8.9 8.5 L 16 8.5 C 17.8 8.5 19.4 9.8 19.4 11.7 L 19.4 16 C 19.4 19.5 16.4 22 12.5 22 L 11.5 22 C 7.6 22 5.4 19 4.4 16 Z'/><g fill='%23fff'><circle cx='8.6' cy='11' r='0.7'/><circle cx='11.2' cy='10.6' r='0.7'/><circle cx='13.8' cy='10.6' r='0.7'/><circle cx='16.4' cy='11' r='0.7'/></g></svg>") 15 20, grabbing; }
+
+  .zone.cursor-connect     { cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><g fill='none' stroke='%23fff' stroke-width='3' stroke-linecap='round'><circle cx='12' cy='12' r='7.5'/><line x1='12' y1='1.5' x2='12' y2='6'/><line x1='12' y1='18' x2='12' y2='22.5'/><line x1='1.5' y1='12' x2='6' y2='12'/><line x1='18' y1='12' x2='22.5' y2='12'/></g><g fill='none' stroke='%231A1F2B' stroke-width='1.6' stroke-linecap='round'><circle cx='12' cy='12' r='7.5'/><line x1='12' y1='1.5' x2='12' y2='6'/><line x1='12' y1='18' x2='12' y2='22.5'/><line x1='1.5' y1='12' x2='6' y2='12'/><line x1='18' y1='12' x2='22.5' y2='12'/></g><circle cx='12' cy='12' r='2' fill='%231766DC' stroke='%23fff' stroke-width='1'/></svg>") 16 16, crosshair; }
+
+  /* === Resize cursors === */
+  .zone.cursor-ew  { cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><g fill='none' stroke-linecap='round' stroke-linejoin='round'><path stroke='%23fff' stroke-width='3.2' d='M4 12 H 20 M 4 12 L 8 8.5 M 4 12 L 8 15.5 M 20 12 L 16 8.5 M 20 12 L 16 15.5'/><path stroke='%231A1F2B' stroke-width='1.6' d='M4 12 H 20 M 4 12 L 8 8.5 M 4 12 L 8 15.5 M 20 12 L 16 8.5 M 20 12 L 16 15.5'/></g></svg>") 16 16, ew-resize; }
+
+  .zone.cursor-ns  { cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><g fill='none' stroke-linecap='round' stroke-linejoin='round'><path stroke='%23fff' stroke-width='3.2' d='M12 4 V 20 M 12 4 L 8.5 8 M 12 4 L 15.5 8 M 12 20 L 8.5 16 M 12 20 L 15.5 16'/><path stroke='%231A1F2B' stroke-width='1.6' d='M12 4 V 20 M 12 4 L 8.5 8 M 12 4 L 15.5 8 M 12 20 L 8.5 16 M 12 20 L 15.5 16'/></g></svg>") 16 16, ns-resize; }
+
+  .zone.cursor-nwse{ cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><g fill='none' stroke-linecap='round' stroke-linejoin='round'><path stroke='%23fff' stroke-width='3.2' d='M5.5 5.5 L 18.5 18.5 M 5.5 5.5 L 10.5 5.5 M 5.5 5.5 L 5.5 10.5 M 18.5 18.5 L 13.5 18.5 M 18.5 18.5 L 18.5 13.5'/><path stroke='%231A1F2B' stroke-width='1.6' d='M5.5 5.5 L 18.5 18.5 M 5.5 5.5 L 10.5 5.5 M 5.5 5.5 L 5.5 10.5 M 18.5 18.5 L 13.5 18.5 M 18.5 18.5 L 18.5 13.5'/></g></svg>") 16 16, nwse-resize; }
+
+  .zone.cursor-nesw{ cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><g fill='none' stroke-linecap='round' stroke-linejoin='round'><path stroke='%23fff' stroke-width='3.2' d='M18.5 5.5 L 5.5 18.5 M 18.5 5.5 L 13.5 5.5 M 18.5 5.5 L 18.5 10.5 M 5.5 18.5 L 10.5 18.5 M 5.5 18.5 L 5.5 13.5'/><path stroke='%231A1F2B' stroke-width='1.6' d='M18.5 5.5 L 5.5 18.5 M 18.5 5.5 L 13.5 5.5 M 18.5 5.5 L 18.5 10.5 M 5.5 18.5 L 10.5 18.5 M 5.5 18.5 L 5.5 13.5'/></g></svg>") 16 16, nesw-resize; }
+
+  .zone.cursor-col { cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><g fill='none' stroke-linecap='round' stroke-linejoin='round'><path stroke='%23fff' stroke-width='3.2' d='M12 5 V 19 M 4 12 H 9 M 4 12 L 7 9 M 4 12 L 7 15 M 20 12 H 15 M 20 12 L 17 9 M 20 12 L 17 15'/><path stroke='%231A1F2B' stroke-width='1.6' d='M12 5 V 19 M 4 12 H 9 M 4 12 L 7 9 M 4 12 L 7 15 M 20 12 H 15 M 20 12 L 17 9 M 20 12 L 17 15'/></g></svg>") 16 16, col-resize; }
+
+  .zone.cursor-row { cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><g fill='none' stroke-linecap='round' stroke-linejoin='round'><path stroke='%23fff' stroke-width='3.2' d='M5 12 H 19 M 12 4 V 9 M 12 4 L 9 7 M 12 4 L 15 7 M 12 20 V 15 M 12 20 L 9 17 M 12 20 L 15 17'/><path stroke='%231A1F2B' stroke-width='1.6' d='M5 12 H 19 M 12 4 V 9 M 12 4 L 9 7 M 12 4 L 15 7 M 12 20 V 15 M 12 20 L 9 17 M 12 20 L 15 17'/></g></svg>") 16 16, row-resize; }
+
+  /* === Unified move cursor for Page + Area in edit mode === */
+  .zone.cursor-node-move { cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><g fill='none' stroke-linecap='round' stroke-linejoin='round'><path stroke='%23fff' stroke-width='3.2' d='M12 3 V 21 M 3 12 H 21 M 12 3 L 9 6 M 12 3 L 15 6 M 12 21 L 9 18 M 12 21 L 15 18 M 3 12 L 6 9 M 3 12 L 6 15 M 21 12 L 18 9 M 21 12 L 18 15'/><path stroke='%231A1F2B' stroke-width='1.6' d='M12 3 V 21 M 3 12 H 21 M 12 3 L 9 6 M 12 3 L 15 6 M 12 21 L 9 18 M 12 21 L 15 18 M 3 12 L 6 9 M 3 12 L 6 15 M 21 12 L 18 9 M 21 12 L 18 15'/></g></svg>") 16 16, move; }
+
+  .section-head {
+    max-width: 72rem;
+    margin: 2.5rem auto 1rem;
+    display: flex; align-items: baseline; gap: 0.75rem;
+  }
+  .section-head h2 {
+    margin: 0;
+    font-size: 1.0625rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--ink-strong);
+  }
+  .section-head .sub {
+    font-family: var(--mono);
+    font-size: 0.6875rem;
+    color: var(--ink-faint);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .grid-3 {
+    max-width: 72rem;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+  }
+  @media (max-width: 900px) { .grid-3 { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { .grid-3 { grid-template-columns: 1fr; } }
+  .grid-3 .zone { height: 9rem; }
+
+  /* Footer scale strip — shows each cursor SVG at 4x so the geometry
+     is easy to inspect without squinting at the live OS cursor. */
+  .scale-strip {
+    max-width: 72rem;
+    margin: 2.5rem auto 0;
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    border-radius: 0.875rem;
+    padding: 1.5rem 1.75rem;
+  }
+  .scale-strip h3 {
+    margin: 0 0 1rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    color: var(--ink-strong);
+  }
+  .scale-strip h3 .sub {
+    color: var(--ink-faint);
+    font-weight: 400;
+    margin-left: 0.5rem;
+  }
+  .scale-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+  @media (max-width: 800px) { .scale-row { grid-template-columns: repeat(2, 1fr); } }
+  .scale-cell {
+    border: 1px solid var(--divider);
+    border-radius: 0.625rem;
+    padding: 1rem;
+    text-align: center;
+  }
+  .scale-cell .stage {
+    height: 6rem;
+    display: flex; align-items: center; justify-content: center;
+    background:
+      radial-gradient(circle at 1px 1px, rgba(10,22,40,0.06) 1px, transparent 0) 0 0 / 16px 16px,
+      var(--bg-alt);
+    border-radius: 0.4375rem;
+    margin-bottom: 0.625rem;
+  }
+  .scale-cell .stage.dark {
+    background:
+      radial-gradient(circle at 1px 1px, rgba(255,255,255,0.06) 1px, transparent 0) 0 0 / 16px 16px,
+      var(--bg-dark);
+  }
+  .scale-cell svg { width: 4.5rem; height: 4.5rem; }
+  .scale-cell .name {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--ink-strong);
+  }
+  .scale-cell .meta {
+    font-family: var(--mono);
+    font-size: 0.625rem;
+    color: var(--ink-faint);
+    margin-top: 0.1875rem;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-head">
+  <div class="eyebrow">Sitemap Editor · Cursor Set</div>
+  <h1>Canvas cursor preview</h1>
+  <p>Hover each panel to see the cursor in context. Left half is the light canvas background; right half is dark so the white halo contrast is easy to judge. The footer strip shows each cursor SVG scaled 4× for shape inspection.</p>
+  <div class="nav">
+    <a href="sitemap-editor.html">← back to editor</a>
+  </div>
+</div>
+
+<div class="grid">
+
+  <!-- 1. Move arrow -->
+  <div class="card">
+    <div class="card-head">
+      <div class="label">
+        <h2>Move</h2>
+        <span class="tag">tool-cursor · default fallback</span>
+      </div>
+      <div class="hotspot">hotspot <b>4, 3</b></div>
+    </div>
+    <div class="zones">
+      <div class="zone zone-light cursor-move"><span class="hint">light · hover here</span></div>
+      <div class="zone zone-dark  cursor-move"><span class="hint">dark · hover here</span></div>
+    </div>
+  </div>
+
+  <!-- 2. Hand idle -->
+  <div class="card">
+    <div class="card-head">
+      <div class="label">
+        <h2>Hand · idle</h2>
+        <span class="tag">tool-hand · grab fallback</span>
+      </div>
+      <div class="hotspot">hotspot <b>12, 12</b></div>
+    </div>
+    <div class="zones">
+      <div class="zone zone-light cursor-hand-idle"><span class="hint">light · hover here</span></div>
+      <div class="zone zone-dark  cursor-hand-idle"><span class="hint">dark · hover here</span></div>
+    </div>
+  </div>
+
+  <!-- 3. Hand grabbing -->
+  <div class="card">
+    <div class="card-head">
+      <div class="label">
+        <h2>Hand · grabbing</h2>
+        <span class="tag">tool-hand.panning · grabbing fallback</span>
+      </div>
+      <div class="hotspot">hotspot <b>11, 15</b></div>
+    </div>
+    <div class="zones">
+      <div class="zone zone-light cursor-hand-grab"><span class="hint">light · hover here</span></div>
+      <div class="zone zone-dark  cursor-hand-grab"><span class="hint">dark · hover here</span></div>
+    </div>
+  </div>
+
+  <!-- 4. Connecting reticle -->
+  <div class="card">
+    <div class="card-head">
+      <div class="label">
+        <h2>Connecting</h2>
+        <span class="tag">graph.connecting · crosshair fallback</span>
+      </div>
+      <div class="hotspot">hotspot <b>16, 16</b></div>
+    </div>
+    <div class="zones">
+      <div class="zone zone-light cursor-connect"><span class="hint">light · hover here</span></div>
+      <div class="zone zone-dark  cursor-connect"><span class="hint">dark · hover here</span></div>
+    </div>
+  </div>
+
+  <!-- 5. Node move — unified Page + Area hover cursor -->
+  <div class="card">
+    <div class="card-head">
+      <div class="label">
+        <h2>Node move</h2>
+        <span class="tag">gnode · gzone · move fallback</span>
+      </div>
+      <div class="hotspot">hotspot <b>16, 16</b></div>
+    </div>
+    <div class="zones">
+      <div class="zone zone-light cursor-node-move"><span class="hint">light · hover here</span></div>
+      <div class="zone zone-dark  cursor-node-move"><span class="hint">dark · hover here</span></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ============================================================
+     Resize cursors — area handles (8 directions, collapsed to 4
+     symmetric pairs) plus the two edge-connector axes.
+     ============================================================ -->
+<div class="section-head">
+  <h2>Resize cursors</h2>
+  <span class="sub">area handles + edge connectors</span>
+</div>
+
+<div class="grid-3">
+
+  <div class="card">
+    <div class="card-head">
+      <div class="label">
+        <h2>Horizontal ↔</h2>
+        <span class="tag">dir-e · dir-w</span>
+      </div>
+      <div class="hotspot">hotspot <b>12, 12</b></div>
+    </div>
+    <div class="zones">
+      <div class="zone zone-light cursor-ew"><span class="hint">light</span></div>
+      <div class="zone zone-dark  cursor-ew"><span class="hint">dark</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="label">
+        <h2>Vertical ↕</h2>
+        <span class="tag">dir-n · dir-s</span>
+      </div>
+      <div class="hotspot">hotspot <b>12, 12</b></div>
+    </div>
+    <div class="zones">
+      <div class="zone zone-light cursor-ns"><span class="hint">light</span></div>
+      <div class="zone zone-dark  cursor-ns"><span class="hint">dark</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="label">
+        <h2>Diagonal ↘↖</h2>
+        <span class="tag">dir-nw · dir-se</span>
+      </div>
+      <div class="hotspot">hotspot <b>12, 12</b></div>
+    </div>
+    <div class="zones">
+      <div class="zone zone-light cursor-nwse"><span class="hint">light</span></div>
+      <div class="zone zone-dark  cursor-nwse"><span class="hint">dark</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="label">
+        <h2>Diagonal ↗↙</h2>
+        <span class="tag">dir-ne · dir-sw</span>
+      </div>
+      <div class="hotspot">hotspot <b>12, 12</b></div>
+    </div>
+    <div class="zones">
+      <div class="zone zone-light cursor-nesw"><span class="hint">light</span></div>
+      <div class="zone zone-dark  cursor-nesw"><span class="hint">dark</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="label">
+        <h2>Column</h2>
+        <span class="tag">gedge-hit · axis x</span>
+      </div>
+      <div class="hotspot">hotspot <b>12, 12</b></div>
+    </div>
+    <div class="zones">
+      <div class="zone zone-light cursor-col"><span class="hint">light</span></div>
+      <div class="zone zone-dark  cursor-col"><span class="hint">dark</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="label">
+        <h2>Row</h2>
+        <span class="tag">gedge-hit · axis y</span>
+      </div>
+      <div class="hotspot">hotspot <b>12, 12</b></div>
+    </div>
+    <div class="zones">
+      <div class="zone zone-light cursor-row"><span class="hint">light</span></div>
+      <div class="zone zone-dark  cursor-row"><span class="hint">dark</span></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Footer: 4× scale render of each cursor SVG -->
+<div class="scale-strip">
+  <h3>4× scale<span class="sub">— the same SVGs rendered large for shape inspection</span></h3>
+  <div class="scale-row">
+
+    <div class="scale-cell">
+      <div class="stage">
+        <svg viewBox="0 0 24 24"><path fill="#1A1F2B" stroke="#fff" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" d="M4 2.5 L 4 17 L 7.8 13.7 L 10.4 19.4 L 12.4 18.6 L 9.9 13 L 15.3 12.4 Z"/></svg>
+      </div>
+      <div class="name">Move</div>
+      <div class="meta">22 × 22 · tip at 4,3</div>
+    </div>
+
+    <div class="scale-cell">
+      <div class="stage">
+        <svg viewBox="0 0 24 24"><path fill="#1A1F2B" stroke="#fff" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" d="M5 14 C 5 12.5 6 11.8 7 12.2 L 7.6 12.5 L 7.6 7.5 C 7.6 6.5 8.4 5.7 9.4 5.7 C 10.4 5.7 11.2 6.5 11.2 7.5 L 11.2 11.4 L 11.2 4.5 C 11.2 3.5 12 2.7 13 2.7 C 14 2.7 14.8 3.5 14.8 4.5 L 14.8 11 L 14.8 5 C 14.8 4 15.6 3.2 16.6 3.2 C 17.6 3.2 18.4 4 18.4 5 L 18.4 11.4 L 18.4 7 C 18.4 6 19.2 5.2 20.2 5.2 C 21.2 5.2 22 6 22 7 L 22 14 C 22 18.4 18.4 22 14 22 L 13 22 C 9.4 22 6.6 19.2 5.6 16 Z"/></svg>
+      </div>
+      <div class="name">Hand · idle</div>
+      <div class="meta">24 × 24 · palm at 12,12</div>
+    </div>
+
+    <div class="scale-cell">
+      <div class="stage">
+        <svg viewBox="0 0 24 24"><path fill="#1A1F2B" stroke="#fff" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" d="M2.5 13 C 2.5 12 3.5 11.2 4.5 11.6 L 6.4 12.5 L 6.4 11 C 6.4 9.5 7.4 8.5 8.9 8.5 L 16 8.5 C 17.8 8.5 19.4 9.8 19.4 11.7 L 19.4 16 C 19.4 19.5 16.4 22 12.5 22 L 11.5 22 C 7.6 22 5.4 19 4.4 16 Z"/><g fill="#fff"><circle cx="8.6" cy="11" r="0.7"/><circle cx="11.2" cy="10.6" r="0.7"/><circle cx="13.8" cy="10.6" r="0.7"/><circle cx="16.4" cy="11" r="0.7"/></g></svg>
+      </div>
+      <div class="name">Hand · grabbing</div>
+      <div class="meta">24 × 24 · palm at 11,15</div>
+    </div>
+
+    <div class="scale-cell">
+      <div class="stage">
+        <svg viewBox="0 0 24 24">
+          <g fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><circle cx="12" cy="12" r="7.5"/><line x1="12" y1="1.5" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22.5"/><line x1="1.5" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22.5" y2="12"/></g>
+          <g fill="none" stroke="#1A1F2B" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="7.5"/><line x1="12" y1="1.5" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22.5"/><line x1="1.5" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22.5" y2="12"/></g>
+          <circle cx="12" cy="12" r="2" fill="#1766DC" stroke="#fff" stroke-width="1"/>
+        </svg>
+      </div>
+      <div class="name">Connecting</div>
+      <div class="meta">24 × 24 · reticle at 12,12</div>
+    </div>
+
+  </div>
+
+  <h3 style="margin-top:1.5rem;">Resize cursors <span class="sub">— 4× scale</span></h3>
+  <div class="scale-row">
+
+    <div class="scale-cell">
+      <div class="stage">
+        <svg viewBox="0 0 24 24">
+          <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="#fff" stroke-width="3.2" d="M4 12 H 20 M 4 12 L 8 8.5 M 4 12 L 8 15.5 M 20 12 L 16 8.5 M 20 12 L 16 15.5"/>
+            <path stroke="#1A1F2B" stroke-width="1.6" d="M4 12 H 20 M 4 12 L 8 8.5 M 4 12 L 8 15.5 M 20 12 L 16 8.5 M 20 12 L 16 15.5"/>
+          </g>
+        </svg>
+      </div>
+      <div class="name">Horizontal</div>
+      <div class="meta">24 × 24 · ew-resize</div>
+    </div>
+
+    <div class="scale-cell">
+      <div class="stage">
+        <svg viewBox="0 0 24 24">
+          <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="#fff" stroke-width="3.2" d="M12 4 V 20 M 12 4 L 8.5 8 M 12 4 L 15.5 8 M 12 20 L 8.5 16 M 12 20 L 15.5 16"/>
+            <path stroke="#1A1F2B" stroke-width="1.6" d="M12 4 V 20 M 12 4 L 8.5 8 M 12 4 L 15.5 8 M 12 20 L 8.5 16 M 12 20 L 15.5 16"/>
+          </g>
+        </svg>
+      </div>
+      <div class="name">Vertical</div>
+      <div class="meta">24 × 24 · ns-resize</div>
+    </div>
+
+    <div class="scale-cell">
+      <div class="stage">
+        <svg viewBox="0 0 24 24">
+          <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="#fff" stroke-width="3.2" d="M5.5 5.5 L 18.5 18.5 M 5.5 5.5 L 10.5 5.5 M 5.5 5.5 L 5.5 10.5 M 18.5 18.5 L 13.5 18.5 M 18.5 18.5 L 18.5 13.5"/>
+            <path stroke="#1A1F2B" stroke-width="1.6" d="M5.5 5.5 L 18.5 18.5 M 5.5 5.5 L 10.5 5.5 M 5.5 5.5 L 5.5 10.5 M 18.5 18.5 L 13.5 18.5 M 18.5 18.5 L 18.5 13.5"/>
+          </g>
+        </svg>
+      </div>
+      <div class="name">Diagonal ↘↖</div>
+      <div class="meta">24 × 24 · nwse-resize</div>
+    </div>
+
+    <div class="scale-cell">
+      <div class="stage">
+        <svg viewBox="0 0 24 24">
+          <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="#fff" stroke-width="3.2" d="M18.5 5.5 L 5.5 18.5 M 18.5 5.5 L 13.5 5.5 M 18.5 5.5 L 18.5 10.5 M 5.5 18.5 L 10.5 18.5 M 5.5 18.5 L 5.5 13.5"/>
+            <path stroke="#1A1F2B" stroke-width="1.6" d="M18.5 5.5 L 5.5 18.5 M 18.5 5.5 L 13.5 5.5 M 18.5 5.5 L 18.5 10.5 M 5.5 18.5 L 10.5 18.5 M 5.5 18.5 L 5.5 13.5"/>
+          </g>
+        </svg>
+      </div>
+      <div class="name">Diagonal ↗↙</div>
+      <div class="meta">24 × 24 · nesw-resize</div>
+    </div>
+
+    <div class="scale-cell">
+      <div class="stage">
+        <svg viewBox="0 0 24 24">
+          <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="#fff" stroke-width="3.2" d="M12 5 V 19 M 4 12 H 9 M 4 12 L 7 9 M 4 12 L 7 15 M 20 12 H 15 M 20 12 L 17 9 M 20 12 L 17 15"/>
+            <path stroke="#1A1F2B" stroke-width="1.6" d="M12 5 V 19 M 4 12 H 9 M 4 12 L 7 9 M 4 12 L 7 15 M 20 12 H 15 M 20 12 L 17 9 M 20 12 L 17 15"/>
+          </g>
+        </svg>
+      </div>
+      <div class="name">Column</div>
+      <div class="meta">24 × 24 · col-resize</div>
+    </div>
+
+    <div class="scale-cell">
+      <div class="stage">
+        <svg viewBox="0 0 24 24">
+          <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="#fff" stroke-width="3.2" d="M5 12 H 19 M 12 4 V 9 M 12 4 L 9 7 M 12 4 L 15 7 M 12 20 V 15 M 12 20 L 9 17 M 12 20 L 15 17"/>
+            <path stroke="#1A1F2B" stroke-width="1.6" d="M5 12 H 19 M 12 4 V 9 M 12 4 L 9 7 M 12 4 L 15 7 M 12 20 V 15 M 12 20 L 9 17 M 12 20 L 15 17"/>
+          </g>
+        </svg>
+      </div>
+      <div class="name">Row</div>
+      <div class="meta">24 × 24 · row-resize</div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

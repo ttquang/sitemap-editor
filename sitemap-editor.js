@@ -646,6 +646,221 @@
     applyVp();
   }
 
+  // ----- 5b) Import / Export (JSON) -----------------------------------
+  // Format: pure JSON, magic { format:"pw-studio-sitemap", version:1 }.
+  // Round-trips pages, areas, edges, and viewport. See plan in
+  // .claude/plans/implement-import-export-feature-which-robust-tulip.md
+  // for schema details.
+  //
+  // Export reads the in-memory model + viewport state and triggers a
+  // Blob download. Import validates the payload, stashes it in
+  // sessionStorage, and reloads — the shim (sitemap-editor.svg-shim.js)
+  // then rebuilds the SVG before this IIFE re-parses on the next load,
+  // and __graphApplyImportedState reapplies styling/routing.
+
+  function exportJSON() {
+    var pages = [];
+    nodes.forEach(function (n) {
+      var ts = n.el.querySelectorAll('text');
+      var name = ts.length >= 1 ? (ts[0].textContent || '') : '';
+      var sub = null;
+      if (ts.length >= 2) {
+        var subTxt = (ts[1].textContent || '').trim();
+        if (subTxt) sub = subTxt;
+      }
+      pages.push({
+        id: n.id,
+        name: name,
+        sub: sub,
+        slug: n.slug || '',
+        x: n.x0 + n.offsetX,
+        y: n.y0 + n.offsetY,
+        w: n.w,
+        h: n.h,
+        color: n.color || 'default',
+        border: n.border || 'solid',
+        locked: !!n.locked
+      });
+    });
+
+    var areasOut = areas.map(function (a) {
+      return {
+        id: a.id,
+        name: a.name || '',
+        slug: a.slug || '',
+        x: a.x,
+        y: a.y,
+        w: a.w,
+        h: a.h,
+        color: a.color || 'neutral',
+        titlePos: a.titlePos || 'top-left',
+        locked: !!a.locked
+      };
+    });
+
+    var edgesOut = edges.map(function (e) {
+      var label = e.labelTextEl ? (e.labelTextEl.textContent || '').trim() : '';
+      return {
+        sourceId: e.sourceId,
+        targetId: e.targetId,
+        label: label || null,
+        lineColor: e.lineColor || 'gray',
+        lineStyle: e.lineStyle || 'solid',
+        lineWidth: e.lineWidth || 'normal',
+        manualMid: e.manualMid || null,
+        manualSp:  e.manualSp  || null,
+        manualTp:  e.manualTp  || null
+      };
+    });
+
+    var payload = {
+      format: 'pw-studio-sitemap',
+      version: 1,
+      viewport: { scale: vpScale, tx: vpTx, ty: vpTy, vbW: vbW, vbH: vbH },
+      pages: pages,
+      areas: areasOut,
+      edges: edgesOut
+    };
+
+    var text = JSON.stringify(payload, null, 2);
+    var blob = new Blob([text], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var d = new Date();
+    function pad(n) { return (n < 10 ? '0' : '') + n; }
+    var stamp = d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate())
+              + '-' + pad(d.getHours()) + pad(d.getMinutes());
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'sitemap-' + stamp + '.sitemap.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 0);
+  }
+  window.__graphExportJSON = exportJSON;
+
+  function importJSON(text) {
+    var state;
+    try {
+      state = JSON.parse(text);
+    } catch (err) {
+      notifyImport('Import failed: file is not valid JSON.');
+      return false;
+    }
+    if (!state || typeof state !== 'object') {
+      notifyImport('Import failed: empty or malformed payload.');
+      return false;
+    }
+    if (state.format !== 'pw-studio-sitemap') {
+      notifyImport('Import failed: unknown format "' + state.format + '".');
+      return false;
+    }
+    if (state.version !== 1) {
+      notifyImport('Import failed: unsupported version ' + state.version + '.');
+      return false;
+    }
+    if (!Array.isArray(state.pages) || !Array.isArray(state.areas) || !Array.isArray(state.edges)) {
+      notifyImport('Import failed: missing pages/areas/edges arrays.');
+      return false;
+    }
+    try {
+      sessionStorage.setItem('pwstudio.import.pending.json', text);
+    } catch (err) {
+      notifyImport('Import failed: could not stash payload for reload.');
+      return false;
+    }
+    location.reload();
+    return true;
+  }
+  window.__graphImportJSON = importJSON;
+
+  // Reuse the #createToast slot to flash an import message. The toast
+  // markup hardcodes "Page X created." — we temporarily overwrite the
+  // message span, then restore it after the toast hides.
+  function notifyImport(message) {
+    var toast = document.getElementById('createToast');
+    if (!toast) { alert(message); return; }
+    var msg = toast.querySelector('span:nth-of-type(2)');
+    var link = document.getElementById('toast-open');
+    var prevHTML = msg ? msg.innerHTML : null;
+    var prevLinkDisplay = link ? link.style.display : null;
+    if (msg) msg.textContent = message;
+    if (link) link.style.display = 'none';
+    toast.classList.add('show');
+    setTimeout(function () {
+      toast.classList.remove('show');
+      setTimeout(function () {
+        if (msg && prevHTML != null) msg.innerHTML = prevHTML;
+        if (link && prevLinkDisplay != null) link.style.display = prevLinkDisplay;
+      }, 250);
+    }, 3200);
+  }
+
+  // After the IIFE parses the freshly-rebuilt SVG (built by the shim
+  // from a pending JSON payload), the model is geometrically correct
+  // but color / border / lock / title-pos / edge-style fields are
+  // still at parse-pass defaults. Walk the payload and apply each via
+  // the existing in-IIFE helpers so everything round-trips.
+  function applyImportedState(state) {
+    if (!state) return;
+    (state.pages || []).forEach(function (p) {
+      var n = nodes.get(p.id);
+      if (!n) return;
+      if (p.color && p.color !== 'default') applyNodeColor(n, p.color);
+      if (p.border) applyNodeBorder(n, p.border);
+      if (p.locked) applyNodeLocked(n, true);
+      if (p.slug) n.slug = p.slug;
+      if (p.name != null) setNodeName(n, p.name);
+    });
+
+    (state.areas || []).forEach(function (a) {
+      var area = findAreaById(a.id);
+      if (!area) return;
+      if (a.name) setAreaName(area, a.name);
+      if (a.slug) area.slug = a.slug;
+      if (a.color && a.color !== 'neutral') applyAreaColor(area, a.color);
+      if (a.titlePos) setAreaTitlePos(area, a.titlePos);
+      if (a.locked) applyAreaLocked(area, true);
+    });
+
+    // Edges match by source→target pair, in JSON order. Two edges
+    // between the same pair are kept in order so styling lines up.
+    var byPair = {};
+    (state.edges || []).forEach(function (e) {
+      var key = e.sourceId + '→' + e.targetId;
+      if (!byPair[key]) byPair[key] = [];
+      byPair[key].push(e);
+    });
+    var consumed = {};
+    edges.forEach(function (eObj) {
+      var key = eObj.sourceId + '→' + eObj.targetId;
+      var list = byPair[key];
+      if (!list) return;
+      var idx = (consumed[key] = (consumed[key] || 0) + 1) - 1;
+      var spec = list[idx];
+      if (!spec) return;
+      if (spec.lineColor) applyLineColor(eObj, spec.lineColor);
+      if (spec.lineStyle) applyLineStyle(eObj, spec.lineStyle);
+      if (spec.lineWidth) applyLineWidth(eObj, spec.lineWidth);
+      if (spec.label) setLineLabel(eObj, spec.label);
+      if (spec.manualMid) eObj.manualMid = spec.manualMid;
+      if (spec.manualSp)  eObj.manualSp  = spec.manualSp;
+      if (spec.manualTp)  eObj.manualTp  = spec.manualTp;
+    });
+
+    // Restore viewport after node/edge state so applyVp lands on the
+    // user's last pan/zoom, not the fitToView default.
+    if (state.viewport) {
+      if (typeof state.viewport.scale === 'number') vpScale = state.viewport.scale;
+      if (typeof state.viewport.tx === 'number')    vpTx    = state.viewport.tx;
+      if (typeof state.viewport.ty === 'number')    vpTy    = state.viewport.ty;
+    }
+
+    renderAll();
+    if (state.viewport) applyVp();
+  }
+  window.__graphApplyImportedState = applyImportedState;
+
   // ----- 6) Interactions — pan / node-drag / connect
   var editMode = false;
   var currentTool = 'hand';     // 'cursor' (marquee) or 'hand' (pan); Hand is the default so element drag works without first switching tools.
@@ -658,90 +873,18 @@
     return !(ax + aw < bx || ax > bx + bw || ay + ah < by || ay > by + bh);
   }
 
-  // App-mode state: 'view' | 'edit' | 'ai' | 'path'. setEditMode is now a
+  // App-mode state: 'view' | 'edit' | 'ai'. setEditMode is now a
   // thin wrapper around setAppMode for backward compatibility with
   // existing call sites (selectPage, selectArea, etc.).
   var currentAppMode = 'view';
-  var pathHighlightOn = false;
-
-  function clearPathHighlight() {
-    if (!pathHighlightOn) return;
-    nodes.forEach(function (n) {
-      n.el.classList.remove('path-on', 'path-target', 'path-dim');
-    });
-    edges.forEach(function (e) {
-      if (e.pathEl) e.pathEl.classList.remove('path-on', 'path-dim');
-      if (e.labelBgEl) e.labelBgEl.classList.remove('path-dim');
-      if (e.labelTextEl) e.labelTextEl.classList.remove('path-dim');
-    });
-    Array.prototype.forEach.call(vp.querySelectorAll('rect.gzone, .gzone-label'), function (el) {
-      el.classList.remove('path-dim');
-    });
-    pathHighlightOn = false;
-  }
-
-  // Reverse-BFS from `target` along incoming edges; mark every reachable
-  // ancestor and the edges connecting them as "on path", dim everything else.
-  // Lets the user see how a leaf page can be reached from any root.
-  function highlightPathTo(target) {
-    clearPathHighlight();
-    var incoming = Object.create(null);
-    edges.forEach(function (e) {
-      (incoming[e.targetId] || (incoming[e.targetId] = [])).push(e);
-    });
-    var onNodes = Object.create(null);
-    var onEdges = [];
-    var queue = [target.id];
-    onNodes[target.id] = true;
-    while (queue.length) {
-      var cur = queue.shift();
-      var ins = incoming[cur] || [];
-      for (var i = 0; i < ins.length; i++) {
-        var e = ins[i];
-        onEdges.push(e);
-        if (!onNodes[e.sourceId]) {
-          onNodes[e.sourceId] = true;
-          queue.push(e.sourceId);
-        }
-      }
-    }
-    nodes.forEach(function (n) {
-      if (onNodes[n.id]) {
-        n.el.classList.add('path-on');
-        if (n.id === target.id) n.el.classList.add('path-target');
-      } else {
-        n.el.classList.add('path-dim');
-      }
-    });
-    var onEdgeSet = Object.create(null);
-    onEdges.forEach(function (e) { onEdgeSet[edges.indexOf(e)] = true; });
-    edges.forEach(function (e, i) {
-      if (onEdgeSet[i]) {
-        if (e.pathEl) e.pathEl.classList.add('path-on');
-      } else {
-        if (e.pathEl) e.pathEl.classList.add('path-dim');
-        if (e.labelBgEl) e.labelBgEl.classList.add('path-dim');
-        if (e.labelTextEl) e.labelTextEl.classList.add('path-dim');
-      }
-    });
-    Array.prototype.forEach.call(vp.querySelectorAll('rect.gzone, .gzone-label'), function (el) {
-      el.classList.add('path-dim');
-    });
-    pathHighlightOn = true;
-  }
 
   function setAppMode(mode) {
-    if (mode !== 'view' && mode !== 'edit' && mode !== 'ai' && mode !== 'path') return;
+    if (mode !== 'view' && mode !== 'edit' && mode !== 'ai') return;
     currentAppMode = mode;
     editMode = (mode === 'edit');
 
     // SVG class hints (legacy)
     svg.classList.toggle('editmode', editMode);
-    svg.classList.toggle('pathmode', mode === 'path');
-
-    // Leaving path mode clears any active highlight. (Re-entering and clicking
-    // a different page also calls clearPathHighlight from highlightPathTo.)
-    if (mode !== 'path') clearPathHighlight();
 
     // Toolbar surface (drives the violet AI wash + mode-specific palette)
     var bottom = document.getElementById('bottomToolbar');
@@ -749,7 +892,6 @@
       bottom.classList.toggle('mode-view', mode === 'view');
       bottom.classList.toggle('mode-edit', mode === 'edit');
       bottom.classList.toggle('mode-ai',   mode === 'ai');
-      bottom.classList.toggle('mode-path', mode === 'path');
       bottom.setAttribute('data-app-mode', mode);
     }
 
@@ -758,7 +900,7 @@
     if (appSeg) {
       var btns = Array.prototype.slice.call(appSeg.querySelectorAll(':scope > button[data-mode]'));
       btns.forEach(function (b) {
-        b.classList.remove('active', 'mode-view', 'mode-edit', 'mode-ai', 'mode-path');
+        b.classList.remove('active', 'mode-view', 'mode-edit', 'mode-ai');
         if (b.getAttribute('data-mode') === mode) {
           b.classList.add('active', 'mode-' + mode);
         }
@@ -902,13 +1044,6 @@
         var n = nodes.get(id);
         if (n) startNodeDrag(n, ev);
         ev.preventDefault();
-      } else if (currentAppMode === 'path') {
-        var pid = nodeEl.getAttribute('data-id');
-        var pn = nodes.get(pid);
-        if (pn) highlightPathTo(pn);
-        ev.preventDefault();
-        ev.stopPropagation();
-        suppressNextClick = true;
       }
       return;
     }
@@ -1555,9 +1690,6 @@
       if (editMode && movedDist < 0.5) {
         // It was a click on empty canvas in edit mode — clear selection
         clearSelection();
-      } else if (currentAppMode === 'path' && movedDist < 0.5) {
-        // Click on empty canvas in path mode — drop the highlighted path
-        clearPathHighlight();
       }
     }
     if (nodeDragState) {
@@ -2830,9 +2962,6 @@
       });
     }
     // ----- Title-position picker — sync the active button -----
-    // The click handler is wired once per button and reads `selected.ref` at
-    // click time rather than capturing the showAreaPanel argument, so it stays
-    // correct after switching between areas.
     var tpWrap = document.getElementById('rp-area-titlepos');
     if (tpWrap) {
       Array.prototype.forEach.call(tpWrap.querySelectorAll('button[data-tp]'), function (b) {
@@ -2840,9 +2969,8 @@
         if (!b.__wired) {
           b.__wired = true;
           b.addEventListener('click', function () {
-            if (selected.kind !== 'area' || !selected.ref) return;
             var pos = b.getAttribute('data-tp');
-            setAreaTitlePos(selected.ref, pos);
+            setAreaTitlePos(g, pos);
             Array.prototype.forEach.call(tpWrap.querySelectorAll('button[data-tp]'), function (x) { x.classList.remove('active'); });
             b.classList.add('active');
           });
@@ -3289,7 +3417,6 @@
     if (e.key === '1') { setAppMode('view'); e.preventDefault(); return; }
     if (e.key === '2') { setAppMode('edit'); e.preventDefault(); return; }
     if (e.key === '3') { setAppMode('ai');   e.preventDefault(); return; }
-    if (e.key === '4') { setAppMode('path'); e.preventDefault(); return; }
 
     // Pointer toggle (always works)
     if (e.key === 'v' || e.key === 'V') {
@@ -3376,7 +3503,6 @@
     var openModal = document.querySelector('.scrim.open');
     if (openModal) return;
     if (currentAppMode === 'ai') { setAppMode('view'); e.preventDefault(); return; }
-    if (currentAppMode === 'path' && pathHighlightOn) { clearPathHighlight(); e.preventDefault(); return; }
     if (typeof marqueeState !== 'undefined' && marqueeState) {
       if (typeof cancelMarquee === 'function') cancelMarquee();
       e.preventDefault(); return;
@@ -3438,7 +3564,18 @@
 
   function init() {
     if (typeof renderAll === 'function') renderAll();
-    if (typeof fitToView === 'function') fitToView();
+    var pending = window.__pendingImportState;
+    if (pending) {
+      // Apply imported styling + viewport. Skip fitToView so the user's
+      // exported pan/zoom is honored, not auto-fit.
+      try { applyImportedState(pending); } catch (err) {
+        console.error('[PW Studio] applyImportedState failed:', err);
+        if (typeof fitToView === 'function') fitToView();
+      }
+      window.__pendingImportState = null;
+    } else {
+      if (typeof fitToView === 'function') fitToView();
+    }
   }
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
