@@ -905,18 +905,102 @@
     return !(ax + aw < bx || ax > bx + bw || ay + ah < by || ay > by + bh);
   }
 
-  // App-mode state: 'view' | 'edit' | 'ai'. setEditMode is now a
+  // App-mode state: 'view' | 'edit' | 'ai' | 'path'. setEditMode is now a
   // thin wrapper around setAppMode for backward compatibility with
   // existing call sites (selectPage, selectArea, etc.).
   var currentAppMode = 'view';
+  var pathHighlightOn = false;
+
+  function clearPathHighlight() {
+    if (!pathHighlightOn) return;
+    nodes.forEach(function (n) {
+      n.el.classList.remove('path-on', 'path-target', 'path-root', 'path-dim');
+    });
+    edges.forEach(function (e) {
+      if (e.pathEl) e.pathEl.classList.remove('path-on', 'path-dim');
+      if (e.labelBgEl) e.labelBgEl.classList.remove('path-dim');
+      if (e.labelTextEl) e.labelTextEl.classList.remove('path-dim');
+    });
+    Array.prototype.forEach.call(vp.querySelectorAll('rect.gzone, .gzone-label'), function (el) {
+      el.classList.remove('path-dim');
+    });
+    pathHighlightOn = false;
+  }
+
+  // Reverse-BFS from `target` along incoming edges. Marks every reachable
+  // ancestor and the edges connecting them as "on path"; dims everything else.
+  // Result: every node/edge that lies on any forward route from a root (a
+  // page with no incoming edges) to the clicked target lights up.
+  function highlightPathTo(target) {
+    clearPathHighlight();
+    var incoming = Object.create(null);
+    edges.forEach(function (e) {
+      (incoming[e.targetId] || (incoming[e.targetId] = [])).push(e);
+    });
+    var onNodes = Object.create(null);
+    var onEdgeIdx = Object.create(null);
+    var queue = [target.id];
+    onNodes[target.id] = true;
+    while (queue.length) {
+      var cur = queue.shift();
+      var ins = incoming[cur] || [];
+      for (var i = 0; i < ins.length; i++) {
+        var e = ins[i];
+        onEdgeIdx[edges.indexOf(e)] = true;
+        if (!onNodes[e.sourceId]) {
+          onNodes[e.sourceId] = true;
+          queue.push(e.sourceId);
+        }
+      }
+    }
+    // Root(s) = pages in the highlighted subgraph with no incoming edge that
+    // is itself on the path. Tagged separately so CSS can paint them green
+    // while the clicked target stays amber.
+    var isRoot = Object.create(null);
+    Object.keys(onNodes).forEach(function (id) {
+      var insR = incoming[id] || [];
+      var hasInbound = false;
+      for (var j = 0; j < insR.length; j++) {
+        if (onEdgeIdx[edges.indexOf(insR[j])]) { hasInbound = true; break; }
+      }
+      if (!hasInbound) isRoot[id] = true;
+    });
+    nodes.forEach(function (n) {
+      if (onNodes[n.id]) {
+        n.el.classList.add('path-on');
+        if (isRoot[n.id]) n.el.classList.add('path-root');
+        if (n.id === target.id) n.el.classList.add('path-target');
+      } else {
+        n.el.classList.add('path-dim');
+      }
+    });
+    edges.forEach(function (e, i) {
+      if (onEdgeIdx[i]) {
+        if (e.pathEl) e.pathEl.classList.add('path-on');
+      } else {
+        if (e.pathEl) e.pathEl.classList.add('path-dim');
+        if (e.labelBgEl) e.labelBgEl.classList.add('path-dim');
+        if (e.labelTextEl) e.labelTextEl.classList.add('path-dim');
+      }
+    });
+    Array.prototype.forEach.call(vp.querySelectorAll('rect.gzone, .gzone-label'), function (el) {
+      el.classList.add('path-dim');
+    });
+    pathHighlightOn = true;
+  }
 
   function setAppMode(mode) {
-    if (mode !== 'view' && mode !== 'edit' && mode !== 'ai') return;
+    if (mode !== 'view' && mode !== 'edit' && mode !== 'ai' && mode !== 'path') return;
     currentAppMode = mode;
     editMode = (mode === 'edit');
 
     // SVG class hints (legacy)
     svg.classList.toggle('editmode', editMode);
+    svg.classList.toggle('pathmode', mode === 'path');
+
+    // Leaving Path mode drops any active highlight. (Re-entering and clicking
+    // a different page also calls clearPathHighlight from highlightPathTo.)
+    if (mode !== 'path') clearPathHighlight();
 
     // Toolbar surface (drives the violet AI wash + mode-specific palette)
     var bottom = document.getElementById('bottomToolbar');
@@ -924,6 +1008,7 @@
       bottom.classList.toggle('mode-view', mode === 'view');
       bottom.classList.toggle('mode-edit', mode === 'edit');
       bottom.classList.toggle('mode-ai',   mode === 'ai');
+      bottom.classList.toggle('mode-path', mode === 'path');
       bottom.setAttribute('data-app-mode', mode);
     }
 
@@ -932,7 +1017,7 @@
     if (appSeg) {
       var btns = Array.prototype.slice.call(appSeg.querySelectorAll(':scope > button[data-mode]'));
       btns.forEach(function (b) {
-        b.classList.remove('active', 'mode-view', 'mode-edit', 'mode-ai');
+        b.classList.remove('active', 'mode-view', 'mode-edit', 'mode-ai', 'mode-path');
         if (b.getAttribute('data-mode') === mode) {
           b.classList.add('active', 'mode-' + mode);
         }
@@ -1082,6 +1167,13 @@
         var n = nodes.get(id);
         if (n) startNodeDrag(n, ev);
         ev.preventDefault();
+      } else if (currentAppMode === 'path') {
+        var pid = nodeEl.getAttribute('data-id');
+        var pn = nodes.get(pid);
+        if (pn) highlightPathTo(pn);
+        ev.preventDefault();
+        ev.stopPropagation();
+        suppressNextClick = true;
       }
       return;
     }
@@ -1767,6 +1859,9 @@
       if (editMode && movedDist < 0.5) {
         // It was a click on empty canvas in edit mode — clear selection
         clearSelection();
+      } else if (currentAppMode === 'path' && movedDist < 0.5) {
+        // Click on empty canvas in path mode — drop the highlighted route
+        clearPathHighlight();
       }
     }
     if (nodeDragState) {
@@ -3545,10 +3640,11 @@
     }
     if (e.metaKey || e.ctrlKey || e.altKey) return;
 
-    // 1 / 2 / 3 → app modes
+    // 1 / 2 / 3 / 4 → app modes
     if (e.key === '1') { setAppMode('view'); e.preventDefault(); return; }
     if (e.key === '2') { setAppMode('edit'); e.preventDefault(); return; }
     if (e.key === '3') { setAppMode('ai');   e.preventDefault(); return; }
+    if (e.key === '4') { setAppMode('path'); e.preventDefault(); return; }
 
     // Pointer toggle (always works)
     if (e.key === 'v' || e.key === 'V') {
@@ -3748,6 +3844,7 @@
     var openModal = document.querySelector('.scrim.open');
     if (openModal) return;
     if (currentAppMode === 'ai') { setAppMode('view'); e.preventDefault(); return; }
+    if (currentAppMode === 'path' && pathHighlightOn) { clearPathHighlight(); e.preventDefault(); return; }
     if (typeof marqueeState !== 'undefined' && marqueeState) {
       if (typeof cancelMarquee === 'function') cancelMarquee();
       e.preventDefault(); return;

@@ -80,7 +80,7 @@
                ========================================================= -->
           <div class="bottom-toolbar mode-view" id="bottomToolbar" data-app-mode="view" role="toolbar" aria-label="Canvas toolbar">
 
-            <!-- App-mode segmented toggle (View / Edit / AI) — icon-only -->
+            <!-- App-mode segmented toggle (View / Edit / AI / Path) — icon-only -->
             <div class="seg seg-app" role="group" aria-label="App mode">
               <span class="seg-pill" aria-hidden="true"></span>
               <button class="active mode-view" data-mode="view" type="button" aria-label="View" title="View (1) — read only">
@@ -91,6 +91,9 @@
               </button>
               <button class="mode-ai" data-mode="ai" type="button" aria-label="AI" title="AI (3 or ⌘K) — open chat">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3L13.5 8.5L19 10L13.5 11.5L12 17L10.5 11.5L5 10L10.5 8.5L12 3Z"/><path d="M18 16L19 18L21 19L19 20L18 22L17 20L15 19L17 18L18 16Z"/></svg>
+              </button>
+              <button class="mode-path" data-mode="path" type="button" aria-label="Path" title="Path (4) — click a page to trace its route from every root">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="11.49"/></svg>
               </button>
             </div>
             <div class="tb-sep" aria-hidden="true"></div>
@@ -185,6 +188,9 @@
               </marker>
               <marker id="arr-sug" markerWidth="6" markerHeight="6" refX="5.5" refY="3" orient="auto">
                 <polygon points="0 0, 6 3, 0 6" fill="#97A3B2"/>
+              </marker>
+              <marker id="arr-path" markerWidth="7" markerHeight="7" refX="6.5" refY="3.5" orient="auto">
+                <polygon points="0 0, 7 3.5, 0 7" fill="#B45309"/>
               </marker>
             </defs>
 

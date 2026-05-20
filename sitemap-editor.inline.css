@@ -48,6 +48,10 @@
     background: linear-gradient(180deg, #F3EEFF 0%, #FFFFFF 60%);
     border-color: #DCD0F8;
   }
+  .bottom-toolbar.mode-path {
+    background: linear-gradient(180deg, #FFF6E5 0%, #FFFFFF 60%);
+    border-color: #F0D49A;
+  }
   .bottom-toolbar .tb-sep {
     width: 1px; align-self: stretch;
     background: #E5E5E5;
@@ -118,6 +122,73 @@
   .bottom-toolbar .seg button.active.mode-view { color: #0A6644; }
   .bottom-toolbar .seg button.active.mode-edit { color: var(--accent); }
   .bottom-toolbar .seg button.active.mode-ai   { color: #7C3AED; }
+  .bottom-toolbar .seg button.active.mode-path { color: #B45309; }
+
+  /* Path mode — neutralize swatch colors and trace a route from the clicked
+     page back to every root. Reverse-BFS marks ancestors as .path-on, roots
+     as .path-root, the click as .path-target, and dims everything else. */
+  svg.graph.pathmode .gnode rect:not(.connect-handle) {
+    fill: #FAFAFA;
+    stroke: #C9CFD6;
+  }
+  svg.graph.pathmode rect.gzone {
+    fill: rgba(180, 188, 200, 0.10);
+    stroke: #C9CFD6;
+  }
+  svg.graph.pathmode .gzone-label { fill: #5E6470; }
+
+  /* Neutralize the line + arrow on every edge in Path mode. CSS beats the
+     inline stroke / marker-end attributes (presentation-attribute
+     specificity is 0). Dashed/dotted edges keep their stroke-dasharray
+     because we don't override it here. */
+  svg.graph.pathmode path.gedge {
+    stroke: #4A5A6E;
+    marker-end: url(#arr-gray);
+  }
+
+  /* Middle nodes — neutral fill, thin amber outline so they read as part of
+     the route. Root/target rules below win via later position. */
+  svg.graph.pathmode .gnode.path-on rect:not(.connect-handle) {
+    stroke: #D89942;
+    stroke-width: 1.75;
+  }
+  /* Root(s) — pages with no incoming edge inside the highlighted subgraph. */
+  svg.graph.pathmode .gnode.path-root rect:not(.connect-handle) {
+    fill: #E6F4EC;
+    stroke: #0E8A5F;
+    stroke-width: 2.5;
+  }
+  /* Target — the clicked page. */
+  svg.graph.pathmode .gnode.path-target rect:not(.connect-handle) {
+    fill: #FFF1DC;
+    stroke: #B45309;
+    stroke-width: 2.5;
+  }
+
+  /* On-path edges — normal width, dashed, marching ants. CSS overrides the
+     inline stroke / stroke-width / stroke-dasharray attributes that the
+     editor sets via setAttribute (presentation-attribute specificity is 0). */
+  @keyframes path-march {
+    to { stroke-dashoffset: -20; }
+  }
+  svg.graph.pathmode path.gedge.path-on {
+    stroke: #B45309;
+    stroke-width: 2;
+    stroke-dasharray: 6 4;
+    animation: path-march 0.9s linear infinite;
+    marker-end: url(#arr-path);
+  }
+
+  /* Dim everything off-route. */
+  svg.graph.pathmode .gnode.path-dim,
+  svg.graph.pathmode rect.gzone.path-dim,
+  svg.graph.pathmode .gzone-label.path-dim,
+  svg.graph.pathmode .gelabel.path-dim,
+  svg.graph.pathmode .gelabel-bg.path-dim { opacity: 0.18; }
+  svg.graph.pathmode path.gedge.path-dim { opacity: 0.12; }
+
+  .canvas-wrap svg.graph .gnode { transition: opacity 160ms ease; }
+  .canvas-wrap svg.graph path.gedge { transition: opacity 160ms ease, stroke 160ms ease; }
   /* App-mode + Pointer-mode buttons are fixed square slots — icons dead-center.
      (App-mode was previously icon+label; labels removed for a tighter toolbar.) */
   .bottom-toolbar .seg.seg-pointer button,
