@@ -197,6 +197,15 @@
     if (e.labelBgEl   && e.labelBgEl.parentNode)   e.labelBgEl.parentNode.removeChild(e.labelBgEl);
     var idx = edges.indexOf(e);
     if (idx >= 0) edges.splice(idx, 1);
+    // Splicing shifts every later edge's array index. The hit-paths cached
+    // data-edge-idx is read on mousedown to find the edge — refresh it on
+    // each surviving edge so subsequent clicks don't pick the wrong edge
+    // (or fall off the end of the array and silently abort the drag).
+    for (var i = idx; i < edges.length; i++) {
+      var hits = edges[i].hitEls;
+      if (!hits) continue;
+      for (var j = 0; j < hits.length; j++) hits[j].setAttribute('data-edge-idx', i);
+    }
   }
   window.__graphApplyLineColor = applyLineColor;
   window.__graphApplyLineStyle = applyLineStyle;
@@ -511,6 +520,10 @@
     // Ensure the right number of hit-paths exist
     var n = pts.length - 1;
     ensureHitPaths(e, n);
+    // data-edge-idx is read on mousedown to look the edge up in `edges`.
+    // Refresh it every render so deletions (which splice the array) don't
+    // leave later edges with stale indices that point to the wrong slot.
+    var curIdx = edges.indexOf(e);
     for (var i = 0; i < n; i++) {
       var p1 = pts[i], p2 = pts[i + 1];
       var seg = e.hitEls[i];
@@ -521,6 +534,7 @@
       seg.setAttribute('data-axis', verticalSeg ? 'x' : 'y');
       seg.setAttribute('data-segment', i);
       seg.setAttribute('data-last-segment', i === n - 1 ? '1' : '0');
+      seg.setAttribute('data-edge-idx', curIdx);
       seg.style.display = '';
     }
     // Hide any extra hit-paths from previous renders with more segments
@@ -864,7 +878,7 @@
   // ----- 6) Interactions — pan / node-drag / connect
   var editMode = false;
   var currentTool = 'hand';     // 'cursor' (marquee) or 'hand' (pan); Hand is the default so element drag works without first switching tools.
-  var panState = null, nodeDragState = null, connectState = null, areaDragState = null, areaResizeState = null, edgeDragState = null, edgeEndpointDragState = null;
+  var panState = null, nodeDragState = null, connectState = null, areaDragState = null, areaResizeState = null, edgeDragState = null, edgeEndpointDragState = null, paletteDragState = null;
   var marqueeState = null, marqueeEl = null;
   var suppressNextClick = false;
 
@@ -1362,6 +1376,27 @@
   if (svg) svg.addEventListener('mouseleave', clearHotAreaOnLeave);
 
   window.addEventListener('mousemove', function (ev) {
+    // Palette drag: follow the cursor with a translucent ghost rect rendered
+    // inside the SVG `vp` group so it scales with the current zoom. The
+    // ghost is only created once the click-vs-drag threshold is crossed, so
+    // a quick tap on a palette tile still falls through to the click path
+    // (spawn at viewport center) in mouseup.
+    if (paletteDragState) {
+      if (!paletteDragState.moved) {
+        var ddx = Math.abs(ev.clientX - paletteDragState.startClientX);
+        var ddy = Math.abs(ev.clientY - paletteDragState.startClientY);
+        if (ddx + ddy < DRAG_THRESHOLD) return;
+        paletteDragState.moved = true;
+      }
+      var wp = clientToWorld(ev.clientX, ev.clientY);
+      if (!paletteDragState.ghost) {
+        paletteDragState.ghost = makePaletteGhost(paletteDragState.kind, wp.x, wp.y);
+      } else {
+        movePaletteGhost(paletteDragState, wp.x, wp.y);
+      }
+      return;
+    }
+
     // Update which Area shows its resize handles. Skipped during any active
     // pointer-driven interaction so an in-progress resize doesn't flicker
     // when the cursor strays outside the area mid-drag.
@@ -1616,7 +1651,25 @@
     }
   });
 
-  window.addEventListener('mouseup', function () {
+  window.addEventListener('mouseup', function (ev) {
+    if (paletteDragState) {
+      var st = paletteDragState;
+      destroyPaletteGhost(st);
+      if (st.tile) st.tile.classList.remove('dragging');
+      paletteDragState = null;
+      // If the user somehow toggled out of edit mode mid-drag, abort.
+      if (!editMode) return;
+      if (!st.moved) {
+        // Treat as a click on the tile — spawn at viewport center.
+        paletteSpawnAtCenter(st.kind);
+      } else if (ev && isClientOverCanvas(ev.clientX, ev.clientY)) {
+        // Real drop on the canvas — spawn at the cursor's world coords.
+        var w = clientToWorld(ev.clientX, ev.clientY);
+        paletteSpawnAtPoint(st.kind, w.x, w.y);
+      }
+      // Drop outside the canvas (e.g. on the toolbar) just cancels — no spawn.
+      return;
+    }
     if (marqueeState) {
       var mx = parseFloat(marqueeEl.getAttribute('x'));
       var my = parseFloat(marqueeEl.getAttribute('y'));
@@ -2353,9 +2406,19 @@
   }
   window.__graphAreaSelection = areaSelection;
 
-  function createArea(name, colorKey, parent) {
+  // opts.x / opts.y / opts.w / opts.h — when provided, place the new area at
+  // exactly that world-space rectangle (used by palette drag-to-place). When
+  // both `parent` and `opts` are passed, opts wins for placement and parent
+  // is ignored. The default flow (click +Area) passes neither and lands the
+  // area centered in the current viewport.
+  function createArea(name, colorKey, parent, opts) {
     var x, y, w, h;
-    if (parent && typeof parent === 'object' && 'x' in parent && 'w' in parent) {
+    if (opts && typeof opts.x === 'number' && typeof opts.y === 'number') {
+      w = Math.max(80, opts.w || 200);
+      h = Math.max(60, opts.h || 120);
+      x = opts.x;
+      y = opts.y;
+    } else if (parent && typeof parent === 'object' && 'x' in parent && 'w' in parent) {
       // Sub-area path: size to fit centered inside `parent`, with inner
       // padding. The no-overlap rule then guarantees the result is a true
       // nested child of `parent`. If the parent is too small for the
@@ -3460,8 +3523,7 @@
         e.preventDefault(); return;
       }
       if (e.key === 'g' || e.key === 'G') {
-        var gb = document.getElementById('newAreaBtn');
-        if (gb && gb.getAttribute('aria-disabled') !== 'true') gb.click();
+        spawnAreaFromSelection();
         e.preventDefault(); return;
       }
     }
@@ -3474,13 +3536,13 @@
     fitToView();
   });
 
-  var newAreaBtnEl = document.getElementById('newAreaBtn');
-  if (newAreaBtnEl) newAreaBtnEl.addEventListener('click', function () {
-    // If exactly one Area is currently selected, create the new Area as a
-    // sub-Area inside it. This is the only ergonomic way to make a child
-    // Area under the no-partial-overlap rule. Selection can come from
-    // single-select (selected.kind === 'area') or a multi-selection that
-    // happens to contain exactly one Area and no Pages.
+  // Spawn a new Area centered in the viewport (click +Area / G shortcut).
+  // If exactly one Area is currently selected, the new Area is created as a
+  // sub-Area inside it — the only ergonomic way to make a child Area under
+  // the no-partial-overlap rule. Selection can come from single-select
+  // (selected.kind === 'area') or a multi-selection that happens to contain
+  // exactly one Area and no Pages.
+  function spawnAreaFromSelection() {
     var parent = null;
     if (selected && selected.kind === 'area' && selected.ref) {
       parent = selected.ref;
@@ -3492,6 +3554,120 @@
     }
     var g = createArea('New area', 'neutral', parent);
     openAreaEditor(g);
+    return g;
+  }
+
+  // Palette tiles handle both click (spawn at viewport center) and drag
+  // (spawn at the drop point) via a single mousedown→mouseup flow — the
+  // distinction is the click-vs-drag threshold in mousemove. No separate
+  // 'click' listener is bound: the mouseup branch dispatches both paths.
+  // This avoids the headache of suppressing a synthesized click event after
+  // a drag commit.
+  function paletteSpawnAtCenter(kind) {
+    if (kind === 'page') {
+      if (typeof window.quickAddPage === 'function') window.quickAddPage();
+    } else if (kind === 'area') {
+      spawnAreaFromSelection();
+    }
+  }
+  function paletteSpawnAtPoint(kind, wx, wy) {
+    if (kind === 'page') {
+      var existing = {};
+      document.querySelectorAll('g.gnode[data-id]').forEach(function (el) {
+        existing[el.getAttribute('data-id')] = true;
+      });
+      var n = 1;
+      while (existing['page-' + n]) n++;
+      var name = 'Page ' + n;
+      var slug = 'page-' + n;
+      addPageNode(name, slug, { x: wx - 70, y: wy - 24 }); // top-left = cursor minus half size
+      var toast = document.getElementById('createToast');
+      var tn = document.getElementById('toast-name');
+      if (tn) tn.textContent = name;
+      if (toast) {
+        toast.classList.add('show');
+        setTimeout(function () { toast.classList.remove('show'); }, 3000);
+      }
+    } else if (kind === 'area') {
+      var w = 240, h = 140;
+      var g = createArea('New area', 'neutral', null, { x: wx - w / 2, y: wy - h / 2, w: w, h: h });
+      openAreaEditor(g);
+    }
+  }
+
+  function startPaletteDrag(tile, ev) {
+    if (!editMode) return;
+    var kind = tile.getAttribute('data-create');
+    if (kind !== 'page' && kind !== 'area') return;
+    paletteDragState = {
+      kind: kind,
+      tile: tile,
+      startClientX: ev.clientX,
+      startClientY: ev.clientY,
+      moved: false,
+      ghost: null
+    };
+    tile.classList.add('dragging');
+    // preventDefault stops text selection and focus side-effects while the
+    // tile is being dragged. Native click won't fire (we'll never get a
+    // matching mouseup *on the tile* unless the drag was 0px, in which case
+    // the mouseup branch invokes paletteSpawnAtCenter directly).
+    ev.preventDefault();
+  }
+
+  function makePaletteGhost(kind, wx, wy) {
+    var g = document.createElementNS(SVG_NS, 'g');
+    g.setAttribute('class', 'palette-ghost');
+    var rect = document.createElementNS(SVG_NS, 'rect');
+    if (kind === 'page') {
+      rect.setAttribute('class', 'ghost-page');
+      rect.setAttribute('width', 140);
+      rect.setAttribute('height', 48);
+      rect.setAttribute('rx', 5);
+      rect.setAttribute('x', wx - 70);
+      rect.setAttribute('y', wy - 24);
+    } else {
+      rect.setAttribute('class', 'ghost-area');
+      rect.setAttribute('width', 240);
+      rect.setAttribute('height', 140);
+      rect.setAttribute('rx', 8);
+      rect.setAttribute('x', wx - 120);
+      rect.setAttribute('y', wy - 70);
+    }
+    g.appendChild(rect);
+    vp.appendChild(g);
+    return { g: g, rect: rect };
+  }
+  function movePaletteGhost(state, wx, wy) {
+    if (!state || !state.ghost) return;
+    var rect = state.ghost.rect;
+    if (state.kind === 'page') {
+      rect.setAttribute('x', wx - 70);
+      rect.setAttribute('y', wy - 24);
+    } else {
+      rect.setAttribute('x', wx - 120);
+      rect.setAttribute('y', wy - 70);
+    }
+  }
+  function destroyPaletteGhost(state) {
+    if (!state || !state.ghost) return;
+    if (state.ghost.g && state.ghost.g.parentNode) {
+      state.ghost.g.parentNode.removeChild(state.ghost.g);
+    }
+    state.ghost = null;
+  }
+
+  function isClientOverCanvas(cx, cy) {
+    if (!svg) return false;
+    var r = svg.getBoundingClientRect();
+    return cx >= r.left && cx <= r.right && cy >= r.top && cy <= r.bottom;
+  }
+
+  document.querySelectorAll('.element-palette .palette-tile').forEach(function (tile) {
+    tile.addEventListener('mousedown', function (ev) {
+      if (ev.button !== 0) return;
+      startPaletteDrag(tile, ev);
+    });
   });
 
   // ESC behavior in edit mode:
@@ -3516,14 +3692,23 @@
   });
 
   // ----- Add a new page node into the workspace (called by quickAddPage()).
-  function addPageNode(name, slug) {
+  // opts.x / opts.y, when provided, specify the top-left corner of the new
+  // node in world coordinates (used by the palette drag-to-place path).
+  // Without opts, the node lands at the current viewport center.
+  function addPageNode(name, slug, opts) {
     var nodeW = 140, nodeH = 48;
-    var visW = vbW / vpScale;
-    var visH = vbH / vpScale;
-    var visX = -vpTx / vpScale;
-    var visY = -vpTy / vpScale;
-    var x = Math.round(visX + visW / 2 - nodeW / 2);
-    var y = Math.round(visY + visH / 2 - nodeH / 2);
+    var x, y;
+    if (opts && typeof opts.x === 'number' && typeof opts.y === 'number') {
+      x = Math.round(opts.x);
+      y = Math.round(opts.y);
+    } else {
+      var visW = vbW / vpScale;
+      var visH = vbH / vpScale;
+      var visX = -vpTx / vpScale;
+      var visY = -vpTy / vpScale;
+      x = Math.round(visX + visW / 2 - nodeW / 2);
+      y = Math.round(visY + visH / 2 - nodeH / 2);
+    }
 
     var id = slug || ('node-' + Date.now().toString(36));
     var initialSlug = slug || (typeof slugify === 'function' ? slugify(name || '') : (name || '').toLowerCase()) || id;

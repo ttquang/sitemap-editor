@@ -131,11 +131,63 @@
   /* Brief "press" squish */
   .bottom-toolbar .seg.pressing .seg-pill { transform: var(--seg-tx, translateX(0)) scaleX(0.94); }
 
-  /* Element palette (+ Page / + Area) — color-coded, gated by aria-disabled */
-  .bottom-toolbar button.add-page  { color: var(--page-fg); }
-  .bottom-toolbar button.add-page:hover  { background: var(--page-bg); }
-  .bottom-toolbar button.add-area { color: #5E3DB3; }
-  .bottom-toolbar button.add-area:hover { background: #EDE6FA; }
+  /* ============================================================
+     Element palette — floats just above the bottom toolbar in
+     Edit mode. Each tile is both a click target (spawn at viewport
+     center) and a drag source (spawn at drop point). Visibility is
+     gated by the `data-needs-edit hidden` attribute on the
+     container, which setAppMode toggles.
+     ============================================================ */
+  .element-palette {
+    position: absolute;
+    left: 50%; bottom: 5.25rem;
+    transform: translateX(-50%);
+    display: inline-flex; align-items: stretch; gap: 0.375rem;
+    padding: 0.4375rem;
+    background: #FFFFFF;
+    border: 1px solid #E5E5E5;
+    border-radius: 0.875rem;
+    box-shadow:
+      0 2px 4px rgba(0,0,0,0.04),
+      0 20px 48px -16px rgba(0,0,0,0.16);
+    z-index: 5;
+  }
+  .element-palette[hidden] { display: none; }
+  .palette-tile {
+    appearance: none; border: 1px solid transparent;
+    background: transparent;
+    display: inline-flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 0.3125rem;
+    min-width: 4.25rem;
+    padding: 0.5625rem 0.625rem;
+    border-radius: 0.5rem;
+    cursor: grab;
+    color: #1E1E1E;
+    font: 500 0.75rem/1 var(--sans); letter-spacing: -0.005em;
+    transition: background 80ms, border-color 80ms, color 80ms;
+    -webkit-user-select: none; user-select: none;
+  }
+  .palette-tile svg { width: 1.25rem; height: 1.25rem; display: block; }
+  .palette-tile:hover { background: #F2F3F5; border-color: #E5E5E5; }
+  .palette-tile:active,
+  .palette-tile.dragging { cursor: grabbing; background: #ECEEF1; }
+  .palette-tile.tile-page         { color: var(--page-fg); }
+  .palette-tile.tile-page:hover   { background: var(--page-bg); }
+  .palette-tile.tile-area         { color: #5E3DB3; }
+  .palette-tile.tile-area:hover   { background: #EDE6FA; }
+  .palette-label { display: block; }
+
+  /* Ghost preview rendered inside the SVG `vp` group while a palette
+     drag is in flight. Translucent so the drop point is visible. */
+  .palette-ghost { opacity: 0.55; pointer-events: none; }
+  .palette-ghost rect.ghost-page {
+    fill: #E8F2F1; stroke: var(--page-fg, #0C6C68); stroke-width: 1.5;
+  }
+  .palette-ghost rect.ghost-area {
+    fill: #F2EFFB; stroke: #5E3DB3; stroke-width: 1.5;
+    stroke-dasharray: 6 4;
+  }
 
   /* Figma-style Hand cursors. Both share a palm silhouette with a
      thumb-bulge on the lower-left, so the shape reads as a real hand

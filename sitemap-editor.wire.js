@@ -145,13 +145,10 @@
   // quickAddPage / openCreatedPage are top-level globals declared at the
   // top of sitemap-editor.js (above its IIFE), so they're accessible on
   // window by the time this script runs.
-
-  // +Page toolbar button — fire only when the button isn't aria-disabled.
-  var addPageBtn = document.querySelector('.bottom-toolbar button.add-page');
-  if (addPageBtn) addPageBtn.addEventListener('click', function () {
-    if (addPageBtn.getAttribute('aria-disabled') === 'true') return;
-    if (typeof window.quickAddPage === 'function') window.quickAddPage();
-  });
+  //
+  // Note: the +Page and +Area palette tiles are wired via mousedown/mouseup
+  // inside the editor IIFE (not click) so a tap and a drag share one flow.
+  // No click listener is bound on them here.
 
   // "Page created" toast — "Open →" link.
   var toastOpen = document.getElementById('toast-open');
