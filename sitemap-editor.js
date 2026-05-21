@@ -910,46 +910,90 @@
   // existing call sites (selectPage, selectArea, etc.).
   var currentAppMode = 'view';
   var pathHighlightOn = false;
+  // Path-results state. currentPathTarget = the node the user last clicked in
+  // Path mode; currentPathList = the enumerated paths for that target (or null
+  // if no target has been picked yet); currentPathSelection = 'all' | <index>.
+  var currentPathTarget = null;
+  var currentPathList = null;
+  var currentPathSelection = 'all';
+  var PATH_ENUM_CAP = 50;
 
   function clearPathHighlight() {
-    if (!pathHighlightOn) return;
-    nodes.forEach(function (n) {
-      n.el.classList.remove('path-on', 'path-target', 'path-root', 'path-dim');
-    });
-    edges.forEach(function (e) {
-      if (e.pathEl) e.pathEl.classList.remove('path-on', 'path-dim');
-      if (e.labelBgEl) e.labelBgEl.classList.remove('path-dim');
-      if (e.labelTextEl) e.labelTextEl.classList.remove('path-dim');
-    });
-    Array.prototype.forEach.call(vp.querySelectorAll('rect.gzone, .gzone-label'), function (el) {
-      el.classList.remove('path-dim');
-    });
-    pathHighlightOn = false;
+    if (pathHighlightOn) {
+      nodes.forEach(function (n) {
+        n.el.classList.remove('path-on', 'path-target', 'path-root', 'path-dim');
+      });
+      edges.forEach(function (e) {
+        if (e.pathEl) e.pathEl.classList.remove('path-on', 'path-dim');
+        if (e.labelBgEl) e.labelBgEl.classList.remove('path-dim');
+        if (e.labelTextEl) e.labelTextEl.classList.remove('path-dim');
+      });
+      Array.prototype.forEach.call(vp.querySelectorAll('rect.gzone, .gzone-label'), function (el) {
+        el.classList.remove('path-dim');
+      });
+      pathHighlightOn = false;
+    }
+    currentPathTarget = null;
+    currentPathList = null;
+    currentPathSelection = 'all';
+    resetPathResultsPanel();
   }
 
-  // Reverse-BFS from `target` along incoming edges. Marks every reachable
-  // ancestor and the edges connecting them as "on path"; dims everything else.
-  // Result: every node/edge that lies on any forward route from a root (a
-  // page with no incoming edges) to the clicked target lights up.
-  function highlightPathTo(target) {
-    clearPathHighlight();
+  // Build incoming-edges adjacency (targetId -> [edges]). Shared by both the
+  // unioned highlight and per-path enumeration so we don't walk `edges` twice.
+  function buildIncomingMap() {
     var incoming = Object.create(null);
     edges.forEach(function (e) {
       (incoming[e.targetId] || (incoming[e.targetId] = [])).push(e);
     });
+    return incoming;
+  }
+
+  // Reverse-BFS from `target` along incoming edges. Marks every reachable
+  // ancestor and the edges connecting them as "on path"; dims everything else.
+  // When `pathSubset` is provided (from enumeratePathsTo), only that single
+  // root->target path lights up instead of the unioned subgraph.
+  function highlightPathTo(target, pathSubset) {
+    // Drop any visual highlight WITHOUT resetting currentPath* state — the
+    // caller manages selection. (clearPathHighlight clears state too, which
+    // we don't want here.)
+    if (pathHighlightOn) {
+      nodes.forEach(function (n) {
+        n.el.classList.remove('path-on', 'path-target', 'path-root', 'path-dim');
+      });
+      edges.forEach(function (e) {
+        if (e.pathEl) e.pathEl.classList.remove('path-on', 'path-dim');
+        if (e.labelBgEl) e.labelBgEl.classList.remove('path-dim');
+        if (e.labelTextEl) e.labelTextEl.classList.remove('path-dim');
+      });
+      Array.prototype.forEach.call(vp.querySelectorAll('rect.gzone, .gzone-label'), function (el) {
+        el.classList.remove('path-dim');
+      });
+      pathHighlightOn = false;
+    }
+    var incoming = buildIncomingMap();
     var onNodes = Object.create(null);
     var onEdgeIdx = Object.create(null);
-    var queue = [target.id];
-    onNodes[target.id] = true;
-    while (queue.length) {
-      var cur = queue.shift();
-      var ins = incoming[cur] || [];
-      for (var i = 0; i < ins.length; i++) {
-        var e = ins[i];
-        onEdgeIdx[edges.indexOf(e)] = true;
-        if (!onNodes[e.sourceId]) {
-          onNodes[e.sourceId] = true;
-          queue.push(e.sourceId);
+    if (pathSubset) {
+      // Single-path mode: use the precomputed node ids and edge indices from
+      // enumeratePathsTo. Root is the first node in the path (which by
+      // construction has no on-path inbound edge).
+      pathSubset.nodeIds.forEach(function (id) { onNodes[id] = true; });
+      pathSubset.edgeIndices.forEach(function (i) { onEdgeIdx[i] = true; });
+    } else {
+      // Union mode (original behavior): BFS backward from target.
+      var queue = [target.id];
+      onNodes[target.id] = true;
+      while (queue.length) {
+        var cur = queue.shift();
+        var ins = incoming[cur] || [];
+        for (var i = 0; i < ins.length; i++) {
+          var e = ins[i];
+          onEdgeIdx[edges.indexOf(e)] = true;
+          if (!onNodes[e.sourceId]) {
+            onNodes[e.sourceId] = true;
+            queue.push(e.sourceId);
+          }
         }
       }
     }
@@ -988,6 +1032,128 @@
     });
     pathHighlightOn = true;
   }
+
+  // DFS backward from `target` enumerating distinct simple paths to any root
+  // (a node with no incoming edges). Returns up to `cap` paths shaped as
+  // { nodeIds: [rootId, ..., targetId], edgeIndices: [edge i for each hop] }.
+  // The `truncated` flag on the returned object signals the cap was hit.
+  function enumeratePathsTo(target, cap) {
+    var incoming = buildIncomingMap();
+    var results = [];
+    var truncated = false;
+    var stack = [target.id];
+    var stackEdges = []; // edge indices, parallel to hops between stack nodes
+    var inStack = Object.create(null);
+    inStack[target.id] = true;
+
+    function dfs(curId) {
+      if (results.length >= cap) { truncated = true; return; }
+      var ins = incoming[curId];
+      if (!ins || ins.length === 0) {
+        // curId is a root — emit a copy of the stack reversed so nodeIds reads
+        // root -> ... -> target, edges in matching forward order.
+        var nodeIds = stack.slice().reverse();
+        var edgeIndices = stackEdges.slice().reverse();
+        results.push({ nodeIds: nodeIds, edgeIndices: edgeIndices });
+        return;
+      }
+      for (var i = 0; i < ins.length; i++) {
+        if (results.length >= cap) { truncated = true; return; }
+        var e = ins[i];
+        if (inStack[e.sourceId]) continue; // cycle guard
+        stack.push(e.sourceId);
+        stackEdges.push(edges.indexOf(e));
+        inStack[e.sourceId] = true;
+        dfs(e.sourceId);
+        inStack[e.sourceId] = false;
+        stack.pop();
+        stackEdges.pop();
+      }
+    }
+    dfs(target.id);
+    results.truncated = truncated;
+    return results;
+  }
+
+  // ---- Path results panel rendering --------------------------------------
+  // The panel lives in HTML as #pathResultsPanel; these helpers populate its
+  // count, list rows, and empty state. clearPathHighlight calls
+  // resetPathResultsPanel(); the click-on-node handler in Path mode calls
+  // renderPathResults(target, paths) to fill it.
+  function resetPathResultsPanel() {
+    var countEl = document.getElementById('pathResultsCount');
+    var listEl = document.getElementById('pathResultsList');
+    var emptyEl = document.getElementById('pathResultsEmpty');
+    if (countEl) countEl.textContent = '—';
+    if (listEl) { listEl.innerHTML = ''; listEl.hidden = true; }
+    if (emptyEl) { emptyEl.textContent = 'Click a page to trace its paths.'; emptyEl.hidden = false; }
+  }
+  function pathRowLabel(path, index) {
+    var rootId = path.nodeIds[0];
+    var rootNode = nodes.get(rootId);
+    var rootName = (rootNode && rootNode.name) ? rootNode.name : rootId;
+    var steps = path.edgeIndices.length;
+    if (steps === 0) return 'Path ' + (index + 1) + ' — direct (0 steps)';
+    return 'Path ' + (index + 1) + ' — via ' + rootName + ' (' + steps + (steps === 1 ? ' step)' : ' steps)');
+  }
+  function renderPathResults(target, paths) {
+    var countEl = document.getElementById('pathResultsCount');
+    var listEl = document.getElementById('pathResultsList');
+    var emptyEl = document.getElementById('pathResultsEmpty');
+    if (!listEl) return;
+    if (!paths || paths.length === 0) {
+      // No upstream routes — target is unreachable from any root via inbound
+      // edges. (Doesn't happen for a normal sitemap root, since enumeratePathsTo
+      // emits the target itself as a 0-step path when it has no incoming edges.)
+      if (countEl) countEl.textContent = '0';
+      listEl.innerHTML = '';
+      listEl.hidden = true;
+      if (emptyEl) { emptyEl.textContent = 'No paths to this page.'; emptyEl.hidden = false; }
+      return;
+    }
+    if (emptyEl) emptyEl.hidden = true;
+    if (countEl) countEl.textContent = String(paths.length) + (paths.truncated ? '+' : '');
+
+    var rows = [];
+    rows.push('<li class="path-row active" role="option" data-path-index="all" aria-selected="true">All paths <span class="path-row-sub">' + paths.length + (paths.truncated ? '+' : '') + ' route' + (paths.length === 1 ? '' : 's') + ' · unioned</span></li>');
+    paths.forEach(function (p, i) {
+      rows.push('<li class="path-row" role="option" data-path-index="' + i + '">' + escapeHtml(pathRowLabel(p, i)) + '</li>');
+    });
+    if (paths.truncated) {
+      rows.push('<li class="path-row-more" aria-disabled="true">+ more paths not shown (cap ' + PATH_ENUM_CAP + ')</li>');
+    }
+    listEl.innerHTML = rows.join('');
+    listEl.hidden = false;
+  }
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return c === '&' ? '&amp;' : c === '<' ? '&lt;' : c === '>' ? '&gt;' : c === '"' ? '&quot;' : '&#39;';
+    });
+  }
+
+  // Delegated click on the results list — switches highlight to the chosen
+  // path (or back to the union when "All paths" is picked).
+  document.addEventListener('click', function (ev) {
+    var row = ev.target.closest && ev.target.closest('.path-row');
+    if (!row) return;
+    var listEl = document.getElementById('pathResultsList');
+    if (!listEl || !listEl.contains(row)) return;
+    if (!currentPathTarget) return;
+    var idxAttr = row.getAttribute('data-path-index');
+    if (idxAttr == null) return;
+    currentPathSelection = (idxAttr === 'all') ? 'all' : parseInt(idxAttr, 10);
+    var subset = null;
+    if (currentPathSelection !== 'all' && currentPathList) {
+      subset = currentPathList[currentPathSelection] || null;
+    }
+    highlightPathTo(currentPathTarget, subset);
+    Array.prototype.forEach.call(listEl.querySelectorAll('.path-row'), function (r) {
+      var isActive = r.getAttribute('data-path-index') === idxAttr;
+      r.classList.toggle('active', isActive);
+      if (isActive) r.setAttribute('aria-selected', 'true');
+      else r.removeAttribute('aria-selected');
+    });
+  });
 
   // ---- Heatmap mode -------------------------------------------------------
   // Colors each Page by how many test cases touch it. Counts are sourced via
@@ -1298,6 +1464,16 @@
       }
     });
 
+    // Path results panel — visible only in Path mode. Mirrors the data-needs-edit
+    // pattern so the panel's presence is purely a function of app mode.
+    document.querySelectorAll('[data-needs-path]').forEach(function (b) {
+      if (mode === 'path') {
+        b.hidden = false;
+      } else {
+        b.hidden = true;
+      }
+    });
+
     // AI chat panel — visible only in AI mode
     var ai = document.getElementById('aiChatPanel');
     if (ai) {
@@ -1424,7 +1600,13 @@
       } else if (currentAppMode === 'path') {
         var pid = nodeEl.getAttribute('data-id');
         var pn = nodes.get(pid);
-        if (pn) highlightPathTo(pn);
+        if (pn) {
+          currentPathTarget = pn;
+          currentPathList = enumeratePathsTo(pn, PATH_ENUM_CAP);
+          currentPathSelection = 'all';
+          highlightPathTo(pn);
+          renderPathResults(pn, currentPathList);
+        }
         ev.preventDefault();
         ev.stopPropagation();
         suppressNextClick = true;

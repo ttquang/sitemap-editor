@@ -161,6 +161,18 @@
             <span class="mn-status" id="monitorStatus">—</span>
           </div>
 
+          <!-- Path results panel — floats on the right edge of the canvas in
+               Path mode. Populated after the user clicks a target page.
+               Hidden in non-Path modes via the data-needs-path gate. -->
+          <aside id="pathResultsPanel" class="path-results-panel" data-needs-path hidden aria-label="Path results">
+            <div class="rp-h">
+              <span class="rp-eyebrow">PATHS</span>
+              <span class="rp-h-name" id="pathResultsCount">—</span>
+            </div>
+            <div class="path-results-empty" id="pathResultsEmpty">Click a page to trace its paths.</div>
+            <ul class="path-results-list" id="pathResultsList" role="listbox" hidden></ul>
+          </aside>
+
           <!-- AI Chat panel — floats just above the toolbar in AI mode -->
           <div class="ai-chat-above" id="aiChatPanel" role="dialog" aria-label="Ask AI" hidden>
             <div class="chat-head">
