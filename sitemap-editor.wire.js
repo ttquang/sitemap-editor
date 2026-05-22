@@ -11,7 +11,6 @@
 //        - the +Page toolbar button (calls quickAddPage)
 //        - the node-modal scrim (close on outside-click)
 //        - the node-modal close button
-//        - the "Page created" toast "Open →" link
 //
 // The unused topbar / sidenav navigation functions (openHome, openPages,
 // openCases, openSuites, switchProject, exportSitemapSVG, importSitemapSVG,
@@ -142,19 +141,13 @@
 
   // ----- Replacements for the inline onclick="" handlers.
   //
-  // quickAddPage / openCreatedPage are top-level globals declared at the
-  // top of sitemap-editor.js (above its IIFE), so they're accessible on
-  // window by the time this script runs.
+  // quickAddPage is a top-level global declared at the top of
+  // sitemap-editor.js (above its IIFE), so it's accessible on window by
+  // the time this script runs.
   //
   // Note: the +Page and +Area palette tiles are wired via mousedown/mouseup
   // inside the editor IIFE (not click) so a tap and a drag share one flow.
   // No click listener is bound on them here.
-
-  // "Page created" toast — "Open →" link.
-  var toastOpen = document.getElementById('toast-open');
-  if (toastOpen) toastOpen.addEventListener('click', function () {
-    if (typeof window.openCreatedPage === 'function') window.openCreatedPage();
-  });
 
   // ----- Import / Export buttons (JSON) -------------------------------
   // Export: synthesize the JSON payload and trigger a Blob download.

@@ -9,7 +9,6 @@
             .replace(/^-+|-+$/g, '');
   }
 
-  var lastCreatedName = '';
   function quickAddPage() {
     // Pick the smallest N such that "page-N" isn't already an existing slug.
     // Reads the live SVG so it stays correct after imports.
@@ -21,7 +20,6 @@
     while (existing['page-' + n]) n++;
     var name = 'Page ' + n;
     var slug = 'page-' + n;
-    lastCreatedName = name;
 
     // Hand off to the graph IIFE for actual DOM construction
     if (typeof window.__graphAddPageNode === 'function') {
@@ -29,20 +27,6 @@
     } else if (typeof window.__graphAddPage === 'function') {
       window.__graphAddPage(name, slug);
     }
-
-    // Reuse the existing toast for visual feedback
-    var toast = document.getElementById('createToast');
-    var tn = document.getElementById('toast-name');
-    if (tn) tn.textContent = name;
-    if (toast) {
-      toast.classList.add('show');
-      setTimeout(function () { toast.classList.remove('show'); }, 3000);
-    }
-  }
-  function openCreatedPage() {
-    window.location.hash = '#page_' + slugify(lastCreatedName);
-    var t = document.getElementById('createToast');
-    if (t) t.classList.remove('show');
   }
 
 /* ============================================================
@@ -348,6 +332,88 @@
     n.el.setAttribute('transform', 'translate(' + n.offsetX + ' ' + n.offsetY + ')');
   }
 
+  // ----- Obstacle-avoidance helpers (used by orthogonalRoute) -----
+  // Non-endpoint pages count as obstacles. If a polyline segment cuts
+  // through one of them, deflectAroundObstacles inserts a U-shaped
+  // detour so the edge goes around instead of through. This is what
+  // lifts the segment count above the default 1/3 when an obstacle
+  // sits between the endpoints.
+
+  var OBSTACLE_PAD = 4;
+
+  function collectObstacles(s, t) {
+    var obs = [];
+    nodes.forEach(function (n) {
+      if (n === s || n === t) return;
+      obs.push({
+        l: n.x0 + n.offsetX - OBSTACLE_PAD,
+        r: n.x0 + n.offsetX + n.w + OBSTACLE_PAD,
+        t: n.y0 + n.offsetY - OBSTACLE_PAD,
+        b: n.y0 + n.offsetY + n.h + OBSTACLE_PAD
+      });
+    });
+    return obs;
+  }
+
+  // AABB overlap with strict inequality so segments that graze the
+  // padded border aren't flagged as crossings.
+  function segmentHitsRect(p1, p2, r) {
+    var minX = Math.min(p1.x, p2.x);
+    var maxX = Math.max(p1.x, p2.x);
+    var minY = Math.min(p1.y, p2.y);
+    var maxY = Math.max(p1.y, p2.y);
+    return !(maxX <= r.l || minX >= r.r || maxY <= r.t || minY >= r.b);
+  }
+
+  function firstHitObstacle(p1, p2, obstacles) {
+    for (var i = 0; i < obstacles.length; i++) {
+      if (segmentHitsRect(p1, p2, obstacles[i])) return obstacles[i];
+    }
+    return null;
+  }
+
+  // Replace segment p1→p2 with a 3-point detour around the closer
+  // side of the obstacle. Returns the points to append after p1.
+  function detourSegment(p1, p2, r) {
+    var dx = p2.x - p1.x, dy = p2.y - p1.y;
+    var pad = 4;
+    if (Math.abs(dx) > Math.abs(dy)) {
+      var goTop = Math.abs(p1.y - r.t) <= Math.abs(p1.y - r.b);
+      var detourY = goTop ? (r.t - pad) : (r.b + pad);
+      return [{ x: p1.x, y: detourY }, { x: p2.x, y: detourY }, p2];
+    } else {
+      var goLeft = Math.abs(p1.x - r.l) <= Math.abs(p1.x - r.r);
+      var detourX = goLeft ? (r.l - pad) : (r.r + pad);
+      return [{ x: detourX, y: p1.y }, { x: detourX, y: p2.y }, p2];
+    }
+  }
+
+  // Walk the polyline and insert detours where any segment crosses
+  // an obstacle. The iteration cap stops runaway expansion in
+  // pathological layouts (e.g. detour direction places the new
+  // segment inside another obstacle).
+  function deflectAroundObstacles(pts, obstacles) {
+    if (!obstacles.length) return pts;
+    var MAX_ITERS = 8;
+    for (var iter = 0; iter < MAX_ITERS; iter++) {
+      var newPts = [pts[0]];
+      var anyHit = false;
+      for (var i = 0; i < pts.length - 1; i++) {
+        var p1 = pts[i], p2 = pts[i + 1];
+        var hit = firstHitObstacle(p1, p2, obstacles);
+        if (!hit) {
+          newPts.push(p2);
+          continue;
+        }
+        anyHit = true;
+        detourSegment(p1, p2, hit).forEach(function (p) { newPts.push(p); });
+      }
+      pts = newPts;
+      if (!anyHit) break;
+    }
+    return pts;
+  }
+
   // Anchor-based orthogonal routing.
   // For each endpoint, pick which side of its rect it exits from (manual or default).
   // Build a short perpendicular stub at each end, then a single bend between stubs.
@@ -430,7 +496,22 @@
     } else if (edge && edge.manualMid && edge.manualMid.axis === 'y' && ssV && tsV) {
       var Vy = edge.manualMid.value;
       pts = [sp, { x: sp.x, y: Vy }, { x: tp.x, y: Vy }, tp];
-    } else {
+    } else if ((ssH && tsV) || (ssV && tsH)) {
+      // Perpendicular sides — emit a clean 2-segment L when the natural corner
+      // lies in the correct quadrant for both endpoints' exit directions.
+      // Otherwise fall through to the zigzag route below.
+      var corner = ssH ? { x: tp.x, y: sp.y } : { x: sp.x, y: tp.y };
+      var sValid = ssH
+        ? ((corner.x - sp.x) * sv.x) > 0
+        : ((corner.y - sp.y) * sv.y) > 0;
+      var tValid = tsH
+        ? ((sp.x - tp.x) * tv.x) > 0
+        : ((sp.y - tp.y) * tv.y) > 0;
+      if (sValid && tValid) {
+        pts = [sp, corner, tp];
+      }
+    }
+    if (!pts) {
       // Default routing: stub + single bend.
       pts = [sp, spStub];
       var alignedX = Math.abs(spStub.x - tpStub.x) < 0.5;
@@ -444,6 +525,12 @@
       pts.push(tpStub);
       pts.push(tp);
     }
+
+    // Detour around any non-endpoint pages the polyline crosses,
+    // lifting the segment count above the default 1/3 when an
+    // obstacle sits between source and target.
+    var obstacles = collectObstacles(s, t);
+    pts = deflectAroundObstacles(pts, obstacles);
 
     // Build d
     var d = 'M ' + pts[0].x.toFixed(1) + ',' + pts[0].y.toFixed(1);
@@ -528,7 +615,7 @@
   }
 
   function syncHitPaths(e, pts) {
-    if (pts.length < 4) {
+    if (pts.length < 2) {
       // No segments to grab on; ensure the hit-paths (if they exist) are hidden,
       // and clear any stale hovered state from the visible edge.
       if (e.hitEls) e.hitEls.forEach(function (seg) { seg.style.display = 'none'; });
@@ -806,26 +893,8 @@
   }
   window.__graphImportJSON = importJSON;
 
-  // Reuse the #createToast slot to flash an import message. The toast
-  // markup hardcodes "Page X created." — we temporarily overwrite the
-  // message span, then restore it after the toast hides.
   function notifyImport(message) {
-    var toast = document.getElementById('createToast');
-    if (!toast) { alert(message); return; }
-    var msg = toast.querySelector('span:nth-of-type(2)');
-    var link = document.getElementById('toast-open');
-    var prevHTML = msg ? msg.innerHTML : null;
-    var prevLinkDisplay = link ? link.style.display : null;
-    if (msg) msg.textContent = message;
-    if (link) link.style.display = 'none';
-    toast.classList.add('show');
-    setTimeout(function () {
-      toast.classList.remove('show');
-      setTimeout(function () {
-        if (msg && prevHTML != null) msg.innerHTML = prevHTML;
-        if (link && prevLinkDisplay != null) link.style.display = prevLinkDisplay;
-      }, 250);
-    }, 3200);
+    alert(message);
   }
 
   // After the IIFE parses the freshly-rebuilt SVG (built by the shim
@@ -1986,7 +2055,7 @@
           var a = nearestAnchorOn(srcNode, w.x, w.y);
           edgeBeing.manualSp = { side: a.side, idx: a.idx };
         }
-      } else if (edgeDragState.segment === (edgeDragState.lastSegmentIdx != null ? edgeDragState.lastSegmentIdx : 2)) {
+      } else if (edgeDragState.lastSegmentIdx != null && edgeDragState.segment === edgeDragState.lastSegmentIdx) {
         var tgtNode = nodes.get(edgeBeing.targetId);
         if (tgtNode) {
           var a = nearestAnchorOn(tgtNode, w.x, w.y);
@@ -2004,16 +2073,36 @@
       var ww = clientToWorld(ev.clientX, ev.clientY);
       var rdx = ww.x - rs.startWorldX;
       var rdy = ww.y - rs.startWorldY;
-      var nx = rs.startX, ny = rs.startY, nw = rs.startW, nh = rs.startH;
-      if (rs.dir.indexOf('w') >= 0) { nx = rs.startX + rdx; nw = rs.startW - rdx; }
-      if (rs.dir.indexOf('e') >= 0) { nw = rs.startW + rdx; }
-      if (rs.dir.indexOf('n') >= 0) { ny = rs.startY + rdy; nh = rs.startH - rdy; }
-      if (rs.dir.indexOf('s') >= 0) { nh = rs.startH + rdy; }
-      // clampAreaResize enforces min size + nested-area rules (must still
-      // contain current descendants, must not partially overlap any other
-      // area).
-      var clamped = clampAreaResize(rs.area, rs.dir, nx, ny, nw, nh);
+
+      // Smart-guide snap: only the moving edge(s) participate, and only if
+      // the snapped rect still passes the same nested-area / overlap rules
+      // as the unsnapped rect. Otherwise fall back so the snap can't trap
+      // the user in an invalid state.
+      var originRect = { x: rs.startX, y: rs.startY, w: rs.startW, h: rs.startH };
+      var resizeExclude = {}; resizeExclude[rs.area.id] = true;
+      var snap = computeSnap(originRect, rdx, rdy, getSnapTargetRects(resizeExclude), resizeAnchorsForDir(rs.dir));
+
+      var clamped, used;
+      if (snap.guideX || snap.guideY) {
+        var srect = applyResizeDelta(rs, snap.dx, snap.dy);
+        var sclamp = clampAreaResize(rs.area, rs.dir, srect.nx, srect.ny, srect.nw, srect.nh);
+        var snapAccepted = sclamp.x === srect.nx && sclamp.y === srect.ny &&
+                           sclamp.w === srect.nw && sclamp.h === srect.nh;
+        if (snapAccepted) {
+          clamped = sclamp;
+          used = snap;
+        }
+      }
+      if (!clamped) {
+        var rect = applyResizeDelta(rs, rdx, rdy);
+        // clampAreaResize enforces min size + nested-area rules (must still
+        // contain current descendants, must not partially overlap any other
+        // area).
+        clamped = clampAreaResize(rs.area, rs.dir, rect.nx, rect.ny, rect.nw, rect.nh);
+      }
       resizeAreaTo(rs.area, clamped.x, clamped.y, clamped.w, clamped.h);
+      if (used) showSmartGuides(used, clamped);
+      else clearSmartGuides();
       restackAreas();
       return;
     }
@@ -2349,6 +2438,7 @@
     }
     if (areaResizeState) {
       areaResizeState = null;
+      clearSmartGuides();
       suppressNextClick = true;
     }
     if (areaDragState) {
@@ -2775,26 +2865,39 @@
   // combination of {left,center,right} × every target's {left,center,right}
   // (and similarly vertical). Returns snapped deltas plus the descriptor of
   // the winning snap on each axis (or null if no snap fired).
-  function computeSnap(originRect, dx, dy, targets) {
+  //
+  // originAnchors (optional): { x: [indices], y: [indices] } restricts which
+  // origin anchors participate, where 0/1/2 = left/center/right (or
+  // top/middle/bottom). Used by resize so only the moving edge snaps. An
+  // explicit empty array disables that axis entirely. Omitted => all three.
+  function computeSnap(originRect, dx, dy, targets, originAnchors) {
     var THR = SMART_SNAP_PX / (vpScale || 1);
     var sx0 = [originRect.x, originRect.x + originRect.w / 2, originRect.x + originRect.w];
     var sy0 = [originRect.y, originRect.y + originRect.h / 2, originRect.y + originRect.h];
+    var xs = originAnchors && originAnchors.x ? originAnchors.x : [0, 1, 2];
+    var ys = originAnchors && originAnchors.y ? originAnchors.y : [0, 1, 2];
     var bestX = null, bestY = null;
     for (var i = 0; i < targets.length; i++) {
       var t = targets[i];
       var tx = [t.x, t.x + t.w / 2, t.x + t.w];
       var ty = [t.y, t.y + t.h / 2, t.y + t.h];
-      for (var a = 0; a < 3; a++) {
-        for (var b = 0; b < 3; b++) {
-          var dxSnap = tx[b] - sx0[a];
+      for (var ai = 0; ai < xs.length; ai++) {
+        var ax = xs[ai];
+        for (var bx = 0; bx < 3; bx++) {
+          var dxSnap = tx[bx] - sx0[ax];
           var diffX = Math.abs(dxSnap - dx);
           if (diffX <= THR && (!bestX || diffX < bestX.diff)) {
-            bestX = { diff: diffX, delta: dxSnap, lineX: tx[b], target: t };
+            bestX = { diff: diffX, delta: dxSnap, lineX: tx[bx], target: t };
           }
-          var dySnap = ty[b] - sy0[a];
+        }
+      }
+      for (var aj = 0; aj < ys.length; aj++) {
+        var ay = ys[aj];
+        for (var by = 0; by < 3; by++) {
+          var dySnap = ty[by] - sy0[ay];
           var diffY = Math.abs(dySnap - dy);
           if (diffY <= THR && (!bestY || diffY < bestY.diff)) {
-            bestY = { diff: diffY, delta: dySnap, lineY: ty[b], target: t };
+            bestY = { diff: diffY, delta: dySnap, lineY: ty[by], target: t };
           }
         }
       }
@@ -2804,6 +2907,31 @@
       dy: bestY ? bestY.delta : dy,
       guideX: bestX, guideY: bestY
     };
+  }
+
+  // Map a resize handle direction to the origin anchors that should
+  // participate in smart-guide snapping. Only the moving edge is allowed
+  // to snap — dragging the east handle snaps the right edge (anchor 2),
+  // not the left or center. Corner handles snap on both axes.
+  function resizeAnchorsForDir(dir) {
+    var anchors = { x: [], y: [] };
+    if (dir.indexOf('w') >= 0) anchors.x = [0];
+    else if (dir.indexOf('e') >= 0) anchors.x = [2];
+    if (dir.indexOf('n') >= 0) anchors.y = [0];
+    else if (dir.indexOf('s') >= 0) anchors.y = [2];
+    return anchors;
+  }
+
+  // Apply the per-direction resize transform to startRect + deltas. Pulled
+  // out of the pointer-move handler so both the snapped-attempt and the
+  // unsnapped-fallback paths can share the math.
+  function applyResizeDelta(rs, rdx, rdy) {
+    var nx = rs.startX, ny = rs.startY, nw = rs.startW, nh = rs.startH;
+    if (rs.dir.indexOf('w') >= 0) { nx = rs.startX + rdx; nw = rs.startW - rdx; }
+    if (rs.dir.indexOf('e') >= 0) { nw = rs.startW + rdx; }
+    if (rs.dir.indexOf('n') >= 0) { ny = rs.startY + rdy; nh = rs.startH - rdy; }
+    if (rs.dir.indexOf('s') >= 0) { nh = rs.startH + rdy; }
+    return { nx: nx, ny: ny, nw: nw, nh: nh };
   }
 
   // Position the two guide lines so each spans from the moving rect to the
@@ -4184,13 +4312,6 @@
       var name = 'Page ' + n;
       var slug = 'page-' + n;
       addPageNode(name, slug, { x: wx - 70, y: wy - 24 }); // top-left = cursor minus half size
-      var toast = document.getElementById('createToast');
-      var tn = document.getElementById('toast-name');
-      if (tn) tn.textContent = name;
-      if (toast) {
-        toast.classList.add('show');
-        setTimeout(function () { toast.classList.remove('show'); }, 3000);
-      }
     } else if (kind === 'area') {
       var w = 240, h = 140;
       var g = createArea('New area', 'neutral', null, { x: wx - w / 2, y: wy - h / 2, w: w, h: h });

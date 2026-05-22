@@ -15,15 +15,14 @@
        12. Smart guides
        13. Lock UI (badge, dim, toggle)
        14. Edit-mode hint banner
-       15. Toast
-       16. Bottom toolbar
-       17. Element palette
-       18. Path results panel
-       19. AI chat panel
-       20. Right-click context menu
-       21. Canvas cursors (SVG data-URL set)
-       22. Modes — Path / Heatmap / Monitor + legends
-       23. Utility classes
+       15. Bottom toolbar
+       16. Element palette
+       17. Path results panel
+       18. AI chat panel
+       19. Right-click context menu
+       20. Canvas cursors (SVG data-URL set)
+       21. Modes — Path / Heatmap / Monitor + legends
+       22. Utility classes
      ============================================================ */
 
   /* ============================================================
@@ -745,38 +744,7 @@
   }
 
   /* ============================================================
-     15. TOAST
-     ============================================================ */
-  /* Toast — appears after a successful Page creation. Pinned to the
-     bottom-right so it doesn't sit on top of the canvas legend that
-     lives bottom-right of .canvas-wrap (the legend is inside .canvas-wrap,
-     the toast is fixed to the viewport — visually overlaps, but the
-     toast is short-lived). */
-  .toast {
-    position: fixed; bottom: 1.5rem; right: 1.5rem;
-    transform: translateY(0.75rem);
-    background: var(--ink-strong); color: white;
-    padding: 0.5rem 0.875rem;
-    border-radius: var(--radius);
-    font-size: 0.75rem; font-weight: 500;
-    box-shadow: var(--shadow-lg);
-    display: flex; align-items: center; gap: 0.5rem;
-    opacity: 0; pointer-events: none;
-    transition: opacity 0.18s, transform 0.18s;
-    z-index: 110;
-  }
-  .toast.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
-  .toast .check {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 1rem; height: 1rem; background: var(--page-fg);
-    border-radius: 50%; color: white;
-  }
-  .toast .check svg { width: 0.625rem; height: 0.625rem; }
-  .toast .link { color: #6BC5B7; cursor: pointer; }
-  .toast .link:hover { color: #BFE3DC; text-decoration: underline; }
-
-  /* ============================================================
-     16. BOTTOM TOOLBAR
+     15. BOTTOM TOOLBAR
      v3 Toolbar — Modern Pill, with App-mode segmented toggle.
      Lives at bottom-center, always visible. The pointer toggle and
      element palette are always rendered; palette is aria-disabled
@@ -900,7 +868,7 @@
   .bottom-toolbar .seg.pressing .seg-pill { transform: var(--seg-tx, translateX(0)) scaleX(0.94); }
 
   /* ============================================================
-     17. ELEMENT PALETTE
+     16. ELEMENT PALETTE
      Floats just above the bottom toolbar in Edit mode. Each tile
      is both a click target (spawn at viewport center) and a drag
      source (spawn at drop point). Visibility is gated by the
@@ -965,7 +933,7 @@
   }
 
   /* ============================================================
-     18. PATH RESULTS PANEL
+     17. PATH RESULTS PANEL
      Floats on the right edge of the canvas in Path mode. Mirrors
      the .element-palette card visuals (white, rounded, subtle
      shadow). Header reuses the right-panel .rp-h / .rp-eyebrow /
@@ -1036,7 +1004,7 @@
   .path-row-more:hover { background: transparent; }
 
   /* ============================================================
-     19. AI CHAT PANEL
+     18. AI CHAT PANEL
      Floats just above the toolbar (centered, not docked).
      ============================================================ */
   .ai-chat-above {
@@ -1134,7 +1102,7 @@
   .ai-chat-above .chat-input button svg { width: 0.875rem; height: 0.875rem; }
 
   /* ============================================================
-     20. RIGHT-CLICK CONTEXT MENU
+     19. RIGHT-CLICK CONTEXT MENU
      ============================================================ */
   .ctx-menu {
     position: fixed;
@@ -1189,7 +1157,7 @@
   }
 
   /* ============================================================
-     21. CANVAS CURSORS — coherent SVG data-URL set.
+     20. CANVAS CURSORS — coherent SVG data-URL set.
      All share: charcoal fill (#1A1F2B), 1.5px white halo for
      contrast over any canvas background, rounded joins. Hotspots
      are calibrated so the action point matches the visual cue.
@@ -1276,7 +1244,7 @@
   }
 
   /* ============================================================
-     22. MODES — Path / Heatmap / Monitor (+ legends + keyframes)
+     21. MODES — Path / Heatmap / Monitor (+ legends + keyframes)
      ============================================================ */
 
   /* ---- Path mode ----
@@ -1503,7 +1471,7 @@
   }
 
   /* ============================================================
-     23. UTILITY CLASSES
+     22. UTILITY CLASSES
      One-off helpers that replace inline style="" attributes.
        .ico-N — square SVG icon, side length N in 1/16rem units
        .u-…   — one-off layout/typography helpers
