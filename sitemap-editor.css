@@ -1,7 +1,34 @@
   /* ============================================================
-     EMBEDDED · pw-studio-v2.css  (shared base — kept in sync with pages.html / page-detail.html)
+     PW Studio — Sitemap Editor
+     Single stylesheet. Sections in order:
+       1.  Design tokens (root vars, breakpoints)
+       2.  Base reset
+       3.  Topbar
+       4.  Body / graph layout
+       5.  Right panel (inspector)
+       6.  Canvas + SVG base
+       7.  SVG nodes
+       8.  SVG edges
+       9.  SVG zones (areas)
+       10. Connect / anchor / endpoint handles
+       11. Resize handles
+       12. Smart guides
+       13. Lock UI (badge, dim, toggle)
+       14. Edit-mode hint banner
+       15. Toast
+       16. Bottom toolbar
+       17. Element palette
+       18. Path results panel
+       19. AI chat panel
+       20. Right-click context menu
+       21. Canvas cursors (SVG data-URL set)
+       22. Modes — Path / Heatmap / Monitor + legends
+       23. Utility classes
      ============================================================ */
 
+  /* ============================================================
+     1. DESIGN TOKENS
+     ============================================================ */
   html { font-size: 16px; }
   :root {
     --bp-fhd: 1600px; --bp-2k: 2400px; --bp-4k: 3200px;
@@ -39,6 +66,9 @@
     --shadow-lg: 0 4px 12px -4px rgba(10,22,40,0.08), 0 24px 48px -16px rgba(10,22,40,0.12);
   }
 
+  /* ============================================================
+     2. BASE RESET
+     ============================================================ */
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; }
   body {
@@ -56,23 +86,35 @@
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 0.625rem; border: 2px solid var(--chrome); }
 
-  /* Topbar / sidenav (unchanged) */
+  /* ============================================================
+     3. TOPBAR
+     ============================================================ */
   .topbar {
     height: 3rem; background: var(--bg); border-bottom: 1px solid var(--border);
     display: flex; align-items: center; padding: 0 1rem; gap: 1rem;
   }
-  .brand {
+  .topbar .brand {
+    display: inline-flex; align-items: baseline; gap: 0.4375rem;
     font-family: var(--mono); font-size: 0.75rem; font-weight: 600;
     color: var(--ink-strong); letter-spacing: -0.02em;
-    display: flex; align-items: center; gap: 0.5rem;
   }
-  .brand::before {
-    content: ''; width: 0.5625rem; height: 0.5625rem;
-    background: var(--accent); border-radius: 1px; transform: rotate(45deg);
+  .topbar .brand .mono {
+    font-family: var(--sans); font-size: 1rem; font-weight: 800;
+    color: var(--ink-strong); letter-spacing: -0.07em;
+    line-height: 1;
+  }
+  .topbar .brand .mono .accent { color: var(--accent); }
+  .topbar .brand .tag {
+    font-family: var(--mono); font-size: 0.5625rem; font-weight: 500;
+    color: var(--ink-faint); letter-spacing: 0.08em;
+    text-transform: uppercase; line-height: 1;
   }
   .meta-text { font-family: var(--mono); font-size: 0.6875rem; color: var(--ink-weak); }
   .meta-text b { color: var(--ink-strong); font-weight: 600; }
 
+  /* ============================================================
+     4. BODY / GRAPH LAYOUT
+     ============================================================ */
   .body-area {
     display: grid; grid-template-columns: 1fr;
     height: calc(100vh - 3rem); min-height: 45rem;
@@ -80,9 +122,6 @@
 
   main { overflow: hidden; display: flex; flex-direction: column; }
 
-  /* ============================================================
-     GRAPH PAGE LAYOUT
-     ============================================================ */
   .graph-page {
     display: grid;
     grid-template-rows: 1fr;
@@ -102,7 +141,9 @@
     grid-template-columns: 1fr 17.5rem;
   }
 
-  /* Right-side inspector panel */
+  /* ============================================================
+     5. RIGHT PANEL (INSPECTOR)
+     ============================================================ */
   .right-panel {
     background: var(--bg);
     border-left: 1px solid var(--border);
@@ -245,14 +286,73 @@
   .rp-width-btn.w-normal .sample { height: 2px; }
   .rp-width-btn.w-thick  .sample { height: 3.25px; }
 
-  /* Selected edge glow */
-  .gedge.selected {
-    filter: drop-shadow(0 0 3px var(--accent)) drop-shadow(0 0 1.5px var(--accent));
+  /* Alignment buttons in the Align panel */
+  .rp-aligns { display: flex; flex-wrap: wrap; gap: 0.3125rem; }
+  .rp-align-btn {
+    width: 2rem; height: 1.75rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0;
+    cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    color: var(--ink-mid);
+    transition: transform 0.1s, border-color 0.12s;
   }
+  .rp-align-btn:hover { border-color: var(--accent); color: var(--accent); transform: scale(1.04); }
+  .rp-align-btn svg { width: 0.875rem; height: 0.875rem; }
 
-  /* A selected zone gets a more solid outline so it's clear in edit mode */
-  .gzone.selected { stroke-width: 2.5; opacity: 0.85; stroke-dasharray: none; }
+  /* Area title-position picker (3×2 grid) */
+  .rp-title-pos {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.1875rem;
+  }
+  .rp-title-pos button {
+    appearance: none; border: 1px solid var(--border);
+    background: var(--bg);
+    padding: 0.375rem;
+    border-radius: 0.3125rem;
+    cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    color: var(--ink-mid);
+    transition: background 80ms, border-color 80ms, color 80ms;
+  }
+  .rp-title-pos button:hover { background: var(--bg-alt); color: var(--ink-strong); }
+  .rp-title-pos button.active {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .rp-title-pos button svg { width: 0.875rem; height: 0.875rem; display: block; }
 
+  /* Inspector "Area selection" action button */
+  .rp-area-btn {
+    appearance: none; border: 1px solid var(--border); background: var(--bg);
+    display: inline-flex; align-items: center; gap: 0.4375rem;
+    width: 100%;
+    padding: 0.5rem 0.625rem;
+    border-radius: 0.4375rem; cursor: pointer;
+    font: 500 0.75rem/1 var(--sans); letter-spacing: -0.005em;
+    color: var(--ink-strong);
+    transition: background 80ms, border-color 80ms;
+  }
+  .rp-area-btn:hover { background: var(--bg-alt); border-color: var(--border-2); }
+  .rp-area-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .rp-area-btn .rp-kbd {
+    margin-left: auto;
+    font: 500 0.625rem/1 var(--mono);
+    color: var(--ink-faint);
+    padding: 0.1875rem 0.3125rem;
+    border-radius: 0.25rem;
+    background: rgba(0,0,0,0.04);
+  }
+  #rp-area-selection { color: var(--accent); }
+  #rp-area-selection svg { color: var(--accent); }
+
+  /* ============================================================
+     6. CANVAS + SVG BASE
+     ============================================================ */
   .canvas-wrap {
     position: relative;
     overflow: hidden;
@@ -273,189 +373,16 @@
   }
   .canvas-wrap svg.graph.panning { cursor: grabbing; }
   .canvas-wrap svg.graph .gnode { cursor: pointer; }
-  .canvas-wrap svg.graph.editmode .gnode { cursor: grab; }
-  .canvas-wrap svg.graph .gnode.dragging,
-  .canvas-wrap svg.graph .gnode.dragging rect { cursor: grabbing; }
 
-  /* Edit mode: cursor + handle visibility */
+  /* Edit mode: default canvas cursor (gnode/gzone/handle cursors live in section 21) */
   .canvas-wrap svg.graph.editmode { cursor: default; }
-  .canvas-wrap svg.graph.editmode .gnode { cursor: move; }
-  .canvas-wrap svg.graph.connecting,
-  .canvas-wrap svg.graph.connecting .gnode { cursor: crosshair; }
 
-  /* Connect handle on each node — only visible in edit mode on hover */
-  .connect-handle {
-    fill: var(--accent);
-    stroke: #fff;
-    stroke-width: 1.25;
-    cursor: crosshair;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.12s;
-  }
-  .canvas-wrap svg.graph.editmode .gnode .connect-handle { pointer-events: auto; }
-  .canvas-wrap svg.graph.editmode .gnode:hover .connect-handle,
-  .canvas-wrap svg.graph.editmode .gnode.handle-on .connect-handle { opacity: 1; }
-
-  /* Drop-target highlight while dragging a new edge */
-  .gnode.drop-target rect {
-    stroke: var(--accent) !important;
-    stroke-width: 2.5 !important;
-    filter: drop-shadow(0 0 0 3px var(--accent-soft));
-  }
-
-  /* Preview line while drawing a new edge */
-  .connect-preview {
-    fill: none;
-    stroke: var(--accent);
-    stroke-width: 2;
-    stroke-dasharray: 5 4;
-    pointer-events: none;
-  }
-
-  /* Area color variants — both the zone rect and its label key off the same class */
-  .gzone.color-page  { fill: var(--page-bg);  stroke: var(--page-bd);  stroke-dasharray: none; opacity: 0.55; }
-  .gzone.color-case  { fill: var(--case-bg);  stroke: var(--case-bd);  stroke-dasharray: none; opacity: 0.55; }
-  .gzone.color-flow  { fill: var(--flow-bg);  stroke: var(--flow-bd);  stroke-dasharray: none; opacity: 0.55; }
-  .gzone.color-env   { fill: var(--env-bg);   stroke: var(--env-bd);   stroke-dasharray: none; opacity: 0.55; }
-  .gzone.color-suite { fill: var(--suite-bg); stroke: var(--suite-bd); stroke-dasharray: none; opacity: 0.55; }
-  .gzone.color-sel   { fill: var(--sel-bg);   stroke: var(--sel-bd);   stroke-dasharray: none; opacity: 0.55; }
-  .gzone.color-warn  { fill: var(--warn-soft); stroke: var(--warn-border); stroke-dasharray: none; opacity: 0.55; }
-  .gzone.color-info  { fill: var(--accent-soft); stroke: var(--accent); stroke-dasharray: none; opacity: 0.45; }
-
-  .gzone-label.color-page  { fill: var(--page-fg); }
-  .gzone-label.color-case  { fill: var(--case-fg); }
-  .gzone-label.color-flow  { fill: var(--flow-fg); }
-  .gzone-label.color-env   { fill: var(--env-fg); }
-  .gzone-label.color-suite { fill: var(--suite-fg); }
-  .gzone-label.color-sel   { fill: var(--sel-fg); }
-  .gzone-label.color-warn  { fill: var(--warn); }
-  .gzone-label.color-info  { fill: var(--accent); }
-
-  /* In edit mode, areas respond to hover so they feel draggable/clickable */
-  .canvas-wrap svg.graph.editmode .gzone { cursor: grab; }
-  .canvas-wrap svg.graph.editmode .gzone.dragging { cursor: grabbing; }
-  .canvas-wrap svg.graph.editmode .gzone:hover { opacity: 0.75; stroke-width: 1.5; }
-  .gzone-label { cursor: pointer; }
-  .gzone-label:hover { text-decoration: underline; }
-
-  /* Alignment buttons in the Align panel */
-  .rp-aligns { display: flex; flex-wrap: wrap; gap: 0.3125rem; }
-  .rp-align-btn {
-    width: 2rem; height: 1.75rem;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 0;
-    cursor: pointer;
-    display: inline-flex; align-items: center; justify-content: center;
-    color: var(--ink-mid);
-    transition: transform 0.1s, border-color 0.12s;
-  }
-  .rp-align-btn:hover { border-color: var(--accent); color: var(--accent); transform: scale(1.04); }
-  .rp-align-btn svg { width: 0.875rem; height: 0.875rem; }
-
-  /* Resize handles — visible only in edit mode, and only on the Area the
-     cursor is currently hovering. The .hovered class is toggled by the
-     mousemove handler in sitemap-editor.js so nested Areas only show their
-     innermost (smallest) handles, never the parent's. */
-  .resize-handle {
-    fill: var(--bg);
-    stroke: var(--accent);
-    stroke-width: 1.25;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.12s;
-  }
-  .canvas-wrap svg.graph.editmode .resize-handle.hovered {
-    opacity: 1;
-    pointer-events: auto;
-  }
-  .resize-handle.dir-nw, .resize-handle.dir-se { cursor: nwse-resize; }
-  .resize-handle.dir-ne, .resize-handle.dir-sw { cursor: nesw-resize; }
-  .resize-handle:hover { fill: var(--accent-soft); }
-
-  /* Smart guides — dashed alignment lines that appear while dragging a page
-     or area. The JS toggles `visibility` per axis: a vertical guide (X) for
-     left/center/right edge alignments, a horizontal guide (Y) for
-     top/center/bottom. Non-scaling stroke keeps the line crisp at any zoom. */
-  .smart-guide {
-    stroke: #E91E63;
-    stroke-width: 1;
-    stroke-dasharray: 4 4;
-    pointer-events: none;
-    vector-effect: non-scaling-stroke;
-    opacity: 0.9;
-  }
-
-  /* Lock feature for Page / Area — locked elements ignore drag/resize gestures */
-  .rp-lock-toggle {
-    display: inline-flex; align-items: center; gap: 0.4375rem;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 0.375rem 0.625rem;
-    font-family: var(--mono); font-size: 0.6875rem; font-weight: 600;
-    color: var(--ink-mid);
-    cursor: pointer;
-    align-self: flex-start;
-    transition: background 0.12s, border-color 0.12s, color 0.12s;
-  }
-  .rp-lock-toggle:hover { background: var(--chrome); }
-  .rp-lock-toggle.active {
-    background: var(--warn-soft);
-    border-color: var(--warn-border);
-    color: var(--warn);
-  }
-  .rp-lock-toggle.active:hover { background: var(--warn-soft); filter: brightness(0.96); }
-  .rp-lock-toggle svg { width: 0.8125rem; height: 0.8125rem; }
-
-  /* When a section is locked, dim its editable controls (except the lock toggle itself) */
-  .rp-section.locked .rp-swatches,
-  .rp-section.locked .rp-borders,
-  .rp-section.locked .rp-widths,
-  .rp-section.locked input[type="text"],
-  .rp-section.locked .rp-delete {
-    opacity: 0.4;
-    pointer-events: none;
-  }
-
-  /* Visual lock indicator on the canvas (small padlock at top-right of locked element) */
-  .lock-badge {
-    pointer-events: none;
-  }
-  .lock-badge rect {
-    fill: var(--warn-soft);
-    stroke: var(--warn-border);
-    stroke-width: 1;
-  }
-  .lock-badge path { stroke: var(--warn); stroke-width: 1.5; fill: none; }
-
-  /* Locked area: solid stroke, slightly stronger to read as "fixed" */
-  .gzone.locked { stroke-dasharray: none; stroke-width: 1.5; }
-
-  /* Small toast-style hint that appears when edit mode is on */
-  .edit-hint {
-    position: absolute; left: 50%; top: 0.875rem;
-    transform: translateX(-50%);
-    background: var(--ink-strong); color: #fff;
-    padding: 0.375rem 0.75rem;
-    border-radius: var(--radius);
-    font-family: var(--mono); font-size: 0.625rem; letter-spacing: 0.03em;
-    box-shadow: var(--shadow);
-    opacity: 0; pointer-events: none;
-    transition: opacity 0.18s;
-    z-index: 3;
-  }
-  .edit-hint.show { opacity: 1; }
-  .edit-hint kbd {
-    background: rgba(255,255,255,0.15);
-    border-radius: 2px; padding: 0.0625rem 0.25rem;
-    font-family: var(--mono); font-size: 0.5625rem;
-  }
+  /* Smooth opacity transitions used by Path / Heatmap / Monitor modes */
+  .canvas-wrap svg.graph .gnode { transition: opacity 160ms ease; }
+  .canvas-wrap svg.graph path.gedge { transition: opacity 160ms ease, stroke 160ms ease; }
 
   /* ============================================================
-     SVG NODE + EDGE STYLES
+     7. SVG NODES
      ============================================================ */
   .gnode {
     cursor: pointer;
@@ -545,7 +472,9 @@
   .gnode.border-none   rect { stroke: transparent; }
   .gnode.border-none:hover rect { stroke: transparent; filter: drop-shadow(0 2px 4px rgba(12, 108, 104, 0.18)); }
 
-  /* Edges */
+  /* ============================================================
+     8. SVG EDGES
+     ============================================================ */
   .gedge {
     fill: none; stroke: var(--ink-mid);
     transition: stroke-width 0.12s, opacity 0.12s;
@@ -565,6 +494,117 @@
   .gedge.suggested:hover {
     opacity: 0.95;
     filter: drop-shadow(0 1.5px 3px rgba(10, 22, 40, 0.22));
+  }
+
+  /* Selected edge glow */
+  .gedge.selected {
+    filter: drop-shadow(0 0 3px var(--accent)) drop-shadow(0 0 1.5px var(--accent));
+  }
+
+  /* Wide invisible hit path over each edge's middle segment for grabbing.
+     Edit-mode cursors for the two axes live in section 21. */
+  .gedge-hit {
+    fill: none;
+    stroke: transparent;
+    stroke-width: 14;
+    pointer-events: none;
+  }
+  .canvas-wrap svg.graph.editmode .gedge-hit { pointer-events: stroke; }
+  .canvas-wrap svg.graph.editmode .gedge-hit:hover {
+    stroke: var(--accent-soft);
+    stroke-opacity: 0.6;
+  }
+
+  /* Edge label */
+  .gelabel {
+    font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 600;
+    fill: var(--ink-mid); text-anchor: middle; pointer-events: none;
+  }
+  .gelabel.fragile { fill: var(--warn); }
+  .gelabel.suggested {
+    fill: var(--ink-faint); font-style: italic; font-weight: 500;
+  }
+
+  /* Label background — small white pill behind weight number for readability */
+  .gelabel-bg {
+    fill: var(--bg-alt); stroke: var(--divider); stroke-width: 0.5;
+    pointer-events: none;
+  }
+
+  /* ============================================================
+     9. SVG ZONES (AREAS)
+     ============================================================ */
+  .gzone {
+    fill: rgba(10, 22, 40, 0.025);
+    stroke: rgba(10, 22, 40, 0.08);
+    stroke-width: 1;
+    stroke-dasharray: 2 4;
+  }
+  .gzone-label {
+    font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 600;
+    fill: var(--ink-faint); text-transform: uppercase; letter-spacing: 1px;
+    text-anchor: start;
+  }
+
+  /* A selected zone gets a more solid outline so it's clear in edit mode */
+  .gzone.selected { stroke-width: 2.5; opacity: 0.85; stroke-dasharray: none; }
+
+  /* Area color variants — both the zone rect and its label key off the same class */
+  .gzone.color-page  { fill: var(--page-bg);  stroke: var(--page-bd);  stroke-dasharray: none; opacity: 0.55; }
+  .gzone.color-case  { fill: var(--case-bg);  stroke: var(--case-bd);  stroke-dasharray: none; opacity: 0.55; }
+  .gzone.color-flow  { fill: var(--flow-bg);  stroke: var(--flow-bd);  stroke-dasharray: none; opacity: 0.55; }
+  .gzone.color-env   { fill: var(--env-bg);   stroke: var(--env-bd);   stroke-dasharray: none; opacity: 0.55; }
+  .gzone.color-suite { fill: var(--suite-bg); stroke: var(--suite-bd); stroke-dasharray: none; opacity: 0.55; }
+  .gzone.color-sel   { fill: var(--sel-bg);   stroke: var(--sel-bd);   stroke-dasharray: none; opacity: 0.55; }
+  .gzone.color-warn  { fill: var(--warn-soft); stroke: var(--warn-border); stroke-dasharray: none; opacity: 0.55; }
+  .gzone.color-info  { fill: var(--accent-soft); stroke: var(--accent); stroke-dasharray: none; opacity: 0.45; }
+
+  .gzone-label.color-page  { fill: var(--page-fg); }
+  .gzone-label.color-case  { fill: var(--case-fg); }
+  .gzone-label.color-flow  { fill: var(--flow-fg); }
+  .gzone-label.color-env   { fill: var(--env-fg); }
+  .gzone-label.color-suite { fill: var(--suite-fg); }
+  .gzone-label.color-sel   { fill: var(--sel-fg); }
+  .gzone-label.color-warn  { fill: var(--warn); }
+  .gzone-label.color-info  { fill: var(--accent); }
+
+  /* In edit mode, areas respond to hover so they feel draggable/clickable.
+     Cursors for .gzone in edit mode live in section 21. */
+  .canvas-wrap svg.graph.editmode .gzone:hover { opacity: 0.75; stroke-width: 1.5; }
+  .gzone-label { cursor: pointer; }
+  .gzone-label:hover { text-decoration: underline; }
+
+  /* ============================================================
+     10. CONNECT / ANCHOR / ENDPOINT HANDLES
+     ============================================================ */
+  /* Connect handle on each node — only visible in edit mode on hover */
+  .connect-handle {
+    fill: var(--accent);
+    stroke: #fff;
+    stroke-width: 1.25;
+    cursor: crosshair;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.12s;
+  }
+  .canvas-wrap svg.graph.editmode .gnode .connect-handle { pointer-events: auto; }
+  .canvas-wrap svg.graph.editmode .gnode:hover .connect-handle,
+  .canvas-wrap svg.graph.editmode .gnode.handle-on .connect-handle { opacity: 1; }
+
+  /* Drop-target highlight while dragging a new edge */
+  .gnode.drop-target rect {
+    stroke: var(--accent) !important;
+    stroke-width: 2.5 !important;
+    filter: drop-shadow(0 0 0 3px var(--accent-soft));
+  }
+
+  /* Preview line while drawing a new edge */
+  .connect-preview {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 2;
+    stroke-dasharray: 5 4;
+    pointer-events: none;
   }
 
   /* Endpoint handles for the selected edge */
@@ -596,50 +636,117 @@
     opacity: 1;
   }
 
-  /* Wide invisible hit path over each edge's middle segment for grabbing */
-  .gedge-hit {
-    fill: none;
-    stroke: transparent;
-    stroke-width: 14;
+  /* ============================================================
+     11. RESIZE HANDLES (cursors live in section 21)
+     ============================================================ */
+  /* Resize handles — visible only in edit mode, and only on the Area the
+     cursor is currently hovering. The .hovered class is toggled by the
+     mousemove handler in sitemap-editor.js so nested Areas only show their
+     innermost (smallest) handles, never the parent's. */
+  .resize-handle {
+    fill: var(--bg);
+    stroke: var(--accent);
+    stroke-width: 1.25;
+    opacity: 0;
     pointer-events: none;
+    transition: opacity 0.12s;
   }
-  .canvas-wrap svg.graph.editmode .gedge-hit { pointer-events: stroke; }
-  .canvas-wrap svg.graph.editmode .gedge-hit[data-axis="x"] { cursor: col-resize; }
-  .canvas-wrap svg.graph.editmode .gedge-hit[data-axis="y"] { cursor: row-resize; }
-  .canvas-wrap svg.graph.editmode .gedge-hit:hover {
-    stroke: var(--accent-soft);
-    stroke-opacity: 0.6;
+  .canvas-wrap svg.graph.editmode .resize-handle.hovered {
+    opacity: 1;
+    pointer-events: auto;
   }
+  .resize-handle:hover { fill: var(--accent-soft); }
 
-  /* Edge label */
-  .gelabel {
-    font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 600;
-    fill: var(--ink-mid); text-anchor: middle; pointer-events: none;
-  }
-  .gelabel.fragile { fill: var(--warn); }
-  .gelabel.suggested {
-    fill: var(--ink-faint); font-style: italic; font-weight: 500;
-  }
-
-  /* Label background — small white pill behind weight number for readability */
-  .gelabel-bg {
-    fill: var(--bg-alt); stroke: var(--divider); stroke-width: 0.5;
-    pointer-events: none;
-  }
-
-  /* Zone backgrounds — soft regions (the "journey" reading) */
-  .gzone {
-    fill: rgba(10, 22, 40, 0.025);
-    stroke: rgba(10, 22, 40, 0.08);
+  /* ============================================================
+     12. SMART GUIDES
+     ============================================================ */
+  /* Smart guides — dashed alignment lines that appear while dragging a page
+     or area. The JS toggles `visibility` per axis: a vertical guide (X) for
+     left/center/right edge alignments, a horizontal guide (Y) for
+     top/center/bottom. Non-scaling stroke keeps the line crisp at any zoom. */
+  .smart-guide {
+    stroke: #E91E63;
     stroke-width: 1;
-    stroke-dasharray: 2 4;
-  }
-  .gzone-label {
-    font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 600;
-    fill: var(--ink-faint); text-transform: uppercase; letter-spacing: 1px;
-    text-anchor: start;
+    stroke-dasharray: 4 4;
+    pointer-events: none;
+    vector-effect: non-scaling-stroke;
+    opacity: 0.9;
   }
 
+  /* ============================================================
+     13. LOCK UI
+     ============================================================ */
+  /* Lock toggle in the inspector */
+  .rp-lock-toggle {
+    display: inline-flex; align-items: center; gap: 0.4375rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.375rem 0.625rem;
+    font-family: var(--mono); font-size: 0.6875rem; font-weight: 600;
+    color: var(--ink-mid);
+    cursor: pointer;
+    align-self: flex-start;
+    transition: background 0.12s, border-color 0.12s, color 0.12s;
+  }
+  .rp-lock-toggle:hover { background: var(--chrome); }
+  .rp-lock-toggle.active {
+    background: var(--warn-soft);
+    border-color: var(--warn-border);
+    color: var(--warn);
+  }
+  .rp-lock-toggle.active:hover { background: var(--warn-soft); filter: brightness(0.96); }
+  .rp-lock-toggle svg { width: 0.8125rem; height: 0.8125rem; }
+
+  /* When a section is locked, dim its editable controls (except the lock toggle itself) */
+  .rp-section.locked .rp-swatches,
+  .rp-section.locked .rp-borders,
+  .rp-section.locked .rp-widths,
+  .rp-section.locked input[type="text"],
+  .rp-section.locked .rp-delete {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  /* Visual lock indicator on the canvas (small padlock at top-right of locked element) */
+  .lock-badge {
+    pointer-events: none;
+  }
+  .lock-badge rect {
+    fill: var(--warn-soft);
+    stroke: var(--warn-border);
+    stroke-width: 1;
+  }
+  .lock-badge path { stroke: var(--warn); stroke-width: 1.5; fill: none; }
+
+  /* Locked area: solid stroke, slightly stronger to read as "fixed" */
+  .gzone.locked { stroke-dasharray: none; stroke-width: 1.5; }
+
+  /* ============================================================
+     14. EDIT-MODE HINT BANNER
+     ============================================================ */
+  .edit-hint {
+    position: absolute; left: 50%; top: 0.875rem;
+    transform: translateX(-50%);
+    background: var(--ink-strong); color: #fff;
+    padding: 0.375rem 0.75rem;
+    border-radius: var(--radius);
+    font-family: var(--mono); font-size: 0.625rem; letter-spacing: 0.03em;
+    box-shadow: var(--shadow);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.18s;
+    z-index: 3;
+  }
+  .edit-hint.show { opacity: 1; }
+  .edit-hint kbd {
+    background: rgba(255,255,255,0.15);
+    border-radius: 2px; padding: 0.0625rem 0.25rem;
+    font-family: var(--mono); font-size: 0.5625rem;
+  }
+
+  /* ============================================================
+     15. TOAST
+     ============================================================ */
   /* Toast — appears after a successful Page creation. Pinned to the
      bottom-right so it doesn't sit on top of the canvas legend that
      lives bottom-right of .canvas-wrap (the legend is inside .canvas-wrap,
@@ -667,3 +774,749 @@
   .toast .check svg { width: 0.625rem; height: 0.625rem; }
   .toast .link { color: #6BC5B7; cursor: pointer; }
   .toast .link:hover { color: #BFE3DC; text-decoration: underline; }
+
+  /* ============================================================
+     16. BOTTOM TOOLBAR
+     v3 Toolbar — Modern Pill, with App-mode segmented toggle.
+     Lives at bottom-center, always visible. The pointer toggle and
+     element palette are always rendered; palette is aria-disabled
+     in non-edit modes. AI chat floats above the toolbar in AI mode.
+     ============================================================ */
+  .bottom-toolbar {
+    position: absolute;
+    bottom: 1rem; left: 50%; transform: translateX(-50%);
+    display: inline-flex; align-items: center; gap: 0.25rem;
+    background: #FFFFFF;
+    border: 1px solid #E5E5E5;
+    border-radius: 999px;
+    padding: 0.4375rem;
+    box-shadow:
+      0 2px 4px rgba(0,0,0,0.04),
+      0 20px 48px -16px rgba(0,0,0,0.18);
+    z-index: 5;
+    transition: background 160ms ease, border-color 160ms ease;
+  }
+  .bottom-toolbar.mode-ai {
+    background: linear-gradient(180deg, #F3EEFF 0%, #FFFFFF 60%);
+    border-color: #DCD0F8;
+  }
+  .bottom-toolbar.mode-path {
+    background: linear-gradient(180deg, #FFF6E5 0%, #FFFFFF 60%);
+    border-color: #F0D49A;
+  }
+  .bottom-toolbar.mode-heatmap {
+    background: linear-gradient(180deg, #FFEAEA 0%, #FFFFFF 60%);
+    border-color: #F2BFBF;
+  }
+  .bottom-toolbar.mode-monitor {
+    background: linear-gradient(180deg, #E8F5EC 0%, #FFFFFF 60%);
+    border-color: #BFE0CB;
+  }
+  .bottom-toolbar .tb-sep {
+    width: 1px; align-self: stretch;
+    background: #E5E5E5;
+    margin: 0.3125rem 0.5rem;
+  }
+  .bottom-toolbar button {
+    appearance: none; border: 0; background: transparent;
+    display: inline-flex; align-items: center; gap: 0.4375rem;
+    padding: 0.6875rem 0.9375rem;
+    border-radius: 999px; cursor: pointer;
+    color: #1E1E1E;
+    font: 500 0.875rem/1 var(--sans); letter-spacing: -0.005em;
+    transition: background 80ms, color 80ms, opacity 80ms;
+  }
+  .bottom-toolbar button:hover { background: #F2F3F5; }
+  .bottom-toolbar button.icon-only {
+    padding: 0.6875rem;
+    justify-content: center;
+    align-items: center;
+  }
+  .bottom-toolbar button svg { width: 1.1875rem; height: 1.1875rem; }
+  .bottom-toolbar button:disabled,
+  .bottom-toolbar button[aria-disabled="true"] {
+    opacity: 0.38;
+    cursor: not-allowed;
+  }
+  .bottom-toolbar button:disabled:hover,
+  .bottom-toolbar button[aria-disabled="true"]:hover { background: transparent; }
+
+  /* Segmented toggle (sliding pill behind the buttons) */
+  .bottom-toolbar .seg {
+    position: relative;
+    display: inline-flex; align-items: stretch;
+    background: rgba(0,0,0,0.04);
+    border-radius: 999px;
+    padding: 0.1875rem;
+    gap: 0.125rem;
+  }
+  .bottom-toolbar .seg .seg-pill {
+    position: absolute;
+    top: 0.1875rem; left: 0; height: calc(100% - 0.375rem);
+    width: 0;
+    background: #FFFFFF;
+    border-radius: 999px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.04);
+    transform: translateX(0);
+    transition:
+      transform 220ms cubic-bezier(0.32, 0.72, 0.27, 1.04),
+      width 220ms cubic-bezier(0.32, 0.72, 0.27, 1.04);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .bottom-toolbar .seg button {
+    position: relative; z-index: 1;
+    padding: 0.5rem 0.6875rem;
+    border-radius: 999px;
+    color: #5E6470;
+    background: transparent;
+    font-weight: 500;
+    gap: 0.375rem;
+    justify-content: center;
+    align-items: center;
+    transition: color 180ms ease, font-weight 180ms ease;
+  }
+  .bottom-toolbar .seg button:hover { background: transparent; color: #1E1E1E; }
+  .bottom-toolbar .seg button svg { width: 1.0625rem; height: 1.0625rem; }
+  .bottom-toolbar .seg button.active { color: #1E1E1E; font-weight: 600; }
+  .bottom-toolbar .seg button.active.mode-view { color: #0A6644; }
+  .bottom-toolbar .seg button.active.mode-edit { color: var(--accent); }
+  .bottom-toolbar .seg button.active.mode-ai   { color: #7C3AED; }
+  .bottom-toolbar .seg button.active.mode-path { color: #B45309; }
+  .bottom-toolbar .seg button.active.mode-heatmap { color: #D83B3B; }
+  .bottom-toolbar .seg button.active.mode-monitor { color: #0E8A5F; }
+
+  /* App-mode + Pointer-mode buttons are fixed square slots — icons dead-center.
+     (App-mode was previously icon+label; labels removed for a tighter toolbar.) */
+  .bottom-toolbar .seg.seg-pointer button,
+  .bottom-toolbar .seg.seg-app button {
+    width: 2.125rem; height: 2.125rem;
+    padding: 0;
+    gap: 0;
+  }
+  .bottom-toolbar .seg.seg-pointer button svg,
+  .bottom-toolbar .seg.seg-app button svg { display: block; width: 1.0625rem; height: 1.0625rem; }
+  /* Brief "press" squish */
+  .bottom-toolbar .seg.pressing .seg-pill { transform: var(--seg-tx, translateX(0)) scaleX(0.94); }
+
+  /* ============================================================
+     17. ELEMENT PALETTE
+     Floats just above the bottom toolbar in Edit mode. Each tile
+     is both a click target (spawn at viewport center) and a drag
+     source (spawn at drop point). Visibility is gated by the
+     `data-needs-edit hidden` attribute on the container, which
+     setAppMode toggles.
+     ============================================================ */
+  .element-palette {
+    position: absolute;
+    left: 50%; bottom: 5.25rem;
+    transform: translateX(-50%);
+    display: inline-flex; align-items: stretch; gap: 0.375rem;
+    padding: 0.4375rem;
+    background: #FFFFFF;
+    border: 1px solid #E5E5E5;
+    border-radius: 0.875rem;
+    box-shadow:
+      0 2px 4px rgba(0,0,0,0.04),
+      0 20px 48px -16px rgba(0,0,0,0.16);
+    z-index: 5;
+  }
+  .element-palette[hidden] { display: none; }
+  .palette-tile {
+    appearance: none; border: 1px solid transparent;
+    background: transparent;
+    display: inline-flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 0.3125rem;
+    min-width: 4.25rem;
+    padding: 0.5625rem 0.625rem;
+    border-radius: 0.5rem;
+    /* Open-palm hand cursor — same SVG as the canvas .tool-hand state so
+       picking up a tile feels continuous with grabbing on the canvas. */
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><path fill='%231A1F2B' stroke='%23fff' stroke-width='1.4' stroke-linejoin='round' stroke-linecap='round' d='M5 14 C 5 12.5 6 11.8 7 12.2 L 7.6 12.5 L 7.6 7.5 C 7.6 6.5 8.4 5.7 9.4 5.7 C 10.4 5.7 11.2 6.5 11.2 7.5 L 11.2 11.4 L 11.2 4.5 C 11.2 3.5 12 2.7 13 2.7 C 14 2.7 14.8 3.5 14.8 4.5 L 14.8 11 L 14.8 5 C 14.8 4 15.6 3.2 16.6 3.2 C 17.6 3.2 18.4 4 18.4 5 L 18.4 11.4 L 18.4 7 C 18.4 6 19.2 5.2 20.2 5.2 C 21.2 5.2 22 6 22 7 L 22 14 C 22 18.4 18.4 22 14 22 L 13 22 C 9.4 22 6.6 19.2 5.6 16 Z'/></svg>") 16 16, grab;
+    color: #1E1E1E;
+    font: 500 0.75rem/1 var(--sans); letter-spacing: -0.005em;
+    transition: background 80ms, border-color 80ms, color 80ms;
+    -webkit-user-select: none; user-select: none;
+  }
+  .palette-tile svg { width: 1.25rem; height: 1.25rem; display: block; }
+  .palette-tile:hover { background: #F2F3F5; border-color: #E5E5E5; }
+  .palette-tile:active,
+  .palette-tile.dragging {
+    /* Closed-fist hand — same SVG as .tool-hand.panning on the canvas. */
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><path fill='%231A1F2B' stroke='%23fff' stroke-width='1.5' stroke-linejoin='round' stroke-linecap='round' d='M2.5 13 C 2.5 12 3.5 11.2 4.5 11.6 L 6.4 12.5 L 6.4 11 C 6.4 9.5 7.4 8.5 8.9 8.5 L 16 8.5 C 17.8 8.5 19.4 9.8 19.4 11.7 L 19.4 16 C 19.4 19.5 16.4 22 12.5 22 L 11.5 22 C 7.6 22 5.4 19 4.4 16 Z'/><g fill='%23fff'><circle cx='8.6' cy='11' r='0.7'/><circle cx='11.2' cy='10.6' r='0.7'/><circle cx='13.8' cy='10.6' r='0.7'/><circle cx='16.4' cy='11' r='0.7'/></g></svg>") 15 20, grabbing;
+    background: #ECEEF1;
+  }
+  .palette-tile.tile-page         { color: var(--page-fg); }
+  .palette-tile.tile-page:hover   { background: var(--page-bg); }
+  .palette-tile.tile-area         { color: #5E3DB3; }
+  .palette-tile.tile-area:hover   { background: #EDE6FA; }
+  .palette-label { display: block; }
+
+  /* Ghost preview rendered inside the SVG `vp` group while a palette
+     drag is in flight. Translucent so the drop point is visible. */
+  .palette-ghost { opacity: 0.55; pointer-events: none; }
+  .palette-ghost rect.ghost-page {
+    fill: #E8F2F1; stroke: var(--page-fg, #0C6C68); stroke-width: 1.5;
+  }
+  .palette-ghost rect.ghost-area {
+    fill: #F2EFFB; stroke: #5E3DB3; stroke-width: 1.5;
+    stroke-dasharray: 6 4;
+  }
+
+  /* ============================================================
+     18. PATH RESULTS PANEL
+     Floats on the right edge of the canvas in Path mode. Mirrors
+     the .element-palette card visuals (white, rounded, subtle
+     shadow). Header reuses the right-panel .rp-h / .rp-eyebrow /
+     .rp-h-name patterns for visual continuity. Hidden in non-Path
+     modes via [data-needs-path][hidden].
+     ============================================================ */
+  .path-results-panel {
+    position: absolute;
+    top: 1.25rem; right: 1.25rem;
+    width: 17rem;
+    max-height: calc(100% - 2.5rem);
+    display: flex; flex-direction: column;
+    padding: 0.75rem 0.75rem 0.625rem;
+    background: #FFFFFF;
+    border: 1px solid #E5E5E5;
+    border-radius: 0.875rem;
+    box-shadow:
+      0 2px 4px rgba(0,0,0,0.04),
+      0 20px 48px -16px rgba(0,0,0,0.16);
+    z-index: 5;
+  }
+  .path-results-panel[hidden] { display: none; }
+  .path-results-panel .rp-h {
+    margin-bottom: 0.625rem;
+  }
+  .path-results-empty {
+    font-size: 0.75rem; line-height: 1.55; color: var(--ink-weak);
+    padding: 0.5rem 0.25rem 0.125rem;
+  }
+  .path-results-list {
+    list-style: none; margin: 0; padding: 0;
+    display: flex; flex-direction: column; gap: 0.125rem;
+    overflow-y: auto;
+    min-height: 0;
+  }
+  .path-results-list[hidden] { display: none; }
+  .path-row {
+    display: block;
+    padding: 0.4375rem 0.5rem 0.4375rem 0.625rem;
+    border-left: 2px solid transparent;
+    border-radius: 0.375rem;
+    font: 500 0.75rem/1.35 var(--sans);
+    color: #1E1E1E;
+    cursor: pointer;
+    transition: background 80ms, border-color 80ms;
+    -webkit-user-select: none; user-select: none;
+  }
+  .path-row:hover { background: #F2F3F5; }
+  .path-row.active {
+    background: #FFF1DC;
+    border-left-color: #B45309;
+    color: #6B3909;
+  }
+  .path-row .path-row-sub {
+    display: block;
+    margin-top: 0.125rem;
+    font: 400 0.6875rem/1.3 var(--mono);
+    color: var(--ink-weak);
+    letter-spacing: 0.01em;
+  }
+  .path-row.active .path-row-sub { color: #8C5418; }
+  .path-row-more {
+    padding: 0.375rem 0.625rem;
+    font: 400 0.6875rem/1.3 var(--mono);
+    color: var(--ink-weak);
+    cursor: default;
+  }
+  .path-row-more:hover { background: transparent; }
+
+  /* ============================================================
+     19. AI CHAT PANEL
+     Floats just above the toolbar (centered, not docked).
+     ============================================================ */
+  .ai-chat-above {
+    position: absolute;
+    left: 50%; bottom: 5.25rem;
+    transform: translateX(-50%);
+    width: min(34rem, calc(100% - 3rem));
+    background: #FFFFFF;
+    border: 1px solid #E5E5E5;
+    border-radius: 0.875rem;
+    box-shadow:
+      0 2px 4px rgba(0,0,0,0.04),
+      0 20px 48px -16px rgba(0,0,0,0.16);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+    z-index: 4;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 140ms ease, transform 140ms ease;
+  }
+  .ai-chat-above.show {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
+  }
+  .ai-chat-above[hidden] { display: none; }
+  .ai-chat-above::after {
+    content: ''; position: absolute;
+    bottom: -6px; left: 50%; transform: translateX(-50%) rotate(45deg);
+    width: 10px; height: 10px;
+    background: #FFFFFF;
+    border-right: 1px solid #E5E5E5;
+    border-bottom: 1px solid #E5E5E5;
+  }
+  .ai-chat-above .chat-head {
+    display: flex; align-items: center; gap: 0.4375rem;
+    padding: 0.625rem 0.875rem;
+    border-bottom: 1px solid var(--divider);
+    font: 600 0.6875rem/1 var(--sans);
+    color: #7C3AED;
+    letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .ai-chat-above .chat-head svg { width: 0.875rem; height: 0.875rem; }
+  .ai-chat-above .chat-head .meta {
+    margin-left: auto;
+    font: 500 0.625rem/1 var(--mono);
+    color: var(--ink-faint);
+    letter-spacing: 0.06em;
+    text-transform: none;
+  }
+  .ai-chat-above .chat-thread {
+    display: flex; flex-direction: column; gap: 0.5rem;
+    padding: 0.625rem 0.875rem 0.75rem;
+    max-height: 11rem; overflow-y: auto;
+  }
+  .ai-chat-above .chat-msg {
+    font: 500 0.8125rem/1.55 var(--sans);
+    padding: 0.5rem 0.6875rem;
+    border-radius: 0.5rem;
+    max-width: 80%;
+    color: var(--ink);
+  }
+  .ai-chat-above .chat-msg.from-ai {
+    align-self: flex-start;
+    background: var(--bg-alt);
+    border: 1px solid var(--divider);
+  }
+  .ai-chat-above .chat-input {
+    display: flex; gap: 0.375rem; align-items: center;
+    padding: 0.5rem 0.5rem 0.5rem 0.875rem;
+    border-top: 1px solid var(--divider);
+    background: var(--bg-alt);
+  }
+  .ai-chat-above .chat-input input {
+    flex: 1; background: transparent; border: 0; outline: 0;
+    color: var(--ink-strong);
+    font: 500 0.8125rem/1 var(--sans);
+    padding: 0.4375rem 0;
+  }
+  .ai-chat-above .chat-input input::placeholder { color: var(--ink-faint); }
+  .ai-chat-above .chat-input .kbd {
+    font: 500 0.6875rem/1 var(--mono);
+    color: var(--ink-faint);
+    padding: 0.1875rem 0.375rem;
+    border-radius: 0.25rem; background: rgba(0,0,0,0.04);
+  }
+  .ai-chat-above .chat-input button {
+    appearance: none; border: 0;
+    background: #7C3AED; color: #FFFFFF;
+    padding: 0.5rem 0.75rem; border-radius: 0.4375rem;
+    font: 600 0.75rem/1 var(--sans); cursor: pointer;
+    display: inline-flex; align-items: center; gap: 0.3125rem;
+  }
+  .ai-chat-above .chat-input button:hover { background: #6B27D9; }
+  .ai-chat-above .chat-input button svg { width: 0.875rem; height: 0.875rem; }
+
+  /* ============================================================
+     20. RIGHT-CLICK CONTEXT MENU
+     ============================================================ */
+  .ctx-menu {
+    position: fixed;
+    z-index: 1000;
+    background: #FFFFFF;
+    border: 1px solid #E5E5E5;
+    border-radius: 0.5rem;
+    padding: 0.25rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.06), 0 16px 32px rgba(0,0,0,0.12);
+    min-width: 12.5rem;
+    opacity: 0;
+    transform: scale(0.97);
+    pointer-events: none;
+    transition: opacity 90ms ease, transform 90ms ease;
+  }
+  .ctx-menu[hidden] { display: none; }
+  .ctx-menu.show {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+  }
+  .ctx-menu .ctx-item {
+    appearance: none; border: 0; background: transparent;
+    display: flex; align-items: center; gap: 0.5rem;
+    width: 100%; padding: 0.4375rem 0.5rem 0.4375rem 0.5625rem;
+    border-radius: 0.3125rem; cursor: pointer;
+    font: 500 0.8125rem/1 var(--sans); letter-spacing: -0.005em;
+    color: var(--ink-strong);
+  }
+  .ctx-menu .ctx-item:hover:not(:disabled) { background: var(--bg-alt); }
+  .ctx-menu .ctx-item:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+  .ctx-menu .ctx-item svg {
+    width: 0.9375rem; height: 0.9375rem;
+    color: var(--ink-mid);
+    flex-shrink: 0;
+  }
+  .ctx-menu .ctx-item .label { flex: 1; text-align: left; }
+  .ctx-menu .ctx-item .kbd {
+    font: 500 0.6875rem/1 var(--mono);
+    color: var(--ink-faint);
+    padding: 0.1875rem 0.375rem;
+    border-radius: 0.25rem;
+    background: rgba(0,0,0,0.04);
+  }
+  .ctx-menu .ctx-sep {
+    height: 1px;
+    background: var(--divider);
+    margin: 0.25rem 0.125rem;
+  }
+
+  /* ============================================================
+     21. CANVAS CURSORS — coherent SVG data-URL set.
+     All share: charcoal fill (#1A1F2B), 1.5px white halo for
+     contrast over any canvas background, rounded joins. Hotspots
+     are calibrated so the action point matches the visual cue.
+       1. Move arrow      — Figma-style filled arrow, tip top-left
+       2. Hand (idle)     — open palm
+       3. Hand (grabbing) — closed fist with knuckle dots
+       4. Connecting      — precision reticle with accent dot
+       5. Resize set      — 8-direction double-arrow handles
+       6. Edge-hit axes   — col-resize / row-resize variants
+       7. Move-node       — unified 4-way arrow on .gnode/.gzone in editmode
+       8. Dragging node   — closed-fist while .dragging
+     These rules win over the OS-keyword cursors implied by base
+     SVG rules (`cursor: grab` on svg.graph, etc.) via specificity.
+     ============================================================ */
+
+  /* 1. Move arrow */
+  .canvas-wrap svg.graph.tool-cursor {
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><path fill='%231A1F2B' stroke='%23fff' stroke-width='1.6' stroke-linejoin='round' stroke-linecap='round' d='M4 2.5 L 4 17 L 7.8 13.7 L 10.4 19.4 L 12.4 18.6 L 9.9 13 L 15.3 12.4 Z'/></svg>") 5 4, default;
+  }
+
+  /* 2. Hand idle — open palm, fingers up, ready to grab */
+  .canvas-wrap svg.graph.tool-hand {
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><path fill='%231A1F2B' stroke='%23fff' stroke-width='1.4' stroke-linejoin='round' stroke-linecap='round' d='M5 14 C 5 12.5 6 11.8 7 12.2 L 7.6 12.5 L 7.6 7.5 C 7.6 6.5 8.4 5.7 9.4 5.7 C 10.4 5.7 11.2 6.5 11.2 7.5 L 11.2 11.4 L 11.2 4.5 C 11.2 3.5 12 2.7 13 2.7 C 14 2.7 14.8 3.5 14.8 4.5 L 14.8 11 L 14.8 5 C 14.8 4 15.6 3.2 16.6 3.2 C 17.6 3.2 18.4 4 18.4 5 L 18.4 11.4 L 18.4 7 C 18.4 6 19.2 5.2 20.2 5.2 C 21.2 5.2 22 6 22 7 L 22 14 C 22 18.4 18.4 22 14 22 L 13 22 C 9.4 22 6.6 19.2 5.6 16 Z'/></svg>") 16 16, grab;
+  }
+
+  /* 3. Hand grabbing — closed fist, knuckles visible (panning state) */
+  .canvas-wrap svg.graph.tool-hand.panning {
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><path fill='%231A1F2B' stroke='%23fff' stroke-width='1.5' stroke-linejoin='round' stroke-linecap='round' d='M2.5 13 C 2.5 12 3.5 11.2 4.5 11.6 L 6.4 12.5 L 6.4 11 C 6.4 9.5 7.4 8.5 8.9 8.5 L 16 8.5 C 17.8 8.5 19.4 9.8 19.4 11.7 L 19.4 16 C 19.4 19.5 16.4 22 12.5 22 L 11.5 22 C 7.6 22 5.4 19 4.4 16 Z'/><g fill='%23fff'><circle cx='8.6' cy='11' r='0.7'/><circle cx='11.2' cy='10.6' r='0.7'/><circle cx='13.8' cy='10.6' r='0.7'/><circle cx='16.4' cy='11' r='0.7'/></g></svg>") 15 20, grabbing;
+  }
+
+  /* 4. Connecting — precision reticle with accent center dot */
+  .canvas-wrap svg.graph.connecting,
+  .canvas-wrap svg.graph.connecting .gnode {
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><g fill='none' stroke='%23fff' stroke-width='3' stroke-linecap='round'><circle cx='12' cy='12' r='7.5'/><line x1='12' y1='1.5' x2='12' y2='6'/><line x1='12' y1='18' x2='12' y2='22.5'/><line x1='1.5' y1='12' x2='6' y2='12'/><line x1='18' y1='12' x2='22.5' y2='12'/></g><g fill='none' stroke='%231A1F2B' stroke-width='1.6' stroke-linecap='round'><circle cx='12' cy='12' r='7.5'/><line x1='12' y1='1.5' x2='12' y2='6'/><line x1='12' y1='18' x2='12' y2='22.5'/><line x1='1.5' y1='12' x2='6' y2='12'/><line x1='18' y1='12' x2='22.5' y2='12'/></g><circle cx='12' cy='12' r='2' fill='%231766DC' stroke='%23fff' stroke-width='1'/></svg>") 16 16, crosshair;
+  }
+
+  /* 5. Resize handles — coherent double-arrow set, centered hotspot (16, 16). */
+
+  /* Horizontal ↔ (E/W) */
+  .resize-handle.dir-e,
+  .resize-handle.dir-w {
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><g fill='none' stroke-linecap='round' stroke-linejoin='round'><path stroke='%23fff' stroke-width='3.2' d='M4 12 H 20 M 4 12 L 8 8.5 M 4 12 L 8 15.5 M 20 12 L 16 8.5 M 20 12 L 16 15.5'/><path stroke='%231A1F2B' stroke-width='1.6' d='M4 12 H 20 M 4 12 L 8 8.5 M 4 12 L 8 15.5 M 20 12 L 16 8.5 M 20 12 L 16 15.5'/></g></svg>") 16 16, ew-resize;
+  }
+
+  /* Vertical ↕ (N/S) */
+  .resize-handle.dir-n,
+  .resize-handle.dir-s {
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><g fill='none' stroke-linecap='round' stroke-linejoin='round'><path stroke='%23fff' stroke-width='3.2' d='M12 4 V 20 M 12 4 L 8.5 8 M 12 4 L 15.5 8 M 12 20 L 8.5 16 M 12 20 L 15.5 16'/><path stroke='%231A1F2B' stroke-width='1.6' d='M12 4 V 20 M 12 4 L 8.5 8 M 12 4 L 15.5 8 M 12 20 L 8.5 16 M 12 20 L 15.5 16'/></g></svg>") 16 16, ns-resize;
+  }
+
+  /* Diagonal ↘↖ (NW / SE) */
+  .resize-handle.dir-nw,
+  .resize-handle.dir-se {
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><g fill='none' stroke-linecap='round' stroke-linejoin='round'><path stroke='%23fff' stroke-width='3.2' d='M5.5 5.5 L 18.5 18.5 M 5.5 5.5 L 10.5 5.5 M 5.5 5.5 L 5.5 10.5 M 18.5 18.5 L 13.5 18.5 M 18.5 18.5 L 18.5 13.5'/><path stroke='%231A1F2B' stroke-width='1.6' d='M5.5 5.5 L 18.5 18.5 M 5.5 5.5 L 10.5 5.5 M 5.5 5.5 L 5.5 10.5 M 18.5 18.5 L 13.5 18.5 M 18.5 18.5 L 18.5 13.5'/></g></svg>") 16 16, nwse-resize;
+  }
+
+  /* Diagonal ↗↙ (NE / SW) */
+  .resize-handle.dir-ne,
+  .resize-handle.dir-sw {
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><g fill='none' stroke-linecap='round' stroke-linejoin='round'><path stroke='%23fff' stroke-width='3.2' d='M18.5 5.5 L 5.5 18.5 M 18.5 5.5 L 13.5 5.5 M 18.5 5.5 L 18.5 10.5 M 5.5 18.5 L 10.5 18.5 M 5.5 18.5 L 5.5 13.5'/><path stroke='%231A1F2B' stroke-width='1.6' d='M18.5 5.5 L 5.5 18.5 M 18.5 5.5 L 13.5 5.5 M 18.5 5.5 L 18.5 10.5 M 5.5 18.5 L 10.5 18.5 M 5.5 18.5 L 5.5 13.5'/></g></svg>") 16 16, nesw-resize;
+  }
+
+  /* 6. Edge-connector axes: column resize (vertical segment, drag L/R) */
+  .canvas-wrap svg.graph.editmode .gedge-hit[data-axis="x"] {
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><g fill='none' stroke-linecap='round' stroke-linejoin='round'><path stroke='%23fff' stroke-width='3.2' d='M12 5 V 19 M 4 12 H 9 M 4 12 L 7 9 M 4 12 L 7 15 M 20 12 H 15 M 20 12 L 17 9 M 20 12 L 17 15'/><path stroke='%231A1F2B' stroke-width='1.6' d='M12 5 V 19 M 4 12 H 9 M 4 12 L 7 9 M 4 12 L 7 15 M 20 12 H 15 M 20 12 L 17 9 M 20 12 L 17 15'/></g></svg>") 16 16, col-resize;
+  }
+
+  /* Row resize (horizontal segment, drag U/D) */
+  .canvas-wrap svg.graph.editmode .gedge-hit[data-axis="y"] {
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><g fill='none' stroke-linecap='round' stroke-linejoin='round'><path stroke='%23fff' stroke-width='3.2' d='M5 12 H 19 M 12 4 V 9 M 12 4 L 9 7 M 12 4 L 15 7 M 12 20 V 15 M 12 20 L 9 17 M 12 20 L 15 17'/><path stroke='%231A1F2B' stroke-width='1.6' d='M5 12 H 19 M 12 4 V 9 M 12 4 L 9 7 M 12 4 L 15 7 M 12 20 V 15 M 12 20 L 9 17 M 12 20 L 15 17'/></g></svg>") 16 16, row-resize;
+  }
+
+  /* 7. Movable node — unified 4-way arrow on a Page or Area in edit mode. */
+  .canvas-wrap svg.graph.editmode .gnode,
+  .canvas-wrap svg.graph.editmode .gzone {
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><g fill='none' stroke-linecap='round' stroke-linejoin='round'><path stroke='%23fff' stroke-width='3.2' d='M12 3 V 21 M 3 12 H 21 M 12 3 L 9 6 M 12 3 L 15 6 M 12 21 L 9 18 M 12 21 L 15 18 M 3 12 L 6 9 M 3 12 L 6 15 M 21 12 L 18 9 M 21 12 L 18 15'/><path stroke='%231A1F2B' stroke-width='1.6' d='M12 3 V 21 M 3 12 H 21 M 12 3 L 9 6 M 12 3 L 15 6 M 12 21 L 9 18 M 12 21 L 15 18 M 3 12 L 6 9 M 3 12 L 6 15 M 21 12 L 18 9 M 21 12 L 18 15'/></g></svg>") 16 16, move;
+  }
+
+  /* 8. Dragging a Page or Area — closed-fist cursor */
+  .canvas-wrap svg.graph .gnode.dragging,
+  .canvas-wrap svg.graph .gnode.dragging rect,
+  .canvas-wrap svg.graph.editmode .gzone.dragging {
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'><path fill='%231A1F2B' stroke='%23fff' stroke-width='1.5' stroke-linejoin='round' stroke-linecap='round' d='M2.5 13 C 2.5 12 3.5 11.2 4.5 11.6 L 6.4 12.5 L 6.4 11 C 6.4 9.5 7.4 8.5 8.9 8.5 L 16 8.5 C 17.8 8.5 19.4 9.8 19.4 11.7 L 19.4 16 C 19.4 19.5 16.4 22 12.5 22 L 11.5 22 C 7.6 22 5.4 19 4.4 16 Z'/><g fill='%23fff'><circle cx='8.6' cy='11' r='0.7'/><circle cx='11.2' cy='10.6' r='0.7'/><circle cx='13.8' cy='10.6' r='0.7'/><circle cx='16.4' cy='11' r='0.7'/></g></svg>") 15 20, grabbing;
+  }
+
+  /* ============================================================
+     22. MODES — Path / Heatmap / Monitor (+ legends + keyframes)
+     ============================================================ */
+
+  /* ---- Path mode ----
+     Neutralize swatch colors and trace a route from the clicked
+     page back to every root. Reverse-BFS marks ancestors as
+     .path-on, roots as .path-root, the click as .path-target,
+     and dims everything else. */
+  svg.graph.pathmode .gnode rect:not(.connect-handle) {
+    fill: #FAFAFA;
+    stroke: #C9CFD6;
+  }
+  svg.graph.pathmode rect.gzone {
+    fill: rgba(180, 188, 200, 0.10);
+    stroke: #C9CFD6;
+  }
+  svg.graph.pathmode .gzone-label { fill: #5E6470; }
+
+  /* Neutralize the line + arrow on every edge in Path mode. CSS beats the
+     inline stroke / marker-end attributes (presentation-attribute
+     specificity is 0). Dashed/dotted edges keep their stroke-dasharray
+     because we don't override it here. */
+  svg.graph.pathmode path.gedge {
+    stroke: #4A5A6E;
+    marker-end: url(#arr-gray);
+  }
+
+  /* Middle nodes — neutral fill, thin amber outline so they read as part of
+     the route. Root/target rules below win via later position. */
+  svg.graph.pathmode .gnode.path-on rect:not(.connect-handle) {
+    stroke: #D89942;
+    stroke-width: 1.75;
+  }
+  /* Root(s) — pages with no incoming edge inside the highlighted subgraph. */
+  svg.graph.pathmode .gnode.path-root rect:not(.connect-handle) {
+    fill: #E6F4EC;
+    stroke: #0E8A5F;
+    stroke-width: 2.5;
+  }
+  /* Target — the clicked page. */
+  svg.graph.pathmode .gnode.path-target rect:not(.connect-handle) {
+    fill: #FFF1DC;
+    stroke: #B45309;
+    stroke-width: 2.5;
+  }
+
+  /* On-path edges — normal width, dashed, marching ants. CSS overrides the
+     inline stroke / stroke-width / stroke-dasharray attributes that the
+     editor sets via setAttribute (presentation-attribute specificity is 0). */
+  @keyframes path-march {
+    to { stroke-dashoffset: -20; }
+  }
+  svg.graph.pathmode path.gedge.path-on {
+    stroke: #B45309;
+    stroke-width: 2;
+    stroke-dasharray: 6 4;
+    animation: path-march 0.9s linear infinite;
+    marker-end: url(#arr-path);
+  }
+
+  /* Dim everything off-route. */
+  svg.graph.pathmode .gnode.path-dim,
+  svg.graph.pathmode rect.gzone.path-dim,
+  svg.graph.pathmode .gzone-label.path-dim,
+  svg.graph.pathmode .gelabel.path-dim,
+  svg.graph.pathmode .gelabel-bg.path-dim { opacity: 0.18; }
+  svg.graph.pathmode path.gedge.path-dim { opacity: 0.12; }
+
+  /* ---- Heatmap mode ----
+     Colors each Page by test-case traversal density.
+     data-heat="0..7" is set by applyHeatmap(): 0 = no coverage (cool gray);
+     1..7 = single-hue red ramp from pale pink to deep crimson. Edges and
+     zones fade out so the page fills carry the signal. Case / flow / suite
+     source nodes are dimmed (dashed outline) because they're the source of
+     the count, not the subject. */
+  svg.graph.heatmapmode .gnode rect:not(.connect-handle) {
+    fill: #F5F7FA;
+    stroke: #C9CFD6;
+    transition: fill 200ms ease, stroke 200ms ease, stroke-width 200ms ease;
+  }
+  svg.graph.heatmapmode .gnode[data-heat="0"] rect:not(.connect-handle) { fill: #F5F7FA; stroke: #C9CFD6; }
+  svg.graph.heatmapmode .gnode[data-heat="1"] rect:not(.connect-handle) { fill: #FEECEC; stroke: #F2C5C5; }
+  svg.graph.heatmapmode .gnode[data-heat="2"] rect:not(.connect-handle) { fill: #FACFCF; stroke: #E29B9B; }
+  svg.graph.heatmapmode .gnode[data-heat="3"] rect:not(.connect-handle) { fill: #F4ABAB; stroke: #D17474; }
+  svg.graph.heatmapmode .gnode[data-heat="4"] rect:not(.connect-handle) { fill: #EE8585; stroke: #B85050; }
+  svg.graph.heatmapmode .gnode[data-heat="5"] rect:not(.connect-handle) { fill: #E25E5E; stroke: #9C3030; stroke-width: 1.5; }
+  svg.graph.heatmapmode .gnode[data-heat="6"] rect:not(.connect-handle) { fill: #C93232; stroke: #7A1818; stroke-width: 1.75; }
+  svg.graph.heatmapmode .gnode[data-heat="7"] rect:not(.connect-handle) { fill: #9C1818; stroke: #4F0808; stroke-width: 2; }
+  /* High-bin nodes use white-on-dark text for readability (mid bins onward) */
+  svg.graph.heatmapmode .gnode[data-heat="5"] text,
+  svg.graph.heatmapmode .gnode[data-heat="6"] text,
+  svg.graph.heatmapmode .gnode[data-heat="7"] text { fill: #FFFFFF; }
+
+  svg.graph.heatmapmode .gnode.heat-source rect:not(.connect-handle) {
+    fill: #FAFAFA;
+    stroke: #D6DEE9;
+    stroke-dasharray: 3 2;
+  }
+  svg.graph.heatmapmode .gnode.heat-source { opacity: 0.55; }
+
+  svg.graph.heatmapmode path.gedge {
+    stroke: #C9CFD6;
+    marker-end: url(#arr-gray);
+    opacity: 0.5;
+  }
+  svg.graph.heatmapmode rect.gzone { fill: rgba(180,188,200,0.06); stroke: #E2E6EC; }
+  svg.graph.heatmapmode .gzone-label { fill: #8A92A0; }
+
+  /* Floating heatmap legend chip — sits just above the bottom toolbar,
+     centered horizontally. Only visible while in Heatmap mode (the JS
+     toggles `hidden`). */
+  .heatmap-legend {
+    position: absolute;
+    bottom: 5.5rem; left: 50%;
+    transform: translateX(-50%);
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: #FFFFFF;
+    border: 1px solid #E5E5E5;
+    border-radius: 999px;
+    padding: 0.4375rem 0.875rem;
+    box-shadow:
+      0 2px 4px rgba(0,0,0,0.04),
+      0 12px 28px -12px rgba(0,0,0,0.18);
+    font: 500 0.75rem/1 var(--sans);
+    color: #5E6470;
+    z-index: 5;
+    pointer-events: none;
+  }
+  .heatmap-legend[hidden] { display: none; }
+  .heatmap-legend .hm-label { font-weight: 600; color: #1E1E1E; }
+  .heatmap-legend .hm-bar {
+    display: inline-block; width: 9rem; height: 0.5rem; border-radius: 999px;
+    background: linear-gradient(90deg,
+      #F5F7FA 0%, #F5F7FA 6%,
+      #FEECEC 6%, #FACFCF 22%, #F4ABAB 36%,
+      #EE8585 50%, #E25E5E 64%, #C93232 80%, #9C1818 100%);
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.06);
+  }
+  .heatmap-legend .hm-min,
+  .heatmap-legend .hm-max { font-variant-numeric: tabular-nums; min-width: 1ch; text-align: center; }
+
+  /* ---- Monitor mode ----
+     Colors each Page by the pass rate of test cases that traverse it.
+     data-monitor="0..4" is set by applyMonitor(): 0 = all failed (red),
+     4 = all passed (green); 1..3 are evenly spaced gradient steps. Pages
+     with no test data get data-monitor="none" (neutral gray). Data is
+     polled from the backend on a 5s interval while this mode is active. */
+  svg.graph.monitormode .gnode rect:not(.connect-handle) {
+    fill: #F5F7FA;
+    stroke: #C9CFD6;
+    transition: fill 240ms ease, stroke 240ms ease, stroke-width 240ms ease;
+  }
+  svg.graph.monitormode .gnode[data-monitor="none"] rect:not(.connect-handle) { fill: #F5F7FA; stroke: #C9CFD6; }
+  svg.graph.monitormode .gnode[data-monitor="0"] rect:not(.connect-handle)    { fill: #D83B3B; stroke: #8C1F1F; stroke-width: 2; }
+  svg.graph.monitormode .gnode[data-monitor="1"] rect:not(.connect-handle)    { fill: #E97A3A; stroke: #A14B17; stroke-width: 1.75; }
+  svg.graph.monitormode .gnode[data-monitor="2"] rect:not(.connect-handle)    { fill: #E8B53A; stroke: #8C6B11; stroke-width: 1.5; }
+  svg.graph.monitormode .gnode[data-monitor="3"] rect:not(.connect-handle)    { fill: #6FBE56; stroke: #2E7820; stroke-width: 1.5; }
+  svg.graph.monitormode .gnode[data-monitor="4"] rect:not(.connect-handle)    { fill: #0E8A5F; stroke: #0A5A3F; stroke-width: 2; }
+  /* High-contrast text on the darker fills */
+  svg.graph.monitormode .gnode[data-monitor="0"] text,
+  svg.graph.monitormode .gnode[data-monitor="4"] text { fill: #FFFFFF; }
+
+  /* Source nodes (cases/flows/suites) — dim so the Pages carry the signal */
+  svg.graph.monitormode .gnode.monitor-source rect:not(.connect-handle) {
+    fill: #FAFAFA;
+    stroke: #D6DEE9;
+    stroke-dasharray: 3 2;
+  }
+  svg.graph.monitormode .gnode.monitor-source { opacity: 0.55; }
+
+  svg.graph.monitormode path.gedge {
+    stroke: #C9CFD6;
+    marker-end: url(#arr-gray);
+    opacity: 0.5;
+  }
+  svg.graph.monitormode rect.gzone { fill: rgba(180,188,200,0.06); stroke: #E2E6EC; }
+  svg.graph.monitormode .gzone-label { fill: #8A92A0; }
+
+  /* Floating monitor legend chip — mirrors .heatmap-legend layout but adds a
+     live status indicator on the left that pulses on each refresh. */
+  .monitor-legend {
+    position: absolute;
+    bottom: 5.5rem; left: 50%;
+    transform: translateX(-50%);
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: #FFFFFF;
+    border: 1px solid #E5E5E5;
+    border-radius: 999px;
+    padding: 0.4375rem 0.875rem;
+    box-shadow:
+      0 2px 4px rgba(0,0,0,0.04),
+      0 12px 28px -12px rgba(0,0,0,0.18);
+    font: 500 0.75rem/1 var(--sans);
+    color: #5E6470;
+    z-index: 5;
+    pointer-events: none;
+  }
+  .monitor-legend[hidden] { display: none; }
+  .monitor-legend .mn-label { font-weight: 600; color: #1E1E1E; }
+  .monitor-legend .mn-bar {
+    display: inline-block; width: 9rem; height: 0.5rem; border-radius: 999px;
+    background: linear-gradient(90deg,
+      #D83B3B 0%, #E97A3A 25%, #E8B53A 50%, #6FBE56 75%, #0E8A5F 100%);
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.06);
+  }
+  .monitor-legend .mn-min,
+  .monitor-legend .mn-max { font-variant-numeric: tabular-nums; }
+  .monitor-legend .mn-min { color: #8C1F1F; }
+  .monitor-legend .mn-max { color: #0A5A3F; }
+  .monitor-legend .mn-sep {
+    width: 1px; height: 0.75rem; background: #E5E5E5; margin: 0 0.125rem;
+  }
+  .monitor-legend .mn-status { font-variant-numeric: tabular-nums; color: #5E6470; }
+  .monitor-legend .mn-dot {
+    width: 0.5rem; height: 0.5rem; border-radius: 999px;
+    background: #0E8A5F;
+    box-shadow: 0 0 0 0 rgba(14, 138, 95, 0.6);
+  }
+  .monitor-legend.is-refreshing .mn-dot {
+    animation: monitor-pulse 0.6s ease-out;
+  }
+  @keyframes monitor-pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(14, 138, 95, 0.6); }
+    100% { box-shadow: 0 0 0 0.5rem rgba(14, 138, 95, 0); }
+  }
+
+  /* ============================================================
+     23. UTILITY CLASSES
+     One-off helpers that replace inline style="" attributes.
+       .ico-N — square SVG icon, side length N in 1/16rem units
+       .u-…   — one-off layout/typography helpers
+     ============================================================ */
+
+  /* SVG icon size used by inspector action buttons */
+  .ico-14  { width: 0.875rem;  height: 0.875rem; }
+
+  /* One-off layout helpers */
+  .u-graph-page-onerow { grid-template-rows: 1fr; }
+  .u-help-accent { color: #6BC5B7; }
+  .u-eyebrow-accent {
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-color: var(--border);
+  }
