@@ -1,0 +1,150 @@
+{
+  "format": "pw-studio-sitemap",
+  "version": 1,
+  "viewport": {
+    "scale": 0.5,
+    "tx": 0,
+    "ty": 0,
+    "vbW": 1750,
+    "vbH": 1700
+  },
+  "pages": [
+    { "id": "page-login",            "name": "Login",             "sub": "login",                                                "slug": "login",                                                "x": 780,  "y": 20,   "w": 140, "h": 48, "color": "sel",  "border": "solid", "locked": false },
+
+    { "id": "ba-dashboard",          "name": "Dashboard",         "sub": "business-admin-dashboard",                             "slug": "business-admin-dashboard",                             "x": 355,  "y": 185,  "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+    { "id": "ba-todo",               "name": "To Do List",        "sub": "business-admin-todo-list",                             "slug": "business-admin-todo-list",                             "x": 635,  "y": 185,  "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+    { "id": "ba-tracking",           "name": "Tracking List",     "sub": "business-admin-tracking-list",                         "slug": "business-admin-tracking-list",                         "x": 915,  "y": 185,  "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+    { "id": "ba-notifications",      "name": "Notification List", "sub": "business-admin-notification-list",                     "slug": "business-admin-notification-list",                     "x": 1195, "y": 185,  "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+
+    { "id": "ba-ug-list",                    "name": "Listing",                   "sub": "business-admin-user-group-listing",                  "slug": "business-admin-user-group-listing",                  "x": 150,  "y": 333,  "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+    { "id": "ba-ug-detail-view",             "name": "Detail - View",             "sub": "business-admin-user-group-detail-view",              "slug": "business-admin-user-group-detail-view",              "x": 430,  "y": 333,  "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+    { "id": "ba-ug-detail-new",              "name": "Detail - New",              "sub": "business-admin-user-group-detail-new",               "slug": "business-admin-user-group-detail-new",               "x": 150,  "y": 429,  "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+    { "id": "ba-ug-detail-edit",             "name": "Detail - Edit",             "sub": "business-admin-user-group-detail-edit",              "slug": "business-admin-user-group-detail-edit",              "x": 430,  "y": 429,  "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+    { "id": "ba-ug-detail-maker-process",    "name": "Detail - Maker - Process",  "sub": "business-admin-user-group-detail-maker-process",     "slug": "business-admin-user-group-detail-maker-process",     "x": 150,  "y": 525,  "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+    { "id": "ba-ug-detail-checker-process",  "name": "Detail - Checker - Process","sub": "business-admin-user-group-detail-checker-process",   "slug": "business-admin-user-group-detail-checker-process",   "x": 430,  "y": 525,  "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+    { "id": "ba-ug-detail-view-tracking",    "name": "Detail - View - Tracking",  "sub": "business-admin-user-group-detail-view-tracking",     "slug": "business-admin-user-group-detail-view-tracking",     "x": 150,  "y": 621,  "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+
+    { "id": "ba-dept-list",                  "name": "Listing",                  "sub": "business-admin-department-listing",                  "slug": "business-admin-department-listing",                  "x": 665,  "y": 333,  "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+    { "id": "ba-dept-detail-view",           "name": "Detail - View",            "sub": "business-admin-department-detail-view",              "slug": "business-admin-department-detail-view",              "x": 945,  "y": 333,  "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+    { "id": "ba-dept-detail-new",            "name": "Detail - New",             "sub": "business-admin-department-detail-new",               "slug": "business-admin-department-detail-new",               "x": 665,  "y": 429,  "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+    { "id": "ba-dept-detail-edit",           "name": "Detail - Edit",            "sub": "business-admin-department-detail-edit",              "slug": "business-admin-department-detail-edit",              "x": 945,  "y": 429,  "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+    { "id": "ba-dept-detail-maker-process",  "name": "Detail - Maker - Process", "sub": "business-admin-department-detail-maker-process",     "slug": "business-admin-department-detail-maker-process",     "x": 665,  "y": 525,  "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+    { "id": "ba-dept-detail-checker-process","name": "Detail - Checker - Process","sub": "business-admin-department-detail-checker-process",  "slug": "business-admin-department-detail-checker-process",   "x": 945,  "y": 525,  "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+    { "id": "ba-dept-detail-view-tracking",  "name": "Detail - View - Tracking", "sub": "business-admin-department-detail-view-tracking",     "slug": "business-admin-department-detail-view-tracking",     "x": 665,  "y": 621,  "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+
+    { "id": "ba-up-list",                    "name": "Listing",                   "sub": "business-admin-user-profile-listing",                "slug": "business-admin-user-profile-listing",                "x": 1180, "y": 333,  "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+    { "id": "ba-up-detail-view",             "name": "Detail - View",             "sub": "business-admin-user-profile-detail-view",            "slug": "business-admin-user-profile-detail-view",            "x": 1460, "y": 333,  "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+    { "id": "ba-up-detail-new",              "name": "Detail - New",              "sub": "business-admin-user-profile-detail-new",             "slug": "business-admin-user-profile-detail-new",             "x": 1180, "y": 429,  "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+    { "id": "ba-up-detail-edit",             "name": "Detail - Edit",             "sub": "business-admin-user-profile-detail-edit",            "slug": "business-admin-user-profile-detail-edit",            "x": 1460, "y": 429,  "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+    { "id": "ba-up-detail-maker-process",    "name": "Detail - Maker - Process",  "sub": "business-admin-user-profile-detail-maker-process",   "slug": "business-admin-user-profile-detail-maker-process",   "x": 1180, "y": 525,  "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+    { "id": "ba-up-detail-checker-process",  "name": "Detail - Checker - Process","sub": "business-admin-user-profile-detail-checker-process", "slug": "business-admin-user-profile-detail-checker-process", "x": 1460, "y": 525,  "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+    { "id": "ba-up-detail-view-tracking",    "name": "Detail - View - Tracking",  "sub": "business-admin-user-profile-detail-view-tracking",   "slug": "business-admin-user-profile-detail-view-tracking",   "x": 1180, "y": 621,  "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+
+    { "id": "ba-chart-list",         "name": "Listing",           "sub": "business-admin-smart-tools-chart-config-listing",      "slug": "business-admin-smart-tools-chart-config-listing",      "x": 150,  "y": 790,  "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+    { "id": "ba-chart-detail-view",  "name": "Detail - View",     "sub": "business-admin-smart-tools-chart-config-detail-view",  "slug": "business-admin-smart-tools-chart-config-detail-view",  "x": 430,  "y": 790,  "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+    { "id": "ba-chart-detail-new",   "name": "Detail - New",      "sub": "business-admin-smart-tools-chart-config-detail-new",   "slug": "business-admin-smart-tools-chart-config-detail-new",   "x": 150,  "y": 886,  "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+    { "id": "ba-chart-detail-edit",  "name": "Detail - Edit",     "sub": "business-admin-smart-tools-chart-config-detail-edit",  "slug": "business-admin-smart-tools-chart-config-detail-edit",  "x": 430,  "y": 886,  "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+
+    { "id": "ba-svc-list",           "name": "Listing",           "sub": "business-admin-smart-tools-service-api-config-listing","slug": "business-admin-smart-tools-service-api-config-listing","x": 665,  "y": 790,  "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+    { "id": "ba-svc-detail-view",    "name": "Detail - View",     "sub": "business-admin-smart-tools-service-api-config-detail-view","slug": "business-admin-smart-tools-service-api-config-detail-view","x": 945, "y": 790,  "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+    { "id": "ba-svc-detail-new",     "name": "Detail - New",      "sub": "business-admin-smart-tools-service-api-config-detail-new","slug": "business-admin-smart-tools-service-api-config-detail-new","x": 665,  "y": 886,  "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+    { "id": "ba-svc-detail-edit",    "name": "Detail - Edit",     "sub": "business-admin-smart-tools-service-api-config-detail-edit","slug": "business-admin-smart-tools-service-api-config-detail-edit","x": 945, "y": 886,  "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+
+    { "id": "ba-set-list",           "name": "Listing",           "sub": "business-admin-smart-tools-setting-listing",           "slug": "business-admin-smart-tools-setting-listing",           "x": 150,  "y": 1010, "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+    { "id": "ba-set-detail-view",    "name": "Detail - View",     "sub": "business-admin-smart-tools-setting-detail-view",       "slug": "business-admin-smart-tools-setting-detail-view",       "x": 430,  "y": 1010, "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+    { "id": "ba-set-detail-new",     "name": "Detail - New",      "sub": "business-admin-smart-tools-setting-detail-new",        "slug": "business-admin-smart-tools-setting-detail-new",        "x": 150,  "y": 1106, "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+    { "id": "ba-set-detail-edit",    "name": "Detail - Edit",     "sub": "business-admin-smart-tools-setting-detail-edit",       "slug": "business-admin-smart-tools-setting-detail-edit",       "x": 430,  "y": 1106, "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+
+    { "id": "ba-udf-list",           "name": "Listing",           "sub": "business-admin-smart-tools-user-defined-fields-listing","slug": "business-admin-smart-tools-user-defined-fields-listing","x": 665, "y": 1010, "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+    { "id": "ba-udf-detail-view",    "name": "Detail - View",     "sub": "business-admin-smart-tools-user-defined-fields-detail-view","slug": "business-admin-smart-tools-user-defined-fields-detail-view","x": 945,"y": 1010, "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+    { "id": "ba-udf-detail-new",     "name": "Detail - New",      "sub": "business-admin-smart-tools-user-defined-fields-detail-new","slug": "business-admin-smart-tools-user-defined-fields-detail-new","x": 665, "y": 1106, "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+    { "id": "ba-udf-detail-edit",    "name": "Detail - Edit",     "sub": "business-admin-smart-tools-user-defined-fields-detail-edit","slug": "business-admin-smart-tools-user-defined-fields-detail-edit","x": 945,"y": 1106, "w": 140, "h": 48, "color": "case", "border": "solid", "locked": false },
+
+    { "id": "bu-dashboard",          "name": "Dashboard",         "sub": "business-user-dashboard",                              "slug": "business-user-dashboard",                              "x": 355,  "y": 1560, "w": 140, "h": 48, "color": "flow", "border": "solid", "locked": false },
+    { "id": "bu-todo",               "name": "To Do List",        "sub": "business-user-todo-list",                              "slug": "business-user-todo-list",                              "x": 635,  "y": 1560, "w": 140, "h": 48, "color": "flow", "border": "solid", "locked": false },
+    { "id": "bu-tracking",           "name": "Tracking List",     "sub": "business-user-tracking-list",                          "slug": "business-user-tracking-list",                          "x": 915,  "y": 1560, "w": 140, "h": 48, "color": "flow", "border": "solid", "locked": false },
+    { "id": "bu-notifications",      "name": "Notification List", "sub": "business-user-notification-list",                      "slug": "business-user-notification-list",                      "x": 1195, "y": 1560, "w": 140, "h": 48, "color": "flow", "border": "solid", "locked": false }
+  ],
+  "areas": [
+    { "id": "area-1",  "name": "BUSINESS ADMIN",          "slug": "business-admin",                                       "x": 60,   "y": 150,  "w": 1630, "h": 1365, "color": "neutral", "titlePos": "top-left", "locked": false },
+
+    { "id": "area-2",  "name": "BUSINESS SETUP",          "slug": "business-admin-business-setup",                        "x": 90,   "y": 263,  "w": 1570, "h": 427,  "color": "neutral", "titlePos": "top-left", "locked": false },
+    { "id": "area-3",  "name": "USER GROUP",              "slug": "business-admin-business-setup-user-group",             "x": 120,  "y": 298,  "w": 480,  "h": 382,  "color": "neutral", "titlePos": "top-left", "locked": false },
+    { "id": "area-4",  "name": "DEPARTMENT",              "slug": "business-admin-business-setup-department",             "x": 635,  "y": 298,  "w": 480,  "h": 382,  "color": "neutral", "titlePos": "top-left", "locked": false },
+    { "id": "area-5",  "name": "USER PROFILE",            "slug": "business-admin-business-setup-user-profile",           "x": 1150, "y": 298,  "w": 480,  "h": 382,  "color": "neutral", "titlePos": "top-left", "locked": false },
+
+    { "id": "area-6",  "name": "SMART TOOLS",             "slug": "business-admin-smart-tools",                           "x": 90,   "y": 720,  "w": 1055, "h": 455,  "color": "neutral", "titlePos": "top-left", "locked": false },
+    { "id": "area-7",  "name": "CHART CONFIG",            "slug": "business-admin-smart-tools-chart-config",              "x": 120,  "y": 755,  "w": 480,  "h": 190,  "color": "neutral", "titlePos": "top-left", "locked": false },
+    { "id": "area-8",  "name": "SERVICE API CONFIG",      "slug": "business-admin-smart-tools-service-api-config",        "x": 635,  "y": 755,  "w": 480,  "h": 190,  "color": "neutral", "titlePos": "top-left", "locked": false },
+    { "id": "area-9",  "name": "SETTING",                 "slug": "business-admin-smart-tools-setting",                   "x": 120,  "y": 975,  "w": 480,  "h": 190,  "color": "neutral", "titlePos": "top-left", "locked": false },
+    { "id": "area-10", "name": "USER DEFINED FIELDS",     "slug": "business-admin-smart-tools-user-defined-fields",       "x": 635,  "y": 975,  "w": 480,  "h": 190,  "color": "neutral", "titlePos": "top-left", "locked": false },
+
+    { "id": "area-11", "name": "PARAMETER MAINTENANCE",   "slug": "business-admin-parameter-maintenance",                 "x": 90,   "y": 1205, "w": 600,  "h": 300,  "color": "neutral", "titlePos": "top-left", "locked": false },
+    { "id": "area-12", "name": "COMMON CODE TYPE",        "slug": "business-admin-parameter-maintenance-common-code-type","x": 120,  "y": 1240, "w": 160,  "h": 110,  "color": "neutral", "titlePos": "top-left", "locked": false },
+    { "id": "area-13", "name": "COMMON CODE PARAMETER",   "slug": "business-admin-parameter-maintenance-common-code-parameter","x": 310,"y":1240,"w": 160,  "h": 110,  "color": "neutral", "titlePos": "top-left", "locked": false },
+    { "id": "area-14", "name": "CREDIT CONTROL",          "slug": "business-admin-parameter-maintenance-credit-control",  "x": 500,  "y": 1240, "w": 160,  "h": 110,  "color": "neutral", "titlePos": "top-left", "locked": false },
+    { "id": "area-15", "name": "TEMPLATES",               "slug": "business-admin-parameter-maintenance-templates",       "x": 120,  "y": 1380, "w": 160,  "h": 110,  "color": "neutral", "titlePos": "top-left", "locked": false },
+    { "id": "area-16", "name": "DOCUMENTATIONS",          "slug": "business-admin-parameter-maintenance-documentations",  "x": 310,  "y": 1380, "w": 160,  "h": 110,  "color": "neutral", "titlePos": "top-left", "locked": false },
+    { "id": "area-17", "name": "NOTIFICATION CONFIG",     "slug": "business-admin-parameter-maintenance-notification-config","x":500,"y": 1380, "w": 160,  "h": 110,  "color": "neutral", "titlePos": "top-left", "locked": false },
+
+    { "id": "area-18", "name": "FACILITY MANAGEMENT",     "slug": "business-admin-facility-management",                   "x": 720,  "y": 1205, "w": 270,  "h": 300,  "color": "neutral", "titlePos": "top-left", "locked": false },
+    { "id": "area-19", "name": "FACILITY PACKAGE MGMT",   "slug": "business-admin-facility-package-management",           "x": 1020, "y": 1205, "w": 270,  "h": 300,  "color": "neutral", "titlePos": "top-left", "locked": false },
+    { "id": "area-20", "name": "RISK PARAMETER MAINT.",   "slug": "business-admin-risk-parameter-maintenance",            "x": 1320, "y": 1205, "w": 270,  "h": 300,  "color": "neutral", "titlePos": "top-left", "locked": false },
+
+    { "id": "area-21", "name": "BUSINESS USER",           "slug": "business-user",                                        "x": 60,   "y": 1525, "w": 1630, "h": 130,  "color": "neutral", "titlePos": "top-left", "locked": false }
+  ],
+  "edges": [
+    { "sourceId": "page-login",         "targetId": "ba-dashboard",        "label": "Sign in", "lineColor": "accent", "lineStyle": "solid", "lineWidth": "thin",   "manualMid": null, "manualSp": { "side": "bottom", "idx": 2 }, "manualTp": { "side": "top",    "idx": 2 } },
+
+    { "sourceId": "ba-dashboard",       "targetId": "ba-todo",             "label": null,      "lineColor": "gray",   "lineStyle": "solid", "lineWidth": "thin",   "manualMid": null, "manualSp": { "side": "right",  "idx": 1 }, "manualTp": { "side": "left",   "idx": 1 } },
+    { "sourceId": "ba-dashboard",       "targetId": "ba-tracking",         "label": null,      "lineColor": "gray",   "lineStyle": "solid", "lineWidth": "thin",   "manualMid": null, "manualSp": { "side": "top",    "idx": 4 }, "manualTp": { "side": "top",    "idx": 0 } },
+    { "sourceId": "ba-dashboard",       "targetId": "ba-dept-list",        "label": "View",    "lineColor": "gray",   "lineStyle": "solid", "lineWidth": "thin",   "manualMid": null, "manualSp": { "side": "bottom", "idx": 2 }, "manualTp": { "side": "top",    "idx": 2 } },
+    { "sourceId": "ba-dashboard",       "targetId": "ba-chart-list",       "label": "View",    "lineColor": "gray",   "lineStyle": "solid", "lineWidth": "thin",   "manualMid": null, "manualSp": { "side": "bottom", "idx": 2 }, "manualTp": { "side": "top",    "idx": 2 } },
+
+    { "sourceId": "ba-todo",            "targetId": "ba-ug-detail-maker-process",    "label": "Process", "lineColor": "accent", "lineStyle": "solid", "lineWidth": "thin",   "manualMid": null, "manualSp": { "side": "left",   "idx": 0 }, "manualTp": { "side": "top",    "idx": 2 } },
+    { "sourceId": "ba-todo",            "targetId": "ba-ug-detail-checker-process",  "label": "Process", "lineColor": "accent", "lineStyle": "solid", "lineWidth": "thin",   "manualMid": null, "manualSp": { "side": "left",   "idx": 2 }, "manualTp": { "side": "top",    "idx": 2 } },
+    { "sourceId": "ba-todo",            "targetId": "ba-dept-detail-maker-process",  "label": "Process", "lineColor": "accent", "lineStyle": "solid", "lineWidth": "thin",   "manualMid": null, "manualSp": { "side": "bottom", "idx": 1 }, "manualTp": { "side": "top",    "idx": 2 } },
+    { "sourceId": "ba-todo",            "targetId": "ba-dept-detail-checker-process","label": "Process", "lineColor": "accent", "lineStyle": "solid", "lineWidth": "thin",   "manualMid": null, "manualSp": { "side": "bottom", "idx": 3 }, "manualTp": { "side": "top",    "idx": 2 } },
+    { "sourceId": "ba-todo",            "targetId": "ba-up-detail-maker-process",    "label": "Process", "lineColor": "accent", "lineStyle": "solid", "lineWidth": "thin",   "manualMid": null, "manualSp": { "side": "right",  "idx": 0 }, "manualTp": { "side": "top",    "idx": 2 } },
+    { "sourceId": "ba-todo",            "targetId": "ba-up-detail-checker-process",  "label": "Process", "lineColor": "accent", "lineStyle": "solid", "lineWidth": "thin",   "manualMid": null, "manualSp": { "side": "right",  "idx": 2 }, "manualTp": { "side": "top",    "idx": 2 } },
+    { "sourceId": "ba-tracking",        "targetId": "ba-ug-detail-view-tracking",    "label": "Track",   "lineColor": "gray",   "lineStyle": "solid", "lineWidth": "thin",   "manualMid": null, "manualSp": { "side": "left",   "idx": 1 }, "manualTp": { "side": "top",    "idx": 2 } },
+    { "sourceId": "ba-tracking",        "targetId": "ba-dept-detail-view-tracking",  "label": "Track",   "lineColor": "gray",   "lineStyle": "solid", "lineWidth": "thin",   "manualMid": null, "manualSp": { "side": "bottom", "idx": 1 }, "manualTp": { "side": "top",    "idx": 2 } },
+    { "sourceId": "ba-tracking",        "targetId": "ba-up-detail-view-tracking",    "label": "Track",   "lineColor": "gray",   "lineStyle": "solid", "lineWidth": "thin",   "manualMid": null, "manualSp": { "side": "right",  "idx": 1 }, "manualTp": { "side": "top",    "idx": 2 } },
+
+    { "sourceId": "ba-dept-list",       "targetId": "ba-ug-list",          "label": null,      "lineColor": "gray",   "lineStyle": "solid", "lineWidth": "thin",   "manualMid": null, "manualSp": { "side": "top",    "idx": 0 }, "manualTp": { "side": "top",    "idx": 4 } },
+    { "sourceId": "ba-dept-list",       "targetId": "ba-up-list",          "label": null,      "lineColor": "gray",   "lineStyle": "solid", "lineWidth": "thin",   "manualMid": null, "manualSp": { "side": "top",    "idx": 4 }, "manualTp": { "side": "top",    "idx": 0 } },
+
+    { "sourceId": "ba-ug-list",         "targetId": "ba-ug-detail-view",   "label": "Open",    "lineColor": "gray",   "lineStyle": "solid", "lineWidth": "thin",   "manualMid": null, "manualSp": { "side": "right",  "idx": 1 }, "manualTp": { "side": "left",   "idx": 1 } },
+    { "sourceId": "ba-ug-list",         "targetId": "ba-ug-detail-new",    "label": "Create",  "lineColor": "accent", "lineStyle": "solid", "lineWidth": "thin",   "manualMid": null, "manualSp": { "side": "bottom", "idx": 2 }, "manualTp": { "side": "top",    "idx": 2 } },
+    { "sourceId": "ba-ug-detail-view",  "targetId": "ba-ug-detail-edit",   "label": "Edit",    "lineColor": "accent", "lineStyle": "solid", "lineWidth": "thin",   "manualMid": null, "manualSp": { "side": "bottom", "idx": 2 }, "manualTp": { "side": "top",    "idx": 2 } },
+
+    { "sourceId": "ba-dept-list",       "targetId": "ba-dept-detail-view", "label": "Open",    "lineColor": "gray",   "lineStyle": "solid", "lineWidth": "thin",   "manualMid": null, "manualSp": { "side": "right",  "idx": 1 }, "manualTp": { "side": "left",   "idx": 1 } },
+    { "sourceId": "ba-dept-list",       "targetId": "ba-dept-detail-new",  "label": "Create",  "lineColor": "accent", "lineStyle": "solid", "lineWidth": "thin",   "manualMid": null, "manualSp": { "side": "bottom", "idx": 2 }, "manualTp": { "side": "top",    "idx": 2 } },
+    { "sourceId": "ba-dept-detail-view","targetId": "ba-dept-detail-edit", "label": "Edit",    "lineColor": "accent", "lineStyle": "solid", "lineWidth": "thin",   "manualMid": null, "manualSp": { "side": "bottom", "idx": 2 }, "manualTp": { "side": "top",    "idx": 2 } },
+
+    { "sourceId": "ba-up-list",         "targetId": "ba-up-detail-view",   "label": "Open",    "lineColor": "gray",   "lineStyle": "solid", "lineWidth": "thin",   "manualMid": null, "manualSp": { "side": "right",  "idx": 1 }, "manualTp": { "side": "left",   "idx": 1 } },
+    { "sourceId": "ba-up-list",         "targetId": "ba-up-detail-new",    "label": "Create",  "lineColor": "accent", "lineStyle": "solid", "lineWidth": "thin",   "manualMid": null, "manualSp": { "side": "bottom", "idx": 2 }, "manualTp": { "side": "top",    "idx": 2 } },
+    { "sourceId": "ba-up-detail-view",  "targetId": "ba-up-detail-edit",   "label": "Edit",    "lineColor": "accent", "lineStyle": "solid", "lineWidth": "thin",   "manualMid": null, "manualSp": { "side": "bottom", "idx": 2 }, "manualTp": { "side": "top",    "idx": 2 } },
+
+    { "sourceId": "ba-chart-list",      "targetId": "ba-chart-detail-view","label": "Open",    "lineColor": "gray",   "lineStyle": "solid", "lineWidth": "thin",   "manualMid": null, "manualSp": { "side": "right",  "idx": 1 }, "manualTp": { "side": "left",   "idx": 1 } },
+    { "sourceId": "ba-chart-list",      "targetId": "ba-chart-detail-new", "label": "Create",  "lineColor": "accent", "lineStyle": "solid", "lineWidth": "thin",   "manualMid": null, "manualSp": { "side": "bottom", "idx": 2 }, "manualTp": { "side": "top",    "idx": 2 } },
+    { "sourceId": "ba-chart-detail-view","targetId":"ba-chart-detail-edit","label": "Edit",    "lineColor": "accent", "lineStyle": "solid", "lineWidth": "thin",   "manualMid": null, "manualSp": { "side": "bottom", "idx": 2 }, "manualTp": { "side": "top",    "idx": 2 } },
+
+    { "sourceId": "ba-chart-list",      "targetId": "ba-svc-list",         "label": null,      "lineColor": "gray",   "lineStyle": "solid", "lineWidth": "thin",   "manualMid": null, "manualSp": { "side": "top",    "idx": 4 }, "manualTp": { "side": "top",    "idx": 0 } },
+    { "sourceId": "ba-chart-list",      "targetId": "ba-set-list",         "label": null,      "lineColor": "gray",   "lineStyle": "solid", "lineWidth": "thin",   "manualMid": null, "manualSp": { "side": "left",   "idx": 1 }, "manualTp": { "side": "left",   "idx": 1 } },
+    { "sourceId": "ba-chart-list",      "targetId": "ba-udf-list",         "label": null,      "lineColor": "gray",   "lineStyle": "solid", "lineWidth": "thin",   "manualMid": null, "manualSp": { "side": "bottom", "idx": 4 }, "manualTp": { "side": "top",    "idx": 4 } },
+
+    { "sourceId": "ba-svc-list",        "targetId": "ba-svc-detail-view",  "label": "Open",    "lineColor": "gray",   "lineStyle": "solid", "lineWidth": "thin",   "manualMid": null, "manualSp": { "side": "right",  "idx": 1 }, "manualTp": { "side": "left",   "idx": 1 } },
+    { "sourceId": "ba-svc-list",        "targetId": "ba-svc-detail-new",   "label": "Create",  "lineColor": "accent", "lineStyle": "solid", "lineWidth": "thin",   "manualMid": null, "manualSp": { "side": "bottom", "idx": 2 }, "manualTp": { "side": "top",    "idx": 2 } },
+    { "sourceId": "ba-svc-detail-view", "targetId": "ba-svc-detail-edit",  "label": "Edit",    "lineColor": "accent", "lineStyle": "solid", "lineWidth": "thin",   "manualMid": null, "manualSp": { "side": "bottom", "idx": 2 }, "manualTp": { "side": "top",    "idx": 2 } },
+
+    { "sourceId": "ba-set-list",        "targetId": "ba-set-detail-view",  "label": "Open",    "lineColor": "gray",   "lineStyle": "solid", "lineWidth": "thin",   "manualMid": null, "manualSp": { "side": "right",  "idx": 1 }, "manualTp": { "side": "left",   "idx": 1 } },
+    { "sourceId": "ba-set-list",        "targetId": "ba-set-detail-new",   "label": "Create",  "lineColor": "accent", "lineStyle": "solid", "lineWidth": "thin",   "manualMid": null, "manualSp": { "side": "bottom", "idx": 2 }, "manualTp": { "side": "top",    "idx": 2 } },
+    { "sourceId": "ba-set-detail-view", "targetId": "ba-set-detail-edit",  "label": "Edit",    "lineColor": "accent", "lineStyle": "solid", "lineWidth": "thin",   "manualMid": null, "manualSp": { "side": "bottom", "idx": 2 }, "manualTp": { "side": "top",    "idx": 2 } },
+
+    { "sourceId": "ba-udf-list",        "targetId": "ba-udf-detail-view",  "label": "Open",    "lineColor": "gray",   "lineStyle": "solid", "lineWidth": "thin",   "manualMid": null, "manualSp": { "side": "right",  "idx": 1 }, "manualTp": { "side": "left",   "idx": 1 } },
+    { "sourceId": "ba-udf-list",        "targetId": "ba-udf-detail-new",   "label": "Create",  "lineColor": "accent", "lineStyle": "solid", "lineWidth": "thin",   "manualMid": null, "manualSp": { "side": "bottom", "idx": 2 }, "manualTp": { "side": "top",    "idx": 2 } },
+    { "sourceId": "ba-udf-detail-view", "targetId": "ba-udf-detail-edit",  "label": "Edit",    "lineColor": "accent", "lineStyle": "solid", "lineWidth": "thin",   "manualMid": null, "manualSp": { "side": "bottom", "idx": 2 }, "manualTp": { "side": "top",    "idx": 2 } }
+  ],
+  "groups": []
+}

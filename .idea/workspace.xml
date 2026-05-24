@@ -4,8 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7956be5f-a3f2-4c04-80fd-1860e56e7340" name="Changes" comment="Update workspace and UI components to enhance app-mode toggles and toolbar layout">
-      <change afterPath="$PROJECT_DIR$/sitemap-data-model.md" afterDir="false" />
+    <list default="true" id="7956be5f-a3f2-4c04-80fd-1860e56e7340" name="Changes" comment="Remove inline `sitemap-editor.inline.css` file for cleaner codebase structure and to eliminate unused styles.">
+      <change beforePath="$PROJECT_DIR$/.claude/settings.local.json" beforeDir="false" afterPath="$PROJECT_DIR$/.claude/settings.local.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -17,7 +17,7 @@
     <execution />
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="58" />
+    <option name="cachedIndexableFilesCount" value="53" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="Git.Settings">
@@ -47,26 +47,27 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/project/sitemap-editor&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "D:/project/sitemap-editor",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecapSpentCounter">
     <option name="endsOfQuotaMs" value="1779652827240" />
     <option name="spentUsd" value="0.16478485" />
@@ -74,10 +75,15 @@
   <component name="RecapUselessUpdatesCounter">
     <option name="suspendCountdown" value="0" />
   </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\project\sitemap-editor" />
+    </key>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-30f59d01ecdd-2fc7cc6b9a17-intellij.indexing.shared.core-IU-253.30387.90" />
+        <option value="bundled-jdk-30f59d01ecdd-37e91769500f-intellij.indexing.shared.core-IU-261.24374.151" />
       </set>
     </attachedChunks>
   </component>
@@ -98,7 +104,12 @@
       <workItem from="1779244888833" duration="1223000" />
       <workItem from="1779258058473" duration="3526000" />
       <workItem from="1779286716376" duration="224000" />
-      <workItem from="1779288377541" duration="306000" />
+      <workItem from="1779288377541" duration="10957000" />
+      <workItem from="1779326695796" duration="1501000" />
+      <workItem from="1779330067797" duration="2906000" />
+      <workItem from="1779421991464" duration="2229000" />
+      <workItem from="1779456737075" duration="502000" />
+      <workItem from="1779457512025" duration="2763000" />
     </task>
     <task id="LOCAL-00001" summary="Add project configuration files and initial styles for sitemap-editor">
       <option name="closed" value="true" />
@@ -124,7 +135,71 @@
       <option name="project" value="LOCAL" />
       <updated>1779209465315</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Add HTML cursor preview page and initial sitemap data model file">
+      <option name="closed" value="true" />
+      <created>1779288901727</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1779288901727</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Add drag-to-place functionality for palette elements (pages and areas)&#10;&#10;Introduces the ability to drag elements (Pages, Areas) from the palette to specific locations in the viewport. Includes dynamic edge index refreshing to prevent stale indices and updates for hit-paths and tool interactions. Simplifies interaction logic and adjusts related CSS and toolbar layout.">
+      <option name="closed" value="true" />
+      <created>1779290910976</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1779290910976</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Add initial sitemap JSON model and enhancements to editor functionality&#10;&#10;Introduces a detailed sitemap data model (`ecommerce-sitemap.sitemap.json`) and integrates it with the editor. Updates include dynamic slug handling, visible URL hints (sub-lines) under page titles, hand-cursor improvements, and consistent hover affordances for newly created pages. Refines line width defaults, slug synchronization, and imported node styling for consistency.">
+      <option name="closed" value="true" />
+      <created>1779294067141</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1779294067141</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Add Path mode: reverse-BFS highlights routes from roots to target page&#10;&#10;Introduces a new Path mode with UI enhancements and keyboard toggle (4). Clicking a page highlights its route from every root using reverse-BFS, applying `.path-on`, `.path-root`, `.path-target`, and `.path-dim` classes for distinct visual emphasis. Includes Escape-to-clear functionality and corresponding CSS refinements.">
+      <option name="closed" value="true" />
+      <created>1779296560314</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1779296560314</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Add Heatmap and Monitor modes with dynamic test coverage and pass rate visualization&#10;&#10;Introduces two new app modes (Heatmap and Monitor) with corresponding UI, backend integration (mocked), and keyboard shortcuts (5 and 6). Heatmap mode visualizes page traversal density (test cases per page), while Monitor mode shows live test pass rates. Includes legends, responsive tooltips, periodic data polling for Monitor mode, and comprehensive CSS enhancements for both modes.">
+      <option name="closed" value="true" />
+      <created>1779299598073</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1779299598073</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Add sitemap JSON model for Streamflix and initialize editor support &#10;&#10;Introduces `streamflix-sitemap.sitemap.json` detailing pages, areas, and connections for the sitemap. Lays groundwork for seamless integration with the editor, supporting structured navigation and visualization.">
+      <option name="closed" value="true" />
+      <created>1779330161346</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1779330161346</updated>
+    </task>
+    <task id="LOCAL-00010" summary="Organize and expand `sitemap-editor.css` into 23 structured sections, adding comprehensive comments, improving readability, aligning with UI features like modes/toolbars, and restoring missing styles for inspector actions and SVG elements.">
+      <option name="closed" value="true" />
+      <created>1779457762365</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1779457762365</updated>
+    </task>
+    <task id="LOCAL-00011" summary="Remove inline `sitemap-editor.inline.css` file for cleaner codebase structure and to eliminate unused styles.">
+      <option name="closed" value="true" />
+      <created>1779466568944</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1779466568944</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -135,6 +210,14 @@
     <MESSAGE value="Update project configuration and clean up unused styles and components" />
     <MESSAGE value="Remove &quot;Dissolve&quot; functionality and related assets from sitemap-editor." />
     <MESSAGE value="Update workspace and UI components to enhance app-mode toggles and toolbar layout" />
-    <option name="LAST_COMMIT_MESSAGE" value="Update workspace and UI components to enhance app-mode toggles and toolbar layout" />
+    <MESSAGE value="Add HTML cursor preview page and initial sitemap data model file" />
+    <MESSAGE value="Add drag-to-place functionality for palette elements (pages and areas)&#10;&#10;Introduces the ability to drag elements (Pages, Areas) from the palette to specific locations in the viewport. Includes dynamic edge index refreshing to prevent stale indices and updates for hit-paths and tool interactions. Simplifies interaction logic and adjusts related CSS and toolbar layout." />
+    <MESSAGE value="Add initial sitemap JSON model and enhancements to editor functionality&#10;&#10;Introduces a detailed sitemap data model (`ecommerce-sitemap.sitemap.json`) and integrates it with the editor. Updates include dynamic slug handling, visible URL hints (sub-lines) under page titles, hand-cursor improvements, and consistent hover affordances for newly created pages. Refines line width defaults, slug synchronization, and imported node styling for consistency." />
+    <MESSAGE value="Add Path mode: reverse-BFS highlights routes from roots to target page&#10;&#10;Introduces a new Path mode with UI enhancements and keyboard toggle (4). Clicking a page highlights its route from every root using reverse-BFS, applying `.path-on`, `.path-root`, `.path-target`, and `.path-dim` classes for distinct visual emphasis. Includes Escape-to-clear functionality and corresponding CSS refinements." />
+    <MESSAGE value="Add Heatmap and Monitor modes with dynamic test coverage and pass rate visualization&#10;&#10;Introduces two new app modes (Heatmap and Monitor) with corresponding UI, backend integration (mocked), and keyboard shortcuts (5 and 6). Heatmap mode visualizes page traversal density (test cases per page), while Monitor mode shows live test pass rates. Includes legends, responsive tooltips, periodic data polling for Monitor mode, and comprehensive CSS enhancements for both modes." />
+    <MESSAGE value="Add sitemap JSON model for Streamflix and initialize editor support &#10;&#10;Introduces `streamflix-sitemap.sitemap.json` detailing pages, areas, and connections for the sitemap. Lays groundwork for seamless integration with the editor, supporting structured navigation and visualization." />
+    <MESSAGE value="Organize and expand `sitemap-editor.css` into 23 structured sections, adding comprehensive comments, improving readability, aligning with UI features like modes/toolbars, and restoring missing styles for inspector actions and SVG elements." />
+    <MESSAGE value="Remove inline `sitemap-editor.inline.css` file for cleaner codebase structure and to eliminate unused styles." />
+    <option name="LAST_COMMIT_MESSAGE" value="Remove inline `sitemap-editor.inline.css` file for cleaner codebase structure and to eliminate unused styles." />
   </component>
 </project>

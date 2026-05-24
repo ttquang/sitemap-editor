@@ -1,0 +1,124 @@
+{
+  "format": "pw-studio-sitemap",
+  "version": 1,
+  "viewport": {
+    "scale": 0.7,
+    "tx": 0,
+    "ty": 0,
+    "vbW": 1800,
+    "vbH": 1040
+  },
+  "pages": [
+    { "id": "pm-project-dashboard", "name": "Project Dashboard", "sub": "project-dashboard", "slug": "project-dashboard", "x": 120,  "y": 130, "w": 140, "h": 48, "color": "case",  "border": "solid", "locked": false },
+    { "id": "pm-project-list",      "name": "Project List",      "sub": "project-list",      "slug": "project-list",      "x": 400,  "y": 130, "w": 140, "h": 48, "color": "case",  "border": "solid", "locked": false },
+    { "id": "pm-project-edit",      "name": "Project Edit",      "sub": "project-edit",      "slug": "project-edit",      "x": 120,  "y": 226, "w": 140, "h": 48, "color": "case",  "border": "solid", "locked": false },
+    { "id": "pm-project-detail",    "name": "Project Detail",    "sub": "project-detail",    "slug": "project-detail",    "x": 400,  "y": 226, "w": 140, "h": 48, "color": "case",  "border": "solid", "locked": false },
+
+    { "id": "pm-template-list",     "name": "Template List",     "sub": "template-list",     "slug": "template-list",     "x": 120,  "y": 350, "w": 140, "h": 48, "color": "case",  "border": "solid", "locked": false },
+    { "id": "pm-template-create",   "name": "Template Create",   "sub": "template-create",   "slug": "template-create",   "x": 400,  "y": 350, "w": 140, "h": 48, "color": "case",  "border": "solid", "locked": false },
+    { "id": "pm-template-detail",   "name": "Template Detail",   "sub": "template-detail",   "slug": "template-detail",   "x": 120,  "y": 446, "w": 140, "h": 48, "color": "case",  "border": "solid", "locked": false },
+    { "id": "pm-template-edit",     "name": "Template Edit",     "sub": "template-edit",     "slug": "template-edit",     "x": 400,  "y": 446, "w": 140, "h": 48, "color": "case",  "border": "solid", "locked": false },
+
+    { "id": "pm-task-board",        "name": "Task Board",        "sub": "task-board",        "slug": "task-board",        "x": 690,  "y": 130, "w": 140, "h": 48, "color": "flow",  "border": "solid", "locked": false },
+    { "id": "pm-task-list",         "name": "Task List",         "sub": "task-list",         "slug": "task-list",         "x": 970,  "y": 130, "w": 140, "h": 48, "color": "flow",  "border": "solid", "locked": false },
+    { "id": "pm-task-edit",         "name": "Task Edit",         "sub": "task-edit",         "slug": "task-edit",         "x": 690,  "y": 226, "w": 140, "h": 48, "color": "flow",  "border": "solid", "locked": false },
+    { "id": "pm-task-detail",       "name": "Task Detail",       "sub": "task-detail",       "slug": "task-detail",       "x": 970,  "y": 226, "w": 140, "h": 48, "color": "flow",  "border": "solid", "locked": false },
+
+    { "id": "pm-task-comments",     "name": "Task Comments",     "sub": "task-comments",     "slug": "task-comments",     "x": 690,  "y": 350, "w": 140, "h": 48, "color": "flow",  "border": "solid", "locked": false },
+    { "id": "pm-task-attachments",  "name": "Attachments",       "sub": "task-attachments",  "slug": "task-attachments",  "x": 970,  "y": 350, "w": 140, "h": 48, "color": "flow",  "border": "solid", "locked": false },
+    { "id": "pm-task-history",      "name": "Task History",      "sub": "task-history",      "slug": "task-history",      "x": 690,  "y": 446, "w": 140, "h": 48, "color": "flow",  "border": "solid", "locked": false },
+    { "id": "pm-task-notifications","name": "Notifications",     "sub": "task-notifications","slug": "task-notifications","x": 970,  "y": 446, "w": 140, "h": 48, "color": "flow",  "border": "solid", "locked": false },
+
+    { "id": "pm-team-members-list", "name": "Members List",      "sub": "team-members-list", "slug": "team-members-list", "x": 1260, "y": 130, "w": 140, "h": 48, "color": "suite", "border": "solid", "locked": false },
+    { "id": "pm-team-invite",       "name": "Invite Member",     "sub": "team-invite",       "slug": "team-invite",       "x": 1540, "y": 130, "w": 140, "h": 48, "color": "suite", "border": "solid", "locked": false },
+    { "id": "pm-team-profile",      "name": "Member Profile",    "sub": "team-profile",      "slug": "team-profile",      "x": 1260, "y": 226, "w": 140, "h": 48, "color": "suite", "border": "solid", "locked": false },
+    { "id": "pm-team-activity",     "name": "Member Activity",   "sub": "team-activity",     "slug": "team-activity",     "x": 1540, "y": 226, "w": 140, "h": 48, "color": "suite", "border": "solid", "locked": false },
+
+    { "id": "pm-perm-roles",        "name": "Roles",             "sub": "perm-roles",        "slug": "perm-roles",        "x": 1260, "y": 350, "w": 140, "h": 48, "color": "suite", "border": "solid", "locked": false },
+    { "id": "pm-perm-assign",       "name": "Assign Role",       "sub": "perm-assign",       "slug": "perm-assign",       "x": 1540, "y": 350, "w": 140, "h": 48, "color": "suite", "border": "solid", "locked": false },
+    { "id": "pm-perm-role-detail",  "name": "Role Detail",       "sub": "perm-role-detail",  "slug": "perm-role-detail",  "x": 1260, "y": 446, "w": 140, "h": 48, "color": "suite", "border": "solid", "locked": false },
+    { "id": "pm-perm-audit",        "name": "Audit Log",         "sub": "perm-audit",        "slug": "perm-audit",        "x": 1540, "y": 446, "w": 140, "h": 48, "color": "suite", "border": "solid", "locked": false },
+
+    { "id": "pm-report-overview",   "name": "Overview",          "sub": "report-overview",   "slug": "report-overview",   "x": 120,  "y": 615, "w": 140, "h": 48, "color": "env",   "border": "solid", "locked": false },
+    { "id": "pm-report-burndown",   "name": "Burndown",          "sub": "report-burndown",   "slug": "report-burndown",   "x": 400,  "y": 615, "w": 140, "h": 48, "color": "env",   "border": "solid", "locked": false },
+    { "id": "pm-report-velocity",   "name": "Velocity",          "sub": "report-velocity",   "slug": "report-velocity",   "x": 120,  "y": 711, "w": 140, "h": 48, "color": "env",   "border": "solid", "locked": false },
+    { "id": "pm-report-status",     "name": "Status Report",     "sub": "report-status",     "slug": "report-status",     "x": 400,  "y": 711, "w": 140, "h": 48, "color": "env",   "border": "solid", "locked": false },
+
+    { "id": "pm-report-builder",    "name": "Report Builder",    "sub": "report-builder",    "slug": "report-builder",    "x": 120,  "y": 835, "w": 140, "h": 48, "color": "env",   "border": "solid", "locked": false },
+    { "id": "pm-report-saved",      "name": "Saved Reports",     "sub": "report-saved",      "slug": "report-saved",      "x": 400,  "y": 835, "w": 140, "h": 48, "color": "env",   "border": "solid", "locked": false },
+    { "id": "pm-report-export",     "name": "Export Data",       "sub": "report-export",     "slug": "report-export",     "x": 120,  "y": 931, "w": 140, "h": 48, "color": "env",   "border": "solid", "locked": false },
+    { "id": "pm-report-schedule",   "name": "Schedule Report",   "sub": "report-schedule",   "slug": "report-schedule",   "x": 400,  "y": 931, "w": 140, "h": 48, "color": "env",   "border": "solid", "locked": false },
+
+    { "id": "pm-set-general",       "name": "General",           "sub": "set-general",       "slug": "set-general",       "x": 690,  "y": 615, "w": 140, "h": 48, "color": "info",  "border": "solid", "locked": false },
+    { "id": "pm-set-workflow",      "name": "Workflow",          "sub": "set-workflow",      "slug": "set-workflow",      "x": 970,  "y": 615, "w": 140, "h": 48, "color": "info",  "border": "solid", "locked": false },
+    { "id": "pm-set-notifications", "name": "Notifications",     "sub": "set-notifications", "slug": "set-notifications", "x": 690,  "y": 711, "w": 140, "h": 48, "color": "info",  "border": "solid", "locked": false },
+    { "id": "pm-set-theme",         "name": "Theme",             "sub": "set-theme",         "slug": "set-theme",         "x": 970,  "y": 711, "w": 140, "h": 48, "color": "info",  "border": "solid", "locked": false },
+
+    { "id": "pm-int-list",          "name": "Integrations",      "sub": "int-list",          "slug": "int-list",          "x": 690,  "y": 835, "w": 140, "h": 48, "color": "info",  "border": "solid", "locked": false },
+    { "id": "pm-int-oauth",         "name": "OAuth Apps",        "sub": "int-oauth",         "slug": "int-oauth",         "x": 970,  "y": 835, "w": 140, "h": 48, "color": "info",  "border": "solid", "locked": false },
+    { "id": "pm-int-webhooks",      "name": "Webhooks",          "sub": "int-webhooks",      "slug": "int-webhooks",      "x": 690,  "y": 931, "w": 140, "h": 48, "color": "info",  "border": "solid", "locked": false },
+    { "id": "pm-int-apikeys",       "name": "API Keys",          "sub": "int-apikeys",       "slug": "int-apikeys",       "x": 970,  "y": 931, "w": 140, "h": 48, "color": "info",  "border": "solid", "locked": false }
+  ],
+  "areas": [
+    { "id": "area-projects",        "name": "PROJECTS",            "slug": "projects",            "x": 60,   "y": 60,  "w": 540, "h": 455, "color": "case",    "titlePos": "top-left", "locked": false },
+    { "id": "area-tasks",           "name": "TASKS",               "slug": "tasks",               "x": 630,  "y": 60,  "w": 540, "h": 455, "color": "flow",    "titlePos": "top-left", "locked": false },
+    { "id": "area-team",            "name": "TEAM",                "slug": "team",                "x": 1200, "y": 60,  "w": 540, "h": 455, "color": "suite",   "titlePos": "top-left", "locked": false },
+    { "id": "area-reports",         "name": "REPORTS",             "slug": "reports",             "x": 60,   "y": 545, "w": 540, "h": 455, "color": "env",     "titlePos": "top-left", "locked": false },
+    { "id": "area-settings",        "name": "SETTINGS",            "slug": "settings",            "x": 630,  "y": 545, "w": 540, "h": 455, "color": "info",    "titlePos": "top-left", "locked": false },
+
+    { "id": "area-project-mgmt",    "name": "Project Management",  "slug": "project-mgmt",        "x": 90,   "y": 95,  "w": 480, "h": 190, "color": "neutral", "titlePos": "top-left", "locked": false },
+    { "id": "area-project-tmpl",    "name": "Project Templates",   "slug": "project-templates",   "x": 90,   "y": 315, "w": 480, "h": 190, "color": "neutral", "titlePos": "top-left", "locked": false },
+    { "id": "area-task-tracking",   "name": "Task Tracking",       "slug": "task-tracking",       "x": 660,  "y": 95,  "w": 480, "h": 190, "color": "neutral", "titlePos": "top-left", "locked": false },
+    { "id": "area-task-activities", "name": "Task Activities",     "slug": "task-activities",     "x": 660,  "y": 315, "w": 480, "h": 190, "color": "neutral", "titlePos": "top-left", "locked": false },
+    { "id": "area-team-members",    "name": "Members",             "slug": "team-members",        "x": 1230, "y": 95,  "w": 480, "h": 190, "color": "neutral", "titlePos": "top-left", "locked": false },
+    { "id": "area-team-permissions","name": "Permissions",         "slug": "team-permissions",    "x": 1230, "y": 315, "w": 480, "h": 190, "color": "neutral", "titlePos": "top-left", "locked": false },
+    { "id": "area-reports-std",     "name": "Standard Reports",    "slug": "reports-standard",    "x": 90,   "y": 580, "w": 480, "h": 190, "color": "neutral", "titlePos": "top-left", "locked": false },
+    { "id": "area-reports-custom",  "name": "Custom & Export",     "slug": "reports-custom",      "x": 90,   "y": 800, "w": 480, "h": 190, "color": "neutral", "titlePos": "top-left", "locked": false },
+    { "id": "area-settings-sys",    "name": "System Config",       "slug": "settings-system",     "x": 660,  "y": 580, "w": 480, "h": 190, "color": "neutral", "titlePos": "top-left", "locked": false },
+    { "id": "area-settings-int",    "name": "Integrations",        "slug": "settings-integrations","x": 660, "y": 800, "w": 480, "h": 190, "color": "neutral", "titlePos": "top-left", "locked": false }
+  ],
+  "edges": [
+    { "sourceId": "pm-project-dashboard", "targetId": "pm-project-list",       "label": "Browse",   "lineColor": "gray",   "lineStyle": "solid", "lineWidth": "thin", "manualMid": null, "manualSp": { "side": "right",  "idx": 1 }, "manualTp": { "side": "left",   "idx": 1 } },
+    { "sourceId": "pm-project-list",      "targetId": "pm-project-detail",     "label": "Open",     "lineColor": "gray",   "lineStyle": "solid", "lineWidth": "thin", "manualMid": null, "manualSp": { "side": "bottom", "idx": 2 }, "manualTp": { "side": "top",    "idx": 2 } },
+    { "sourceId": "pm-project-detail",    "targetId": "pm-project-edit",       "label": "Edit",     "lineColor": "accent", "lineStyle": "solid", "lineWidth": "thin", "manualMid": null, "manualSp": { "side": "left",   "idx": 1 }, "manualTp": { "side": "right",  "idx": 1 } },
+
+    { "sourceId": "pm-template-list",     "targetId": "pm-template-create",    "label": "New",      "lineColor": "accent", "lineStyle": "solid", "lineWidth": "thin", "manualMid": null, "manualSp": { "side": "right",  "idx": 1 }, "manualTp": { "side": "left",   "idx": 1 } },
+    { "sourceId": "pm-template-list",     "targetId": "pm-template-detail",    "label": "Open",     "lineColor": "gray",   "lineStyle": "solid", "lineWidth": "thin", "manualMid": null, "manualSp": { "side": "bottom", "idx": 2 }, "manualTp": { "side": "top",    "idx": 2 } },
+    { "sourceId": "pm-template-detail",   "targetId": "pm-template-edit",      "label": "Edit",     "lineColor": "accent", "lineStyle": "solid", "lineWidth": "thin", "manualMid": null, "manualSp": { "side": "right",  "idx": 1 }, "manualTp": { "side": "left",   "idx": 1 } },
+
+    { "sourceId": "pm-task-board",        "targetId": "pm-task-list",          "label": null,       "lineColor": "gray",   "lineStyle": "solid", "lineWidth": "thin", "manualMid": null, "manualSp": { "side": "right",  "idx": 1 }, "manualTp": { "side": "left",   "idx": 1 } },
+    { "sourceId": "pm-task-list",         "targetId": "pm-task-detail",        "label": "Open",     "lineColor": "gray",   "lineStyle": "solid", "lineWidth": "thin", "manualMid": null, "manualSp": { "side": "bottom", "idx": 2 }, "manualTp": { "side": "top",    "idx": 2 } },
+    { "sourceId": "pm-task-detail",       "targetId": "pm-task-edit",          "label": "Edit",     "lineColor": "accent", "lineStyle": "solid", "lineWidth": "thin", "manualMid": null, "manualSp": { "side": "left",   "idx": 1 }, "manualTp": { "side": "right",  "idx": 1 } },
+
+    { "sourceId": "pm-task-comments",     "targetId": "pm-task-attachments",   "label": null,       "lineColor": "gray",   "lineStyle": "solid", "lineWidth": "thin", "manualMid": null, "manualSp": { "side": "right",  "idx": 1 }, "manualTp": { "side": "left",   "idx": 1 } },
+    { "sourceId": "pm-task-comments",     "targetId": "pm-task-history",       "label": null,       "lineColor": "gray",   "lineStyle": "solid", "lineWidth": "thin", "manualMid": null, "manualSp": { "side": "bottom", "idx": 2 }, "manualTp": { "side": "top",    "idx": 2 } },
+
+    { "sourceId": "pm-team-members-list", "targetId": "pm-team-invite",        "label": "Invite",   "lineColor": "accent", "lineStyle": "solid", "lineWidth": "thin", "manualMid": null, "manualSp": { "side": "right",  "idx": 1 }, "manualTp": { "side": "left",   "idx": 1 } },
+    { "sourceId": "pm-team-members-list", "targetId": "pm-team-profile",       "label": "View",     "lineColor": "gray",   "lineStyle": "solid", "lineWidth": "thin", "manualMid": null, "manualSp": { "side": "bottom", "idx": 2 }, "manualTp": { "side": "top",    "idx": 2 } },
+    { "sourceId": "pm-team-profile",      "targetId": "pm-team-activity",      "label": null,       "lineColor": "gray",   "lineStyle": "solid", "lineWidth": "thin", "manualMid": null, "manualSp": { "side": "right",  "idx": 1 }, "manualTp": { "side": "left",   "idx": 1 } },
+
+    { "sourceId": "pm-perm-roles",        "targetId": "pm-perm-assign",        "label": "Assign",   "lineColor": "accent", "lineStyle": "solid", "lineWidth": "thin", "manualMid": null, "manualSp": { "side": "right",  "idx": 1 }, "manualTp": { "side": "left",   "idx": 1 } },
+    { "sourceId": "pm-perm-roles",        "targetId": "pm-perm-role-detail",   "label": "Open",     "lineColor": "gray",   "lineStyle": "solid", "lineWidth": "thin", "manualMid": null, "manualSp": { "side": "bottom", "idx": 2 }, "manualTp": { "side": "top",    "idx": 2 } },
+    { "sourceId": "pm-perm-role-detail",  "targetId": "pm-perm-audit",         "label": null,       "lineColor": "gray",   "lineStyle": "solid", "lineWidth": "thin", "manualMid": null, "manualSp": { "side": "right",  "idx": 1 }, "manualTp": { "side": "left",   "idx": 1 } },
+
+    { "sourceId": "pm-report-overview",   "targetId": "pm-report-burndown",    "label": null,       "lineColor": "gray",   "lineStyle": "solid", "lineWidth": "thin", "manualMid": null, "manualSp": { "side": "right",  "idx": 1 }, "manualTp": { "side": "left",   "idx": 1 } },
+    { "sourceId": "pm-report-overview",   "targetId": "pm-report-velocity",    "label": null,       "lineColor": "gray",   "lineStyle": "solid", "lineWidth": "thin", "manualMid": null, "manualSp": { "side": "bottom", "idx": 1 }, "manualTp": { "side": "top",    "idx": 2 } },
+    { "sourceId": "pm-report-overview",   "targetId": "pm-report-status",      "label": null,       "lineColor": "gray",   "lineStyle": "solid", "lineWidth": "thin", "manualMid": null, "manualSp": { "side": "bottom", "idx": 3 }, "manualTp": { "side": "top",    "idx": 0 } },
+
+    { "sourceId": "pm-report-builder",    "targetId": "pm-report-saved",       "label": null,       "lineColor": "gray",   "lineStyle": "solid", "lineWidth": "thin", "manualMid": null, "manualSp": { "side": "right",  "idx": 1 }, "manualTp": { "side": "left",   "idx": 1 } },
+    { "sourceId": "pm-report-builder",    "targetId": "pm-report-export",      "label": "Export",   "lineColor": "accent", "lineStyle": "solid", "lineWidth": "thin", "manualMid": null, "manualSp": { "side": "bottom", "idx": 2 }, "manualTp": { "side": "top",    "idx": 2 } },
+
+    { "sourceId": "pm-set-general",       "targetId": "pm-set-workflow",       "label": null,       "lineColor": "gray",   "lineStyle": "solid", "lineWidth": "thin", "manualMid": null, "manualSp": { "side": "right",  "idx": 1 }, "manualTp": { "side": "left",   "idx": 1 } },
+    { "sourceId": "pm-set-general",       "targetId": "pm-set-notifications",  "label": null,       "lineColor": "gray",   "lineStyle": "solid", "lineWidth": "thin", "manualMid": null, "manualSp": { "side": "bottom", "idx": 2 }, "manualTp": { "side": "top",    "idx": 2 } },
+
+    { "sourceId": "pm-int-list",          "targetId": "pm-int-oauth",          "label": null,       "lineColor": "gray",   "lineStyle": "solid", "lineWidth": "thin", "manualMid": null, "manualSp": { "side": "right",  "idx": 1 }, "manualTp": { "side": "left",   "idx": 1 } },
+    { "sourceId": "pm-int-list",          "targetId": "pm-int-webhooks",       "label": null,       "lineColor": "gray",   "lineStyle": "solid", "lineWidth": "thin", "manualMid": null, "manualSp": { "side": "bottom", "idx": 2 }, "manualTp": { "side": "top",    "idx": 2 } },
+
+    { "sourceId": "pm-project-dashboard", "targetId": "pm-task-board",         "label": "Tasks",    "lineColor": "page",   "lineStyle": "solid", "lineWidth": "thin", "manualMid": { "axis": "y", "value": 75 },  "manualSp": { "side": "top",  "idx": 4 }, "manualTp": { "side": "top",  "idx": 0 } },
+    { "sourceId": "pm-task-board",        "targetId": "pm-team-members-list",  "label": "Team",     "lineColor": "page",   "lineStyle": "solid", "lineWidth": "thin", "manualMid": { "axis": "y", "value": 75 },  "manualSp": { "side": "top",  "idx": 4 }, "manualTp": { "side": "top",  "idx": 0 } },
+    { "sourceId": "pm-project-dashboard", "targetId": "pm-report-overview",    "label": "Reports",  "lineColor": "page",   "lineStyle": "solid", "lineWidth": "thin", "manualMid": { "axis": "x", "value": 75 },  "manualSp": { "side": "left", "idx": 1 }, "manualTp": { "side": "left", "idx": 1 } },
+    { "sourceId": "pm-task-board",        "targetId": "pm-set-general",        "label": "Settings", "lineColor": "page",   "lineStyle": "solid", "lineWidth": "thin", "manualMid": { "axis": "x", "value": 645 }, "manualSp": { "side": "left", "idx": 1 }, "manualTp": { "side": "left", "idx": 1 } },
+    { "sourceId": "pm-report-overview",   "targetId": "pm-set-general",        "label": null,       "lineColor": "gray",   "lineStyle": "solid", "lineWidth": "thin", "manualMid": { "axis": "y", "value": 562 }, "manualSp": { "side": "top",  "idx": 4 }, "manualTp": { "side": "top",  "idx": 0 } }
+  ],
+  "groups": []
+}

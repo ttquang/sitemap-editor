@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git *)"
+      "Bash(git *)",
+      "Bash(node -c \"D:\\\\project\\\\sitemap-editor\\\\sitemap-editor.js\")",
+      "Bash(node --check D:/project/sitemap-editor/sitemap-editor.js)",
+      "Bash(node *)"
     ]
   }
 }

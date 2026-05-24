@@ -101,7 +101,13 @@ Defined when parsing `path.gedge` elements at [sitemap-editor.js:245](sitemap-ed
   sourceId:    string,          // Node id where the edge starts
   targetId:    string,          // Node id where the edge ends
 
-  manualMid:   null,            // reserved; no manual mid-routing yet
+  manualMid:   null | { axis: 'x' | 'y', value: number },
+                                // optional pinned bend point of the
+                                // orthogonal L-route. When set, the
+                                // middle bend lies on the specified
+                                // x= or y= line. When null, the
+                                // router picks the bend. See
+                                // sitemap-editor.js:493-497 and 2065.
   manualSp:    { side, idx } | null, // pinned source anchor, see §2.3
   manualTp:    { side, idx } | null, // pinned target anchor, see §2.3
 
